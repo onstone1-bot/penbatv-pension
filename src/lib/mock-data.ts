@@ -1,0 +1,231 @@
+export type Stay = {
+  id: string;
+  name: string;
+  area: string;
+  address: string;
+  concept: string;
+  rating: number;
+  reviewCount: number;
+  heroUrl: string;
+  featuredVideoUrl?: string;
+  featuredVideoTitle?: string;
+};
+
+export type RoomImage = {
+  url: string;
+  caption: string;
+  isCover: boolean;
+};
+
+export type RoomRate = {
+  startDate: string;
+  endDate: string;
+  rateType: "base" | "seasonal" | "special";
+  nightlyPrice: number;
+  weekendExtra: number;
+  priority: number;
+};
+
+export type Room = {
+  id: string;
+  name: string;
+  type: "private_house" | "glamping" | "camp_site";
+  basePrice: number;
+  weekendExtra: number;
+  standardCapacity: number;
+  maxCapacity: number;
+  description: string;
+  tags: string[];
+  amenities: string[];
+  images: RoomImage[];
+  rates: RoomRate[];
+};
+
+export type BookingOption = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+};
+
+export type YoutubeVideo = {
+  code: string;
+  title: string;
+  tag: string;
+  description: string;
+  roomId: string;
+};
+
+export type DatePreset = {
+  id: string;
+  checkIn: string;
+  checkOut: string;
+  label: string;
+};
+
+export const mockStay: Stay = {
+  id: "baebang-alps",
+  name: "배방알프스",
+  area: "충남 아산 배방",
+  address: "충남 아산시 배방읍 고불로231번길 38",
+  concept: "수철저수지를 마주 보는 독채와 소나무 정원 속 글램핑",
+  rating: 4.8,
+  reviewCount: 126,
+  heroUrl:
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80"
+};
+
+export const mockRooms: Room[] = [
+  {
+    id: "A",
+    name: "독채펜션",
+    type: "private_house",
+    basePrice: 250000,
+    weekendExtra: 100000,
+    standardCapacity: 6,
+    maxCapacity: 10,
+    description:
+      "저수지 통창 목조 독채와 개별 바비큐장을 갖춘 단체형 공간입니다. 영상에서 본 거실, 주방, 야외 데크 동선 그대로 예약할 수 있습니다.",
+    tags: ["수철저수지 통창", "화목난로", "단체 모임", "개별 바비큐"],
+    amenities: ["화목난로", "노래방 음향", "주방", "개별 바비큐", "주차 4대"],
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80",
+        caption: "독채펜션 외부",
+        isCover: true
+      },
+      {
+        url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
+        caption: "통창 거실",
+        isCover: false
+      }
+    ],
+    rates: [
+      {
+        startDate: "2026-01-01",
+        endDate: "2026-12-31",
+        rateType: "base",
+        nightlyPrice: 250000,
+        weekendExtra: 100000,
+        priority: 0
+      },
+      {
+        startDate: "2026-07-15",
+        endDate: "2026-08-31",
+        rateType: "seasonal",
+        nightlyPrice: 300000,
+        weekendExtra: 120000,
+        priority: 10
+      }
+    ]
+  },
+  {
+    id: "B",
+    name: "돔 글램핑",
+    type: "glamping",
+    basePrice: 180000,
+    weekendExtra: 60000,
+    standardCapacity: 2,
+    maxCapacity: 4,
+    description:
+      "소나무 정원 속 개별 화로대가 있는 돔 글램핑입니다. 커플, 친구 여행, 짧은 불멍 숙박에 맞춘 공간입니다.",
+    tags: ["돔 글램핑", "개별 화로대", "불멍", "커플"],
+    amenities: ["개별 화로대", "냉난방", "무선 인터넷", "공용 샤워실", "주차 1대"],
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1504851149312-7a075b496cc7?auto=format&fit=crop&w=1200&q=80",
+        caption: "돔 글램핑 전경",
+        isCover: true
+      },
+      {
+        url: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&q=80",
+        caption: "야간 불멍",
+        isCover: false
+      }
+    ],
+    rates: [
+      {
+        startDate: "2026-01-01",
+        endDate: "2026-12-31",
+        rateType: "base",
+        nightlyPrice: 180000,
+        weekendExtra: 60000,
+        priority: 0
+      },
+      {
+        startDate: "2026-07-15",
+        endDate: "2026-08-31",
+        rateType: "seasonal",
+        nightlyPrice: 220000,
+        weekendExtra: 80000,
+        priority: 10
+      }
+    ]
+  }
+];
+
+export const mockOptions: BookingOption[] = [
+  {
+    id: "bbq",
+    name: "참숯 바비큐 세트",
+    description: "참숯, 그릴, 집게 포함",
+    price: 30000
+  },
+  {
+    id: "fire",
+    name: "불멍 장작 세트",
+    description: "장작 10kg, 착화제 포함",
+    price: 15000
+  },
+  {
+    id: "early",
+    name: "얼리 체크인",
+    description: "13시 입실",
+    price: 20000
+  }
+];
+
+export const mockVideos: YoutubeVideo[] = [
+  {
+    code: "campheaven_room_01",
+    title: "캠핑천국식 룸투어",
+    tag: "대표 영상",
+    description: "입구, 주차, 방 내부, 개별 바비큐 동선을 영상처럼 먼저 확인",
+    roomId: "A"
+  },
+  {
+    code: "campheaven_bbq_01",
+    title: "바비큐·불멍 실사용 리뷰",
+    tag: "인기 쇼츠",
+    description: "저녁 조리 동선과 화로대 간격을 보고 바로 예약으로 연결",
+    roomId: "B"
+  },
+  {
+    code: "campheaven_route_01",
+    title: "처음 방문 동선 안내",
+    tag: "처음 방문",
+    description: "체크인, 샤워실, 분리수거, 주변 산책 코스를 짧게 확인",
+    roomId: "A"
+  }
+];
+
+export const mockDatePresets: DatePreset[] = [
+  {
+    id: "d1",
+    checkIn: "2026-08-20",
+    checkOut: "2026-08-22",
+    label: "08.20 목 - 08.22 토 · 2박"
+  },
+  {
+    id: "d2",
+    checkIn: "2026-08-28",
+    checkOut: "2026-08-29",
+    label: "08.28 금 - 08.29 토 · 1박"
+  },
+  {
+    id: "d3",
+    checkIn: "2026-09-05",
+    checkOut: "2026-09-07",
+    label: "09.05 토 - 09.07 월 · 2박"
+  }
+];

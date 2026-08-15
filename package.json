@@ -1,0 +1,40 @@
+{
+  "name": "staylink-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "build:sites": "node scripts/build-sites-worker.mjs",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "verify:week1": "node scripts/verify-week1.mjs",
+    "verify:mobile": "node scripts/verify-mobile.mjs",
+    "verify:week3": "node scripts/verify-week3.mjs",
+    "verify:platform": "node scripts/verify-platform.mjs",
+    "verify:host-ux": "node scripts/verify-host-ux.mjs",
+    "verify:core-features": "node scripts/verify-core-features.mjs",
+    "verify:penba-home": "node scripts/verify-penba-home.mjs",
+    "verify:ddnayo-calendar": "node scripts/verify-ddnayo-calendar.mjs",
+    "verify:make24-benchmark": "node scripts/verify-make24-benchmark.mjs",
+    "verify:hdweb-design": "node scripts/verify-hdweb-design.mjs"
+  },
+  "dependencies": {
+    "@supabase/ssr": "0.12.3",
+    "@supabase/supabase-js": "2.110.8",
+    "next": "16.2.12",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "typescript": "^5.9.3"
+  }
+}
