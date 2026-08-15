@@ -37,6 +37,12 @@ export default async function BookingCalendarStatusPage({ searchParams }: PagePr
   const currentStart = dateFromCalendarISO(dates[0]?.date ?? "2026-08-20");
   const previousISO = toCalendarISODate(addCalendarDays(currentStart, -15));
   const nextISO = toCalendarISODate(addCalendarDays(currentStart, 15));
+  const selectedDate = dates[2]?.date ?? startDate;
+  const bookingHref = `/stays/${accommodationId}?utm_source=penbatv&utm_medium=calendar_direct_booking&utm_campaign=${accommodationId}&room=A&checkIn=${selectedDate}`;
+  const roomAmount = 250000;
+  const barbecueAmount = 30000;
+  const discountAmount = 10000;
+  const totalAmount = roomAmount + barbecueAmount - discountAmount;
 
   return (
     <main className="calendar-status-page">
@@ -79,6 +85,63 @@ export default async function BookingCalendarStatusPage({ searchParams }: PagePr
             {item.label}
           </span>
         ))}
+      </section>
+
+      <section className="calendar-booking-panel" aria-label="예약 및 결제 선택">
+        <div className="booking-panel-copy">
+          <span>빠른 예약결제</span>
+          <h2>달력에서 가능한 날짜를 고르고 바로 예약을 진행하세요.</h2>
+          <p>
+            고객이 이 화면에서 예약 가능 여부를 확인한 뒤 객실, 바베큐 시간, 결제수단까지 한 번에 이해할 수 있도록 구성했습니다.
+          </p>
+        </div>
+        <div className="booking-choice-grid">
+          <label>
+            <span>체크인</span>
+            <strong>{selectedDate}</strong>
+          </label>
+          <label>
+            <span>객실</span>
+            <strong>독채펜션 A</strong>
+          </label>
+          <label>
+            <span>바베큐장</span>
+            <strong>18:00 - 21:00</strong>
+          </label>
+          <label>
+            <span>인원</span>
+            <strong>성인 4명</strong>
+          </label>
+        </div>
+        <div className="payment-preview-card">
+          <div>
+            <span>객실 요금</span>
+            <b>{formatWon(roomAmount)}</b>
+          </div>
+          <div>
+            <span>바베큐 숯불세트</span>
+            <b>{formatWon(barbecueAmount)}</b>
+          </div>
+          <div>
+            <span>유튜브 유입 할인</span>
+            <b>-{formatWon(discountAmount)}</b>
+          </div>
+          <div className="total">
+            <span>총 결제 예정금액</span>
+            <strong>{formatWon(totalAmount)}</strong>
+          </div>
+          <div className="payment-methods" aria-label="결제수단">
+            <span>신용카드</span>
+            <span>간편결제</span>
+            <span>현금영수증</span>
+          </div>
+          <div className="booking-payment-actions">
+            <Link href={bookingHref}>예약/결제 진행</Link>
+            <Link href={`/stays/${accommodationId}?utm_source=penbatv&utm_medium=calendar_payment_preview&utm_campaign=${accommodationId}`}>
+              상세 예약 화면
+            </Link>
+          </div>
+        </div>
       </section>
 
       <section className="status-calendar-shell" aria-label="객실별 예약 현황 달력">

@@ -818,6 +818,126 @@ dd {
   color: #7b4fb3;
 }
 
+.calendar-booking-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+  gap: 16px;
+  margin-top: 16px;
+  border: 1px solid rgba(15, 90, 71, 0.16);
+  border-radius: 16px;
+  background: #fff;
+  padding: 18px;
+}
+
+.booking-panel-copy span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.booking-panel-copy h2 {
+  margin: 8px 0 10px;
+  font-size: 25px;
+  line-height: 1.22;
+}
+
+.booking-panel-copy p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.booking-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.booking-choice-grid label {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f8faf9;
+  padding: 12px;
+}
+
+.booking-choice-grid span,
+.payment-preview-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.booking-choice-grid strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 15px;
+}
+
+.payment-preview-card {
+  display: grid;
+  gap: 10px;
+}
+
+.payment-preview-card > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.payment-preview-card b {
+  font-size: 14px;
+}
+
+.payment-preview-card .total {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.payment-preview-card .total strong {
+  color: var(--green);
+  font-size: 24px;
+}
+
+.payment-methods {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start !important;
+  gap: 8px;
+}
+
+.payment-methods span {
+  border-radius: 999px;
+  background: #edf7f2;
+  color: var(--green);
+  padding: 7px 9px;
+}
+
+.booking-payment-actions {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.booking-payment-actions a {
+  border-radius: 10px;
+  padding: 13px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.booking-payment-actions a:first-child {
+  background: var(--green);
+  color: #fff;
+}
+
+.booking-payment-actions a:last-child {
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
 .status-calendar-shell {
   overflow-x: auto;
   margin-top: 16px;
@@ -2885,6 +3005,9 @@ button {
   .guide-hero,
   .calendar-status-hero,
   .calendar-status-toolbar,
+  .calendar-booking-panel,
+  .booking-choice-grid,
+  .booking-payment-actions,
   .market-metrics,
   .category-grid,
   .real-photo-grid,
@@ -2989,6 +3112,18 @@ button {
   .calendar-status-nav a,
   .calendar-status-nav strong {
     text-align: center;
+  }
+
+  .calendar-booking-panel {
+    padding: 14px;
+  }
+
+  .booking-panel-copy h2 {
+    font-size: 22px;
+  }
+
+  .payment-preview-card .total strong {
+    font-size: 21px;
   }
 
   .hero-action,
