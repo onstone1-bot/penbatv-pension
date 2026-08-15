@@ -21,6 +21,7 @@ export default function DesignBenchmarkPage() {
           <Link href="/host/properties">입점 등록</Link>
           <Link href="/host/make24-benchmark">입점 제안</Link>
           <Link href="/booking-calendar-status?accommodationId=87">예약 달력</Link>
+          <Link href="/host/reservation-payment">예약 결제 프로그램</Link>
           <Link href="/">고객 홈</Link>
         </div>
       </section>

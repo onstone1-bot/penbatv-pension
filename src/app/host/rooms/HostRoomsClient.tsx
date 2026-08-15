@@ -87,6 +87,7 @@ export function HostRoomsClient() {
           <Link href="/host/properties">펜션 입점 등록</Link>
           <Link href="/host/rate-calendar">요금·옵션 설정</Link>
           <Link href="/host/core-features">핵심 기능</Link>
+          <Link href="/host/reservation-payment">예약 결제 프로그램</Link>
           <Link href="/host/make24-benchmark">입점 제안</Link>
           <Link href="/host/design-benchmark">디자인 선택</Link>
           <Link href="/">입점 펜션 목록</Link>

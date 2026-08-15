@@ -139,6 +139,11 @@ const operatorShortcuts = [
     title: "예약 현황",
     body: "객실과 바베큐장 날짜별 예약 가능 여부를 확인하는 달력",
     href: "/booking-calendar-status?accommodationId=baebang-alps"
+  },
+  {
+    title: "예약 결제 프로그램",
+    body: "예약접수, 결제대기, 결제완료, 정산예정을 관리하는 운영 화면",
+    href: "/host/reservation-payment"
   }
 ];
 

@@ -54,6 +54,11 @@ const routes = {
     subtitle: "객실별 날짜 상태와 바베큐장 타임슬롯",
     body: "떠나요식 예약 달력 구조를 참고해 예약가능, 잔여소량, 예약완료, 마감, 예약대기 상태를 한눈에 보여줍니다."
   },
+  "/host/reservation-payment": {
+    title: "예약 결제 프로그램",
+    subtitle: "예약 선점부터 결제 승인과 정산까지",
+    body: "유튜브에서 들어온 고객이 날짜와 객실을 고른 뒤 예약 선점, 결제 준비, 결제 승인, 알림톡, 정산까지 이어지는 운영 프로그램입니다."
+  },
   "/host/core-features": {
     title: "핵심 기능 요구사항",
     subtitle: "예약 엔진·결제·관리자·알림톡",
@@ -122,9 +127,16 @@ function sectionOperations() {
   const items = [
     ["입점 제안", "유튜브 촬영, 예약결제, 운영 콘솔 패키지를 사장님에게 제안하는 화면입니다.", "/host/make24-benchmark"],
     ["디자인 선택", "영상형, 예약형, 바베큐형 상세페이지 템플릿을 고르는 화면입니다.", "/host/design-benchmark"],
-    ["예약 현황", "객실과 바베큐장 날짜별 예약 가능 여부를 바로 확인하는 달력입니다.", "/booking-calendar-status"]
+    ["예약 현황", "객실과 바베큐장 날짜별 예약 가능 여부를 바로 확인하는 달력입니다.", "/booking-calendar-status"],
+    ["예약 결제 프로그램", "예약요청, 결제대기, 결제완료, 정산예정을 한 화면에서 관리합니다.", "/host/reservation-payment"]
   ];
   return `<section class="section"><div class="section-head"><h2>입점 운영 기능</h2><span class="muted">제안 · 디자인 · 예약현황</span></div><div class="cards">${items.map(([title, body, href]) => `<article class="card"><span class="chip">PenBa TV</span><h3>${title}</h3><p>${body}</p><a class="btn" href="${href}">${title} 보기</a></article>`).join("")}</div></section>`;
+}
+
+function sectionReservationPaymentProgram() {
+  const metrics = [["오늘 예약접수", "12건", "유튜브 유입 8건"], ["결제대기", "4건", "총 1,080,000원"], ["결제완료", "7건", "카드 5 · 간편결제 2"], ["정산예정", "2,430,000원", "수수료 차감 전"]];
+  const rows = [["PB-20260822-001", "김민지", "독채펜션 A", "결제대기", "270,000원", "결제 링크 재발송"], ["PB-20260822-002", "박성훈", "글램핑 B", "결제완료", "210,000원", "예약 완료 알림톡"], ["PB-20260823-003", "이서연", "독채펜션 A", "운영자확인", "620,000원", "객실 가능 여부 확인"]];
+  return `<section class="section"><div class="section-head"><h2>예약 결제 프로그램</h2><span class="muted">예약접수 · 결제대기 · 결제완료 · 정산예정</span></div><div class="metrics">${metrics.map(([label, value, detail]) => `<div class="metric"><span class="muted">${label}</span><b>${value}</b><p>${detail}</p></div>`).join("")}</div><div class="cards">${rows.map(([no, guest, room, status, amount, action]) => `<article class="card"><span class="chip">${status}</span><h3>${guest}</h3><p>${room}<br>${no}</p><div class="price">${amount}</div><a class="btn" href="/host/rooms">${action}</a></article>`).join("")}</div><div class="packages"><article class="card"><span class="chip">01</span><h3>예약 가능 여부 확인</h3><p>객실 예약, 예약 홀드, 방막기, 바베큐 타임슬롯을 동시에 확인합니다.</p></article><article class="card"><span class="chip">02</span><h3>예약 15분 선점</h3><p>바로결제 고객은 결제 전 객실 재고를 잠금 처리합니다.</p></article><article class="card"><span class="chip">03</span><h3>결제 승인 및 정산</h3><p>카드, 간편결제, 현금영수증, 사장님 정산예정 금액을 관리합니다.</p></article></div></section>`;
 }
 
 function label(status) {
@@ -154,10 +166,10 @@ function sectionFeatures() {
 function render(pathname) {
   const route = routes[pathname] ?? routes["/"];
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
-    <section class="hero"><div><span class="eyebrow">PenBa TV</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/">고객 홈</a><a class="btn alt" href="/host/make24-benchmark">입점 제안</a><a class="btn alt" href="/host/design-benchmark">디자인 선택</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, time, image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${time}</small></a>`).join("")}</div></section>
-    ${sectionHome()}${sectionPhotos()}${sectionCalendar()}${sectionDirectBooking()}${sectionOperations()}${sectionPackages()}${sectionTemplates()}${sectionFeatures()}
+    <section class="hero"><div><span class="eyebrow">PenBa TV</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/">고객 홈</a><a class="btn alt" href="/host/make24-benchmark">입점 제안</a><a class="btn alt" href="/host/design-benchmark">디자인 선택</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a><a class="btn alt" href="/host/reservation-payment">예약 결제 프로그램</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, time, image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${time}</small></a>`).join("")}</div></section>
+    ${sectionHome()}${sectionPhotos()}${sectionCalendar()}${sectionDirectBooking()}${sectionOperations()}${sectionReservationPaymentProgram()}${sectionPackages()}${sectionTemplates()}${sectionFeatures()}
     <section class="band section"><h2>외부 공유용 펜바TV 데모</h2><p>이 페이지는 외부에서 바로 볼 수 있는 배포용 버전입니다. 실제 예약결제 연동 전까지는 펜바TV 콘셉트, 입점 제안, 디자인 선택, 예약 현황 흐름을 설명하는 공개 데모로 사용하면 됩니다.</p></section>
-  </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/booking-calendar-status">예약</a><a href="/host/make24-benchmark">입점</a><a href="/host/design-benchmark">디자인</a><a href="/host/core-features">기능</a></nav></body></html>`;
+  </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/booking-calendar-status">예약</a><a href="/host/reservation-payment">결제</a><a href="/host/design-benchmark">디자인</a><a href="/host/core-features">기능</a></nav></body></html>`;
 }
 
 const worker = `
@@ -187,6 +199,7 @@ ${sectionPhotos.toString()}
 ${sectionCalendar.toString()}
 ${sectionDirectBooking.toString()}
 ${sectionOperations.toString()}
+${sectionReservationPaymentProgram.toString()}
 ${sectionPackages.toString()}
 ${sectionTemplates.toString()}
 ${sectionFeatures.toString()}

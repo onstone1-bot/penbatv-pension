@@ -310,6 +310,9 @@ export default function HomePage() {
           <Link className="ghost-action" href="/host/core-features">
             예약결제 구조 보기
           </Link>
+          <Link className="ghost-action" href="/host/reservation-payment">
+            예약 결제 프로그램
+          </Link>
           <Link className="ghost-action" href="/host/make24-benchmark">
             입점 제안 보기
           </Link>

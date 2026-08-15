@@ -1289,6 +1289,202 @@ dd {
   background: #fff;
 }
 
+.reservation-payment-hero {
+  border-color: rgba(15, 90, 71, 0.16);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(237, 247, 242, 0.82)),
+    url("/penba/bbq-deck.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.reservation-payment-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.reservation-payment-metrics div,
+.payment-stage-card,
+.payment-method-card,
+.settlement-preview-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 16px;
+}
+
+.reservation-payment-metrics span,
+.reservation-payment-metrics small,
+.payment-stage-card span,
+.payment-method-card span,
+.settlement-preview-card > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.reservation-payment-metrics b {
+  display: block;
+  margin: 7px 0 4px;
+  color: var(--green);
+  font-size: 24px;
+}
+
+.payment-stage-grid,
+.payment-method-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.payment-stage-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.payment-method-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.payment-stage-card span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #edf7f2;
+  color: var(--green);
+}
+
+.payment-stage-card h3,
+.payment-method-card h3,
+.settlement-preview-card h2 {
+  margin: 12px 0 8px;
+}
+
+.payment-stage-card p,
+.payment-method-card p,
+.settlement-preview-card p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.payment-stage-card code {
+  display: inline-flex;
+  border-radius: 999px;
+  background: #f4f7f5;
+  padding: 7px 9px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.payment-board {
+  display: grid;
+  gap: 10px;
+}
+
+.payment-board-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px 150px;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 14px;
+}
+
+.payment-board-row h3,
+.payment-board-row p {
+  margin: 7px 0 4px;
+}
+
+.payment-board-row p,
+.payment-board-row small,
+.payment-board-row div:last-of-type span {
+  color: var(--muted);
+}
+
+.payment-board-row div:last-of-type b,
+.payment-board-row div:last-of-type span {
+  display: block;
+  text-align: right;
+}
+
+.payment-board-row a {
+  border-radius: 10px;
+  background: var(--green);
+  color: #fff;
+  padding: 11px 12px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.payment-status {
+  display: inline-flex;
+  border-radius: 999px;
+  background: #edf7f2;
+  color: var(--green);
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.payment-status.결제대기,
+.payment-status.운영자확인 {
+  background: #fff8e8;
+  color: #875a00;
+}
+
+.payment-program-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 14px;
+}
+
+.settlement-preview-card div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--line);
+  padding: 12px 0;
+}
+
+.settlement-preview-card div:last-of-type b {
+  color: var(--green);
+  font-size: 20px;
+}
+
+.settlement-preview-card .minus b {
+  color: #a33a1f;
+}
+
+.program-action-band {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  margin-top: 18px;
+  border: 1px solid rgba(15, 90, 71, 0.16);
+  border-radius: 14px;
+  background: #fff;
+  padding: 20px;
+}
+
+.program-action-band > div:first-child span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.program-action-band h2 {
+  margin: 7px 0 0;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
 .design-template-image {
   position: relative;
   display: block;
@@ -3061,6 +3257,11 @@ button {
   .partner-center-band,
   .benchmark-grid,
   .owner-package-grid,
+  .reservation-payment-metrics,
+  .payment-stage-grid,
+  .payment-method-grid,
+  .payment-program-split,
+  .program-action-band,
   .service-module-grid,
   .build-step-list,
   .design-feature-grid,
@@ -3167,6 +3368,15 @@ button {
 
   .payment-preview-card .total strong {
     font-size: 21px;
+  }
+
+  .payment-board-row {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-board-row div:last-of-type b,
+  .payment-board-row div:last-of-type span {
+    text-align: left;
   }
 
   .hero-action,

@@ -28,6 +28,7 @@ export default function CoreFeaturesPage() {
         <div className="host-nav">
           <Link href="/host/rate-calendar">요금·옵션 설정</Link>
           <Link href="/host/rooms">예약 운영 콘솔</Link>
+          <Link href="/host/reservation-payment">예약 결제 프로그램</Link>
           <Link href="/host/launch-plan">런칭 가이드</Link>
         </div>
       </section>
