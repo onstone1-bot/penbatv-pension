@@ -31,9 +31,10 @@ const css = `
 .flow-card strong{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--green);color:#fff}.flow-card h3{margin:12px 0 8px}.video-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.video-tabs span{border:1px solid var(--line);border-radius:999px;background:#fff;padding:9px 12px;font-weight:900}.video-tabs .on{background:var(--green);color:#fff}.category-card{overflow:hidden;padding:0}.category-card .image{min-height:190px;background-size:cover;background-position:center}.category-card .body{padding:16px}.room-choice-card{overflow:hidden;padding:0}.room-choice-card .media{display:grid;grid-template-columns:1.1fr .9fr;gap:0}.room-choice-card .main-photo,.room-choice-card .side-photo{min-height:210px}.room-choice-card .main-photo,.room-choice-card .side-photo span{background-size:cover;background-position:center}.room-choice-card .side-photo{display:grid;grid-template-rows:1fr 1fr}.room-choice-card .side-photo span{display:block}.room-choice-card .body{padding:16px}.room-choice-card .actions{margin-top:12px}.mini-video-list{display:grid;gap:8px;margin-top:12px}.mini-video-list a{display:grid;grid-template-columns:86px 1fr;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px;text-decoration:none}.mini-video-list span{min-height:58px;border-radius:8px;background-size:cover;background-position:center}
 .checkout-demo{display:grid;grid-template-columns:300px 1fr;gap:14px}.checkout-side,.checkout-main{border:1px solid var(--line);border-radius:14px;background:#fff;padding:18px}.checkout-steps{display:grid;gap:8px}.checkout-steps div{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px}.checkout-steps b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--green);color:#fff}.checkout-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.checkout-grid div{border:1px solid var(--line);border-radius:10px;background:#f8faf9;padding:12px}.checkout-grid span{display:block;color:var(--muted);font-size:12px;font-weight:900}.checkout-grid strong{display:block;margin-top:5px}.checkout-media{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}.checkout-media article{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#fff}.checkout-media .image{min-height:180px;background-size:cover;background-position:center}.checkout-media .body{padding:12px}.checkout-total{display:grid;gap:8px;border:1px solid rgba(15,90,71,.18);border-radius:12px;background:#f7fbf9;padding:14px}.checkout-total div,.checkout-total strong{display:flex;justify-content:space-between;gap:10px}.checkout-total strong{border-top:1px solid var(--line);padding-top:10px;color:var(--green);font-size:22px}
 .booking-form-demo{display:grid;gap:14px}.booking-form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.booking-field{border:1px solid var(--line);border-radius:12px;background:#fff;padding:13px}.booking-field span{display:block;color:var(--muted);font-size:12px;font-weight:900}.booking-field b{display:block;margin-top:6px;font-size:16px}.booking-room-pick{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.booking-room-pick article{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#fff}.booking-room-pick .image{min-height:170px;background-size:cover;background-position:center}.booking-room-pick .body{padding:13px}.booking-room-pick h3{margin:6px 0}.guest-option-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.guest-box,.option-box{border:1px solid var(--line);border-radius:12px;background:#fff;padding:14px}.guest-row,.option-row-demo{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0}.guest-row+ .guest-row,.option-row-demo+ .option-row-demo{border-top:1px solid var(--line)}.option-row-demo b{color:var(--green)}.booking-form-total{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(15,90,71,.18);border-radius:12px;background:#f7fbf9;padding:15px}.booking-form-total b{color:var(--green);font-size:26px}
+.booking-demo-top{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.booking-demo-calendar,.booking-demo-summary{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px}.date-button-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.demo-date,.demo-room,.demo-option,.demo-step{border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);font:inherit;font-weight:900;cursor:pointer}.demo-date{min-height:66px;padding:9px;text-align:left}.demo-date small,.demo-room small{display:block;margin-top:4px;color:var(--muted);font-size:12px}.demo-date.active,.demo-room.active,.demo-option.active{border-color:var(--green);background:#edf7f2;color:var(--green)}.demo-date[data-status="reserved"],.demo-date[data-status="blocked"]{background:#f6f6f6;color:#8a8a8a}.date-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.date-inputs label{display:grid;gap:5px;color:var(--muted);font-size:12px;font-weight:900}.date-inputs input{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}.demo-room-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}.demo-room{overflow:hidden;padding:0;text-align:left}.demo-room .image{min-height:126px;background-size:cover;background-position:center}.demo-room .room-body{display:grid;gap:4px;padding:12px}.demo-room .room-status{font-size:12px;color:var(--green)}.demo-room.unavailable .room-status{color:#a33a1f}.demo-room.unavailable{opacity:.72}.summary-lines{display:grid;gap:8px}.summary-lines div{display:flex;justify-content:space-between;gap:10px}.demo-guest-panel,.demo-option-panel{display:grid;gap:8px}.demo-guest-row{display:grid;grid-template-columns:1fr 34px 38px 34px;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px}.demo-step{width:34px;height:34px;border-radius:50%;padding:0}.option-button-grid{display:grid;gap:8px}.demo-option{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 12px;text-align:left}.booking-demo-message{border-radius:12px;background:#fff8e8;color:#875a00;padding:12px;font-weight:900}.booking-demo-message.ok{background:#edf7f2;color:var(--green)}.booking-demo-message.no{background:#fff0ec;color:#a33a1f}.booking-demo-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.booking-demo-actions .disabled{pointer-events:none;opacity:.45}
 .booking-panel{display:grid;grid-template-columns:minmax(0,.9fr)minmax(360px,1.1fr);gap:16px;border:1px solid rgba(15,90,71,.16);border-radius:16px;background:#fff;padding:18px}.booking-panel h2{margin:7px 0 10px;font-size:25px}.booking-panel p{margin:0;color:var(--muted);line-height:1.6}.booking-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.booking-grid label{border:1px solid var(--line);border-radius:10px;background:#f8faf9;padding:12px}.booking-grid span,.pay-card span{display:block;color:var(--muted);font-size:12px;font-weight:900}.booking-grid strong{display:block;margin-top:5px}.pay-card{display:grid;gap:10px}.pay-card>div{display:flex;align-items:center;justify-content:space-between;gap:12px}.pay-card .total{border-top:1px solid var(--line);padding-top:12px}.pay-card .total strong{color:var(--green);font-size:24px}.methods{display:flex!important;flex-wrap:wrap;justify-content:flex-start!important;gap:8px}.methods span{border-radius:999px;background:#edf7f2;color:var(--green);padding:7px 9px}.pay-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:8px}.pay-actions a{border-radius:10px;padding:13px;text-align:center;text-decoration:none;font-weight:900}.pay-actions a:first-child{background:var(--green);color:#fff}.pay-actions a:last-child{border:1px solid var(--line);color:var(--ink)}
 .calendar{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:14px}.calendar-grid{display:grid;grid-template-columns:190px repeat(7,110px);min-width:960px}.cal-head,.date,.room,.cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px;min-height:72px}.cal-head,.date{background:#f8faf9;font-weight:900}.cell{text-align:center;text-decoration:none}.available{background:#edf7f2;color:var(--green)}.few{background:#fff8e8;color:#875a00}.reserved{background:#fff0ec;color:#a33a1f}.blocked{background:#eef2f6;color:#405161}.wait{background:#f5efff;color:#67409b}.bottom{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(1080px,100%);display:grid;grid-template-columns:repeat(5,1fr);gap:6px;border-top:1px solid var(--line);background:rgba(255,255,255,.96);padding:8px 12px}.bottom a{border-radius:10px;padding:10px 6px;text-align:center;text-decoration:none;color:var(--muted);font-size:12px;font-weight:900}.bottom a.on{background:#edf7f2;color:var(--green)}
-@media(max-width:720px){.shell{padding-inline:14px}.hero,.metrics,.cards,.templates,.features,.packages,.photos,.flow-grid,.video-category-grid,.room-media-grid,.booking-panel,.booking-grid,.pay-actions,.checkout-demo,.checkout-grid,.checkout-media,.booking-form-grid,.booking-room-pick,.guest-option-grid{grid-template-columns:1fr}.hero h1{font-size:32px}.video-stack a{grid-template-columns:72px 1fr auto}.section-head{display:block}.bottom{grid-template-columns:repeat(5,1fr)}.room-choice-card .media{grid-template-columns:1fr}.room-choice-card .side-photo{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.room-choice-card .main-photo,.room-choice-card .side-photo{min-height:170px}}
+@media(max-width:720px){.shell{padding-inline:14px}.hero,.metrics,.cards,.templates,.features,.packages,.photos,.flow-grid,.video-category-grid,.room-media-grid,.booking-panel,.booking-grid,.pay-actions,.checkout-demo,.checkout-grid,.checkout-media,.booking-form-grid,.booking-room-pick,.guest-option-grid,.booking-demo-top,.date-button-grid,.date-inputs,.demo-room-grid,.booking-demo-actions{grid-template-columns:1fr}.hero h1{font-size:32px}.video-stack a{grid-template-columns:72px 1fr auto}.section-head{display:block}.bottom{grid-template-columns:repeat(5,1fr)}.room-choice-card .media{grid-template-columns:1fr}.room-choice-card .side-photo{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.room-choice-card .main-photo,.room-choice-card .side-photo{min-height:170px}}
 `;
 
 const routes = {
@@ -112,6 +113,210 @@ const bookingFormDemo = {
   glamping: images.glamping
 };
 
+const bookingDemoScript = `
+(() => {
+  const root = document.querySelector("[data-booking-demo]");
+  if (!root) return;
+
+  const rooms = {
+    A: {
+      name: "독채펜션 A",
+      base: 350000,
+      standard: 4,
+      capacity: 8,
+      status: {
+        "2026-08-20": "reserved",
+        "2026-08-21": "reserved",
+        "2026-08-22": "available",
+        "2026-08-23": "few",
+        "2026-08-24": "blocked",
+        "2026-08-25": "available",
+        "2026-08-26": "available"
+      }
+    },
+    B: {
+      name: "돔 글램핑 B",
+      base: 220000,
+      standard: 2,
+      capacity: 4,
+      status: {
+        "2026-08-20": "available",
+        "2026-08-21": "few",
+        "2026-08-22": "wait",
+        "2026-08-23": "available",
+        "2026-08-24": "available",
+        "2026-08-25": "available",
+        "2026-08-26": "reserved"
+      }
+    }
+  };
+
+  const optionPrices = {
+    bbq: 30000,
+    fire: 15000,
+    early: 20000
+  };
+
+  const optionLabels = {
+    bbq: "참숯 바비큐 세트",
+    fire: "불멍 장작 세트",
+    early: "얼리 체크인"
+  };
+
+  const statusLabels = {
+    available: "예약가능",
+    few: "잔여소량",
+    reserved: "예약완료",
+    blocked: "마감",
+    wait: "예약대기"
+  };
+
+  const state = {
+    checkIn: "2026-08-22",
+    checkOut: "2026-08-23",
+    room: "A",
+    adults: 4,
+    children: 0,
+    options: new Set(["bbq"])
+  };
+
+  const won = (value) => value.toLocaleString("ko-KR") + "원";
+  const dayMs = 24 * 60 * 60 * 1000;
+  const nights = () => Math.max(1, Math.round((new Date(state.checkOut) - new Date(state.checkIn)) / dayMs));
+  const nextDate = (date) => {
+    const value = new Date(date);
+    value.setDate(value.getDate() + 1);
+    return value.toISOString().slice(0, 10);
+  };
+  const roomStatus = (roomId) => rooms[roomId].status[state.checkIn] || "available";
+  const canBook = () => ["available", "few"].includes(roomStatus(state.room));
+  const selectedOptions = () => Array.from(state.options);
+
+  function totalAmount() {
+    const room = rooms[state.room];
+    const overGuests = Math.max(0, state.adults + state.children - room.standard);
+    const extraGuests = overGuests * 20000 * nights();
+    const options = selectedOptions().reduce((sum, key) => sum + optionPrices[key], 0);
+    const youtubeDiscount = 10000;
+    return room.base * nights() + extraGuests + options - youtubeDiscount;
+  }
+
+  function setText(selector, text) {
+    const el = root.querySelector(selector);
+    if (el) el.textContent = text;
+  }
+
+  function update() {
+    if (new Date(state.checkOut) <= new Date(state.checkIn)) {
+      state.checkOut = nextDate(state.checkIn);
+    }
+
+    root.querySelector("#demo-checkin").value = state.checkIn;
+    root.querySelector("#demo-checkout").value = state.checkOut;
+
+    root.querySelectorAll("[data-date]").forEach((button) => {
+      button.classList.toggle("active", button.dataset.date === state.checkIn);
+    });
+
+    root.querySelectorAll("[data-room]").forEach((button) => {
+      const roomId = button.dataset.room;
+      const status = roomStatus(roomId);
+      button.classList.toggle("active", roomId === state.room);
+      button.classList.toggle("unavailable", !["available", "few"].includes(status));
+      const statusEl = button.querySelector(".room-status");
+      if (statusEl) statusEl.textContent = statusLabels[status];
+    });
+
+    root.querySelectorAll("[data-option]").forEach((button) => {
+      button.classList.toggle("active", state.options.has(button.dataset.option));
+    });
+
+    const optionText = selectedOptions().map((key) => optionLabels[key]).join(", ") || "선택 없음";
+    const availability = roomStatus(state.room);
+    const message = root.querySelector("[data-message]");
+    if (message) {
+      message.className = "booking-demo-message " + (canBook() ? "ok" : "no");
+      message.textContent = canBook()
+        ? "선택한 일정은 예약 가능합니다. 결제 진행 버튼에 선택값이 반영됩니다."
+        : "선택한 객실은 이 날짜에 예약이 어렵습니다. 다른 날짜나 객실을 선택하세요.";
+    }
+
+    setText("[data-summary-date]", state.checkIn + " - " + state.checkOut + " · " + nights() + "박");
+    setText("[data-summary-room]", rooms[state.room].name + " · " + statusLabels[availability]);
+    setText("[data-summary-guests]", "성인 " + state.adults + "명 · 아동 " + state.children + "명");
+    setText("[data-summary-options]", optionText);
+    setText("[data-summary-total]", won(totalAmount()));
+    setText("[data-adults]", String(state.adults));
+    setText("[data-children]", String(state.children));
+
+    const checkout = root.querySelector("[data-checkout-link]");
+    if (checkout) {
+      const params = new URLSearchParams({
+        checkIn: state.checkIn,
+        checkOut: state.checkOut,
+        room: state.room,
+        adults: String(state.adults),
+        children: String(state.children),
+        options: selectedOptions().join(","),
+        amount: String(totalAmount()),
+        utm_source: "penbatv",
+        utm_medium: "interactive_booking_demo",
+        utm_campaign: "baebang-alps"
+      });
+      checkout.href = "/host/reservation-payment?" + params.toString();
+      checkout.classList.toggle("disabled", !canBook());
+      checkout.textContent = canBook() ? "이 조건으로 결제 진행" : "예약 불가 - 조건 변경";
+    }
+  }
+
+  root.querySelectorAll("[data-date]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.checkIn = button.dataset.date;
+      state.checkOut = nextDate(state.checkIn);
+      update();
+    });
+  });
+
+  root.querySelectorAll("[data-room]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.room = button.dataset.room;
+      update();
+    });
+  });
+
+  root.querySelectorAll("[data-guest]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const key = button.dataset.guest;
+      const delta = Number(button.dataset.delta);
+      if (key === "adults") state.adults = Math.max(1, state.adults + delta);
+      if (key === "children") state.children = Math.max(0, state.children + delta);
+      update();
+    });
+  });
+
+  root.querySelectorAll("[data-option]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const key = button.dataset.option;
+      if (state.options.has(key)) state.options.delete(key);
+      else state.options.add(key);
+      update();
+    });
+  });
+
+  root.querySelector("#demo-checkin").addEventListener("change", (event) => {
+    state.checkIn = event.target.value;
+    update();
+  });
+
+  root.querySelector("#demo-checkout").addEventListener("change", (event) => {
+    state.checkOut = event.target.value;
+    update();
+  });
+
+  update();
+})();
+`;
+
 const roomMedia = [
   {
     name: "독채펜션 A",
@@ -171,7 +376,16 @@ function sectionPriorityCheckout() {
 }
 
 function sectionCustomerBookingForm() {
-  return `<section class="section booking-form-demo"><div class="section-head"><h2>예약 정보 입력</h2><span class="muted">예약일정 · 객실 · 인원 · 부대선택</span></div><div class="booking-form-grid"><div class="booking-field"><span>예약일정 선택</span><b>08.22 토 - 08.23 일 · 1박</b></div><div class="booking-field"><span>객실 선택</span><b>독채펜션 A</b></div><div class="booking-field"><span>인원 선택</span><b>성인 4명 · 아동 0명</b></div><div class="booking-field"><span>바베큐 시간</span><b>18:00 - 21:00</b></div></div><div class="booking-room-pick"><article><div class="image" style="background-image:url('${bookingFormDemo.interior}')"></div><div class="body"><span class="chip">선택됨</span><h3>독채펜션 A</h3><p>내부 사진과 전체 영상을 확인하고 예약하는 가족·단체 객실입니다.</p></div></article><article><div class="image" style="background-image:url('${bookingFormDemo.glamping}')"></div><div class="body"><span class="chip">대안 객실</span><h3>돔 글램핑 B</h3><p>외부 바베큐와 글램핑 감성 영상이 연결되는 객실입니다.</p></div></article></div><div class="guest-option-grid"><div class="guest-box"><h3>인원</h3><div class="guest-row"><span>성인</span><b>4명</b></div><div class="guest-row"><span>아동</span><b>0명</b></div></div><div class="option-box"><h3>부대선택</h3><div class="option-row-demo"><span>참숯 바비큐 세트</span><b>30,000원</b></div><div class="option-row-demo"><span>불멍 장작 세트</span><b>15,000원</b></div><div class="option-row-demo"><span>얼리 체크인</span><b>20,000원</b></div></div></div><div class="booking-form-total"><span>총 결제 예정금액</span><b>370,000원</b></div><div class="actions"><a class="btn" href="/host/reservation-payment">이 조건으로 결제 진행</a><a class="btn alt" href="/booking-calendar-status">예약 가능 날짜 보기</a></div></section>`;
+  const dates = [
+    ["2026-08-20", "8/20 목", "예약완료", "reserved"],
+    ["2026-08-21", "8/21 금", "예약완료", "reserved"],
+    ["2026-08-22", "8/22 토", "예약가능", "available"],
+    ["2026-08-23", "8/23 일", "잔여소량", "few"],
+    ["2026-08-24", "8/24 월", "마감", "blocked"],
+    ["2026-08-25", "8/25 화", "예약가능", "available"],
+    ["2026-08-26", "8/26 수", "예약가능", "available"]
+  ];
+  return `<section class="section booking-form-demo" data-booking-demo><div class="section-head"><h2>예약 정보 입력 데모</h2><span class="muted">날짜 클릭 · 체크인/아웃 · 객실상태 · 인원/옵션 금액반영</span></div><div class="booking-demo-top"><div class="booking-demo-calendar"><h3>예약일정 선택</h3><div class="date-button-grid">${dates.map(([value, labelText, status, code]) => `<button class="demo-date${value === "2026-08-22" ? " active" : ""}" type="button" data-date="${value}" data-status="${code}"><b>${labelText}</b><small>${status}</small></button>`).join("")}</div><div class="date-inputs"><label>체크인<input id="demo-checkin" type="date" value="2026-08-22"></label><label>체크아웃<input id="demo-checkout" type="date" value="2026-08-23"></label></div></div><div class="booking-demo-summary"><h3>예약 선택값</h3><div class="summary-lines"><div><span>일정</span><b data-summary-date>2026-08-22 - 2026-08-23 · 1박</b></div><div><span>객실</span><b data-summary-room>독채펜션 A · 예약가능</b></div><div><span>인원</span><b data-summary-guests>성인 4명 · 아동 0명</b></div><div><span>부대옵션</span><b data-summary-options>참숯 바비큐 세트</b></div></div></div></div><div class="booking-start-block"><b>객실 선택</b><div class="demo-room-grid"><button class="demo-room active" type="button" data-room="A"><span class="image" style="background-image:url('${bookingFormDemo.interior}')"></span><span class="room-body"><strong>독채펜션 A</strong><small>기준 4인 · 최대 8인 · 350,000원~</small><small class="room-status">예약가능</small></span></button><button class="demo-room" type="button" data-room="B"><span class="image" style="background-image:url('${bookingFormDemo.glamping}')"></span><span class="room-body"><strong>돔 글램핑 B</strong><small>기준 2인 · 최대 4인 · 220,000원~</small><small class="room-status">예약대기</small></span></button></div></div><div class="guest-option-grid"><div class="guest-box demo-guest-panel"><h3>인원 선택</h3><div class="demo-guest-row"><span>성인</span><button class="demo-step" type="button" data-guest="adults" data-delta="-1">-</button><b data-adults>4</b><button class="demo-step" type="button" data-guest="adults" data-delta="1">+</button></div><div class="demo-guest-row"><span>아동</span><button class="demo-step" type="button" data-guest="children" data-delta="-1">-</button><b data-children>0</b><button class="demo-step" type="button" data-guest="children" data-delta="1">+</button></div></div><div class="option-box demo-option-panel"><h3>부대선택</h3><div class="option-button-grid"><button class="demo-option active" type="button" data-option="bbq"><span>참숯 바비큐 세트</span><b>30,000원</b></button><button class="demo-option" type="button" data-option="fire"><span>불멍 장작 세트</span><b>15,000원</b></button><button class="demo-option" type="button" data-option="early"><span>얼리 체크인</span><b>20,000원</b></button></div></div></div><div class="booking-demo-message ok" data-message>선택한 일정은 예약 가능합니다. 결제 진행 버튼에 선택값이 반영됩니다.</div><div class="booking-form-total"><span>총 결제 예정금액</span><b data-summary-total>370,000원</b></div><div class="booking-demo-actions"><a class="btn" data-checkout-link href="/host/reservation-payment?checkIn=2026-08-22&checkOut=2026-08-23&room=A&adults=4&children=0&options=bbq&amount=370000&utm_source=penbatv&utm_medium=interactive_booking_demo&utm_campaign=baebang-alps">이 조건으로 결제 진행</a><a class="btn alt" href="/booking-calendar-status">예약 가능 날짜 보기</a></div></section>`;
 }
 
 function sectionPhotos() {
@@ -237,7 +451,7 @@ function render(pathname) {
     <section class="hero"><div><span class="eyebrow">PenBa TV</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/">고객 홈</a><a class="btn alt" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=youtube_description&utm_campaign=baebang-alps">객실 선택</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a><a class="btn alt" href="/host/make24-benchmark">입점 제안</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
     ${sectionCustomerBookingForm()}${sectionPriorityCheckout()}${sectionCustomerYoutubeFlow()}${sectionVideoCategories()}${sectionRoomMediaSelection()}${sectionHome()}${sectionPhotos()}${sectionCalendar()}${sectionDirectBooking()}${sectionOperations()}${sectionPackages()}${sectionTemplates()}${sectionFeatures()}
     <section class="band section"><h2>외부 공유용 펜바TV 고객 데모</h2><p>이 페이지는 유튜브 설명란 링크를 누른 고객이 보게 될 흐름을 기준으로 구성했습니다. 영상으로 신뢰를 만들고, 객실 사진과 예약 현황을 본 뒤 예약·결제 선택으로 이어지는 구조입니다.</p></section>
-  </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/stays/baebang-alps?utm_source=penbatv&utm_medium=bottom_room&utm_campaign=baebang-alps">객실</a><a href="/booking-calendar-status">예약</a><a href="/host/make24-benchmark">입점</a><a href="/host/core-features">기능</a></nav></body></html>`;
+  </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/stays/baebang-alps?utm_source=penbatv&utm_medium=bottom_room&utm_campaign=baebang-alps">객실</a><a href="/booking-calendar-status">예약</a><a href="/host/make24-benchmark">입점</a><a href="/host/core-features">기능</a></nav><script>${bookingDemoScript}</script></body></html>`;
 }
 
 const worker = `
@@ -264,6 +478,7 @@ const photos = ${JSON.stringify(photos)};
 const videoCategories = ${JSON.stringify(videoCategories)};
 const checkoutDemo = ${JSON.stringify(checkoutDemo)};
 const bookingFormDemo = ${JSON.stringify(bookingFormDemo)};
+const bookingDemoScript = ${JSON.stringify(bookingDemoScript)};
 const roomMedia = ${JSON.stringify(roomMedia)};
 ${label.toString()}
 ${sectionHome.toString()}
