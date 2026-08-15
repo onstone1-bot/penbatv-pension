@@ -2100,6 +2100,48 @@ button {
   line-height: 1.45;
 }
 
+.operator-shortcuts {
+  border: 1px solid rgba(15, 90, 71, 0.14);
+  border-radius: 14px;
+  background: #fff;
+  padding: 14px;
+}
+
+.operator-shortcuts .section-head {
+  margin-bottom: 10px;
+}
+
+.operator-shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.operator-shortcut-grid a {
+  min-height: 108px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f8faf9;
+  padding: 12px;
+  text-decoration: none;
+}
+
+.operator-shortcut-grid b,
+.operator-shortcut-grid small {
+  display: block;
+}
+
+.operator-shortcut-grid b {
+  color: var(--green);
+  font-size: 15px;
+}
+
+.operator-shortcut-grid small {
+  margin-top: 8px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .section {
   margin-top: 24px;
 }
@@ -3011,6 +3053,7 @@ button {
   .market-metrics,
   .category-grid,
   .real-photo-grid,
+  .operator-shortcut-grid,
   .property-grid,
   .youtube-link-grid,
   .collection-grid,

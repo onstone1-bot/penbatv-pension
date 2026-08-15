@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { BookingDraft } from "@/lib/booking-draft";
 import type { BookingOption, DatePreset, Room, Stay, YoutubeVideo } from "@/lib/mock-data";
@@ -120,6 +121,24 @@ const customerJourney = [
     step: "03",
     title: "예약 방식 선택",
     body: "운영자 확정 후 결제하거나, 가능한 기간은 바로 결제로 진행합니다."
+  }
+];
+
+const operatorShortcuts = [
+  {
+    title: "입점 제안",
+    body: "펜션 사장님에게 보여줄 촬영, 예약결제, 운영 패키지 제안 화면",
+    href: "/host/make24-benchmark"
+  },
+  {
+    title: "디자인 선택",
+    body: "영상형, 예약형, 바베큐형 상세페이지 템플릿을 고르는 화면",
+    href: "/host/design-benchmark"
+  },
+  {
+    title: "예약 현황",
+    body: "객실과 바베큐장 날짜별 예약 가능 여부를 확인하는 달력",
+    href: "/booking-calendar-status?accommodationId=baebang-alps"
   }
 ];
 
@@ -592,6 +611,21 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                 <small>{item.body}</small>
               </div>
             ))}
+          </section>
+
+          <section className="operator-shortcuts" aria-label="펜바TV 운영 바로가기">
+            <div className="section-head">
+              <h2>입점 운영 기능</h2>
+              <span>제안 · 디자인 · 예약현황</span>
+            </div>
+            <div className="operator-shortcut-grid">
+              {operatorShortcuts.map((item) => (
+                <Link href={item.href} key={item.title}>
+                  <b>{item.title}</b>
+                  <small>{item.body}</small>
+                </Link>
+              ))}
+            </div>
           </section>
 
           <section className="section">
