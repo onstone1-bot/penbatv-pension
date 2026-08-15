@@ -612,6 +612,106 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
             <button onClick={() => goBooking(selectedRoomId, 1)}>검색</button>
           </section>
 
+          <section className="booking-start-panel" aria-label="예약 일정, 객실, 인원, 부대옵션 선택">
+            <div className="section-head">
+              <h2>예약 시작</h2>
+              <span>일정 · 객실 · 인원 · 부대옵션</span>
+            </div>
+
+            <div className="booking-start-block">
+              <b>예약일정 선택</b>
+              <div className="booking-start-dates">
+                {datePresets.map((date) => (
+                  <button
+                    className={selectedDateId === date.id ? "active" : ""}
+                    key={date.id}
+                    type="button"
+                    onClick={() => chooseDate(date.id)}
+                  >
+                    {date.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="booking-start-block">
+              <b>객실 선택</b>
+              <div className="booking-start-rooms">
+                {rooms.map((room) => (
+                  <button
+                    className={selectedRoomId === room.id ? "active" : ""}
+                    key={room.id}
+                    type="button"
+                    onClick={() => chooseRoomForBooking(room.id)}
+                  >
+                    <span style={{ backgroundImage: `url(${cover(room)})` }} />
+                    <strong>{room.name}</strong>
+                    <small>
+                      기준 {room.standardCapacity}인 · {formatWon(room.basePrice)}~
+                    </small>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="booking-start-block">
+              <b>인원 선택</b>
+              <div className="booking-start-guests">
+                <div>
+                  <span>성인</span>
+                  <button type="button" onClick={() => setAdultCount(Math.max(1, adultCount - 1))}>
+                    -
+                  </button>
+                  <strong>{adultCount}</strong>
+                  <button type="button" onClick={() => setAdultCount(adultCount + 1)}>
+                    +
+                  </button>
+                </div>
+                <div>
+                  <span>아동</span>
+                  <button type="button" onClick={() => setChildCount(Math.max(0, childCount - 1))}>
+                    -
+                  </button>
+                  <strong>{childCount}</strong>
+                  <button type="button" onClick={() => setChildCount(childCount + 1)}>
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="booking-start-block">
+              <b>부대옵션 선택</b>
+              <div className="booking-start-options">
+                {options.map((option) => (
+                  <button
+                    className={selectedOptions.includes(option.id) ? "active" : ""}
+                    key={option.id}
+                    type="button"
+                    onClick={() =>
+                      setSelectedOptions((current) =>
+                        current.includes(option.id)
+                          ? current.filter((id) => id !== option.id)
+                          : [...current, option.id]
+                      )
+                    }
+                  >
+                    <span>{option.name}</span>
+                    <strong>{formatWon(option.price)}</strong>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="booking-start-total">
+              <span>예상 결제금액</span>
+              <b>{formatWon(totalAmount)}</b>
+            </div>
+            <button className="primary-action" type="button" onClick={() => goBooking(selectedRoom.id, 4)}>
+              선택 완료, 결제 진행
+            </button>
+          </section>
+
           <section className="chip-row">
             {["전체", "독채", "글램핑", "바비큐", "불멍", "오늘가능"].map((chip, index) => (
               <span className={index === 0 ? "chip active" : "chip"} key={chip}>

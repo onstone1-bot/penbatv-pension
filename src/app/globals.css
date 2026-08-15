@@ -2759,6 +2759,165 @@ button {
   color: var(--green);
 }
 
+.booking-start-panel {
+  margin: 14px 0;
+  border: 1px solid rgba(15, 90, 71, 0.18);
+  border-radius: 14px;
+  background: #fff;
+  padding: 14px;
+  box-shadow: 0 12px 30px rgba(15, 90, 71, 0.08);
+}
+
+.booking-start-block {
+  display: grid;
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.booking-start-block > b {
+  font-size: 14px;
+}
+
+.booking-start-dates,
+.booking-start-rooms,
+.booking-start-options {
+  display: grid;
+  gap: 8px;
+}
+
+.booking-start-dates {
+  grid-template-columns: 1fr;
+}
+
+.booking-start-dates button,
+.booking-start-rooms button,
+.booking-start-options button {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  text-align: left;
+  font-weight: 900;
+}
+
+.booking-start-dates button {
+  padding: 11px 12px;
+}
+
+.booking-start-rooms {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.booking-start-rooms button {
+  overflow: hidden;
+  display: grid;
+  padding: 0;
+}
+
+.booking-start-rooms button > span {
+  min-height: 96px;
+  background-size: cover;
+  background-position: center;
+}
+
+.booking-start-rooms strong,
+.booking-start-rooms small {
+  display: block;
+  padding: 0 10px;
+}
+
+.booking-start-rooms strong {
+  padding-top: 10px;
+}
+
+.booking-start-rooms small {
+  padding-bottom: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.booking-start-dates .active,
+.booking-start-rooms .active,
+.booking-start-options .active {
+  border-color: var(--green);
+  background: #edf7f2;
+  color: var(--green);
+}
+
+.booking-start-guests {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.booking-start-guests div {
+  display: grid;
+  grid-template-columns: 1fr 34px 32px 34px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 9px;
+}
+
+.booking-start-guests span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.booking-start-guests button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.booking-start-guests strong {
+  text-align: center;
+}
+
+.booking-start-options {
+  grid-template-columns: 1fr;
+}
+
+.booking-start-options button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 12px;
+}
+
+.booking-start-options span {
+  min-width: 0;
+}
+
+.booking-start-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 14px 0 10px;
+  border-top: 1px solid var(--line);
+  padding-top: 13px;
+}
+
+.booking-start-total span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.booking-start-total b {
+  color: var(--green);
+  font-size: 22px;
+}
+
 .section {
   margin-top: 24px;
 }
