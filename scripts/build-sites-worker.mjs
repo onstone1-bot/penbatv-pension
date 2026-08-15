@@ -166,6 +166,7 @@ const css = ${JSON.stringify(css)};
 const routes = ${JSON.stringify(routes)};
 const videos = ${JSON.stringify(videos)};
 const templates = ${JSON.stringify(templates)};
+const photos = ${JSON.stringify(photos)};
 ${label.toString()}
 ${sectionHome.toString()}
 ${sectionPhotos.toString()}
