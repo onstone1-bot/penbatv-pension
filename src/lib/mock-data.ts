@@ -54,6 +54,7 @@ export type YoutubeVideo = {
   thumbnailUrl?: string;
   title: string;
   tag: string;
+  category: "all" | "exterior" | "interior";
   description: string;
   roomId: string;
 };
@@ -195,7 +196,18 @@ export const mockVideos: YoutubeVideo[] = [
     thumbnailUrl: "https://img.youtube.com/vi/CGOBDAEbBqc/hqdefault.jpg",
     title: "배방알프스 전체 공간 소개",
     tag: "대표 영상",
+    category: "all",
     description: "입구, 주차, 방 내부, 개별 바비큐 동선을 영상처럼 먼저 확인",
+    roomId: "A"
+  },
+  {
+    code: "campheaven_reservoir_01",
+    url: "https://youtube.com/shorts/SLUDFGDzoZ4?si=U0vwkdsFVzgJCF34",
+    thumbnailUrl: "https://img.youtube.com/vi/SLUDFGDzoZ4/hqdefault.jpg",
+    title: "저수지 전망과 외부 동선 쇼츠",
+    tag: "외부",
+    category: "exterior",
+    description: "저수지 전망, 진입로, 마당 분위기를 짧은 영상으로 확인",
     roomId: "A"
   },
   {
@@ -204,7 +216,38 @@ export const mockVideos: YoutubeVideo[] = [
     thumbnailUrl: "https://img.youtube.com/vi/lVz-IlPW6VQ/hqdefault.jpg",
     title: "바베큐 마당 동선 쇼츠",
     tag: "인기 쇼츠",
+    category: "exterior",
     description: "저녁 조리 동선과 화로대 간격을 보고 바로 예약으로 연결",
+    roomId: "B"
+  },
+  {
+    code: "campheaven_glamping_01",
+    url: "https://youtube.com/shorts/BMnTeq-tTO4?si=ykqRHyCeiKGHtFUt",
+    thumbnailUrl: "https://img.youtube.com/vi/BMnTeq-tTO4/hqdefault.jpg",
+    title: "글램핑 감성 공간 쇼츠",
+    tag: "외부",
+    category: "exterior",
+    description: "돔 글램핑과 야외 데크, 소나무 정원 분위기를 먼저 확인",
+    roomId: "B"
+  },
+  {
+    code: "campheaven_room_inside_01",
+    url: "https://youtube.com/shorts/PkQPdz4WHps?si=9_eRkV4G0koGCuUF",
+    thumbnailUrl: "https://img.youtube.com/vi/PkQPdz4WHps/hqdefault.jpg",
+    title: "객실 내부 미리보기 쇼츠",
+    tag: "내부",
+    category: "interior",
+    description: "거실, 통창, 목조 인테리어, 가족방 구조를 객실 선택 전에 확인",
+    roomId: "A"
+  },
+  {
+    code: "campheaven_bbq_night_01",
+    url: "https://youtube.com/shorts/FMibcJCCSx8?si=FWKicOupJBEzLghE",
+    thumbnailUrl: "https://img.youtube.com/vi/FMibcJCCSx8/hqdefault.jpg",
+    title: "야외 바베큐 감성 쇼츠",
+    tag: "외부",
+    category: "exterior",
+    description: "바비큐장 테이블, 화로대, 저녁 분위기를 예약 전에 확인",
     roomId: "B"
   },
   {
@@ -213,8 +256,29 @@ export const mockVideos: YoutubeVideo[] = [
     thumbnailUrl: "https://img.youtube.com/vi/KDs0V0NGYTA/hqdefault.jpg",
     title: "간판과 진입로 쇼츠",
     tag: "처음 방문",
+    category: "exterior",
     description: "체크인, 샤워실, 분리수거, 주변 산책 코스를 짧게 확인",
     roomId: "A"
+  },
+  {
+    code: "campheaven_tour_01",
+    url: "https://youtu.be/prvj3pzAokA?si=4xrKXIZZD1Ppu_Xf",
+    thumbnailUrl: "https://img.youtube.com/vi/prvj3pzAokA/hqdefault.jpg",
+    title: "배방알프스 공간 투어",
+    tag: "전체",
+    category: "all",
+    description: "전체 시설을 둘러본 뒤 고객 홈에서 원하는 객실로 이동",
+    roomId: "A"
+  },
+  {
+    code: "campheaven_guide_01",
+    url: "https://youtu.be/auNckmC4O1s?si=QRqRTmdQ8xgOeYFT",
+    thumbnailUrl: "https://img.youtube.com/vi/auNckmC4O1s/hqdefault.jpg",
+    title: "바베큐장 이용 안내 영상",
+    tag: "내부",
+    category: "interior",
+    description: "객실 이용 안내와 바비큐장 예약 전 확인해야 할 이용 기준",
+    roomId: "B"
   }
 ];
 

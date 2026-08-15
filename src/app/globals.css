@@ -2338,6 +2338,77 @@ button {
   line-height: 1.45;
 }
 
+.youtube-entry-panel {
+  margin-top: 14px;
+  border: 1px solid rgba(197, 31, 31, 0.16);
+  border-radius: 14px;
+  background: #fff7f4;
+  padding: 14px;
+}
+
+.youtube-entry-panel p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.youtube-entry-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.youtube-entry-actions button,
+.video-category-tabs button {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.youtube-entry-actions button {
+  min-height: 42px;
+}
+
+.youtube-entry-actions button:last-child {
+  border-color: transparent;
+  background: #c51f1f;
+  color: #fff;
+}
+
+.video-category-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.video-category-tabs button {
+  display: grid;
+  gap: 3px;
+  min-height: 58px;
+  padding: 9px 8px;
+  text-align: left;
+}
+
+.video-category-tabs b,
+.video-category-tabs small {
+  display: block;
+}
+
+.video-category-tabs small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.video-category-tabs .active {
+  border-color: var(--green);
+  background: #edf7f2;
+  color: var(--green);
+}
+
 .section {
   margin-top: 24px;
 }
@@ -2470,6 +2541,21 @@ button {
   padding: 14px;
 }
 
+.room-photo-strip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.room-photo-strip button {
+  min-height: 72px;
+  border: 0;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+}
+
 .room-card h3,
 .flow-card h2 {
   margin: 4px 0 6px;
@@ -2519,6 +2605,45 @@ button {
 .detail-image {
   height: 260px;
   border-radius: 14px;
+}
+
+.room-media-section {
+  margin-top: 16px;
+}
+
+.room-media-grid,
+.room-video-list {
+  display: grid;
+  gap: 10px;
+}
+
+.room-media-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.room-media-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.room-media-card div {
+  min-height: 108px;
+  background-size: cover;
+  background-position: center;
+}
+
+.room-media-card span {
+  display: block;
+  padding: 9px 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.room-video-list {
+  margin-top: 10px;
 }
 
 .video-check {
@@ -3246,6 +3371,10 @@ button {
   .calendar-booking-panel,
   .booking-choice-grid,
   .booking-payment-actions,
+  .youtube-entry-actions,
+  .video-category-tabs,
+  .room-photo-strip,
+  .room-media-grid,
   .market-metrics,
   .category-grid,
   .real-photo-grid,

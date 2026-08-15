@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { BookingDraft } from "@/lib/booking-draft";
 import type { BookingOption, DatePreset, Room, Stay, YoutubeVideo } from "@/lib/mock-data";
@@ -11,6 +10,7 @@ type Screen = "home" | "detail" | "booking" | "mine";
 type BookingStep = 1 | 2 | 3 | 4 | 5;
 type RangeAvailability = "idle" | "checking" | "available" | "unavailable" | "unknown";
 type BookingMode = "request" | "instant";
+type VideoCategory = YoutubeVideo["category"];
 
 type LocalBooking = {
   bookingNo: string;
@@ -109,41 +109,40 @@ type Props = {
 const customerJourney = [
   {
     step: "01",
-    title: "영상 확인",
-    body: "캠핑천국 리뷰에서 본 공간을 그대로 방·사이트 상세로 연결합니다."
+    title: "유튜브에서 실제 영상 확인",
+    body: "전체 투어, 외부 동선, 내부 객실 영상을 먼저 보고 설명란의 펜바TV 링크로 들어옵니다."
   },
   {
     step: "02",
-    title: "날짜 확인",
-    body: "달력에서 체크인과 체크아웃을 고르고 예약 가능 여부를 먼저 봅니다."
+    title: "펜바TV 고객 홈 도착",
+    body: "영상에서 본 숙소의 고객 홈으로 바로 이동해 방 사진과 예약 가능 여부를 확인합니다."
   },
   {
     step: "03",
-    title: "예약 방식 선택",
-    body: "운영자 확정 후 결제하거나, 가능한 기간은 바로 결제로 진행합니다."
+    title: "객실 선택 후 예약·결제",
+    body: "객실을 고르면 관련 영상과 방 사진을 함께 보고 날짜, 옵션, 결제 방식을 선택합니다."
   }
 ];
 
-const operatorShortcuts = [
+const videoCategoryTabs: Array<{
+  id: VideoCategory;
+  label: string;
+  helper: string;
+}> = [
   {
-    title: "입점 제안",
-    body: "펜션 사장님에게 보여줄 촬영, 예약결제, 운영 패키지 제안 화면",
-    href: "/host/make24-benchmark"
+    id: "all",
+    label: "전체",
+    helper: "숙소 전체 분위기"
   },
   {
-    title: "디자인 선택",
-    body: "영상형, 예약형, 바베큐형 상세페이지 템플릿을 고르는 화면",
-    href: "/host/design-benchmark"
+    id: "exterior",
+    label: "외부",
+    helper: "마당·바베큐·진입로"
   },
   {
-    title: "예약 현황",
-    body: "객실과 바베큐장 날짜별 예약 가능 여부를 확인하는 달력",
-    href: "/booking-calendar-status?accommodationId=baebang-alps"
-  },
-  {
-    title: "예약 결제 프로그램",
-    body: "예약접수, 결제대기, 결제완료, 정산예정을 관리하는 운영 화면",
-    href: "/host/reservation-payment"
+    id: "interior",
+    label: "내부",
+    helper: "객실·이용 안내"
   }
 ];
 
@@ -301,6 +300,7 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
   const [isSubmittingBooking, setIsSubmittingBooking] = useState(false);
   const [activeHold, setActiveHold] = useState<ActiveHold | null>(null);
   const [holdSecondsLeft, setHoldSecondsLeft] = useState<number | null>(null);
+  const [selectedVideoCategory, setSelectedVideoCategory] = useState<VideoCategory>("all");
 
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId) ?? rooms[0] ?? emptyRoom;
   const selectedDate = {
@@ -324,6 +324,17 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
   const coupon = youtubeCoupon(initialDraft.utmCode);
   const totalAmount = Math.max(0, roomQuote.roomAmount + optionAmount - coupon);
   const featuredEmbedUrl = youtubeEmbedUrl(stay.featuredVideoUrl);
+  const filteredVideos = useMemo(
+    () =>
+      selectedVideoCategory === "all"
+        ? videos
+        : videos.filter((video) => video.category === selectedVideoCategory),
+    [selectedVideoCategory, videos]
+  );
+  const selectedRoomVideos = useMemo(
+    () => videos.filter((video) => video.roomId === selectedRoom.id),
+    [selectedRoom.id, videos]
+  );
 
   useEffect(() => {
     if (!activeHold) {
@@ -388,6 +399,7 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
 
   function chooseVideo(video: YoutubeVideo) {
     setSelectedRoomId(video.roomId);
+    setSelectedVideoCategory(video.category);
     setScreen("detail");
   }
 
@@ -618,18 +630,22 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
             ))}
           </section>
 
-          <section className="operator-shortcuts" aria-label="펜바TV 운영 바로가기">
+          <section className="youtube-entry-panel" aria-label="유튜브 설명란 고객 유입 흐름">
             <div className="section-head">
-              <h2>입점 운영 기능</h2>
-              <span>제안 · 디자인 · 예약현황</span>
+              <h2>유튜브 설명란 링크로 들어온 고객 화면</h2>
+              <span>영상 확인 후 예약 연결</span>
             </div>
-            <div className="operator-shortcut-grid">
-              {operatorShortcuts.map((item) => (
-                <Link href={item.href} key={item.title}>
-                  <b>{item.title}</b>
-                  <small>{item.body}</small>
-                </Link>
-              ))}
+            <p>
+              유튜브 영상 설명란에는 이 숙소의 펜바TV 링크가 들어가고, 고객은 여기서 객실 사진과
+              관련 영상을 다시 확인한 뒤 예약·결제를 선택합니다.
+            </p>
+            <div className="youtube-entry-actions">
+              <button type="button" onClick={() => setScreen("detail")}>
+                객실 먼저 보기
+              </button>
+              <button type="button" onClick={() => goBooking(selectedRoom.id, 1)}>
+                예약·결제 선택
+              </button>
             </div>
           </section>
 
@@ -653,8 +669,21 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                 </div>
               )}
             </div>
+            <div className="video-category-tabs" aria-label="영상 분류">
+              {videoCategoryTabs.map((tab) => (
+                <button
+                  className={selectedVideoCategory === tab.id ? "active" : ""}
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setSelectedVideoCategory(tab.id)}
+                >
+                  <b>{tab.label}</b>
+                  <small>{tab.helper}</small>
+                </button>
+              ))}
+            </div>
             <div className="video-list">
-              {videos.map((video) => {
+              {filteredVideos.map((video) => {
                 const linkedRoom = rooms.find((room) => room.id === video.roomId) ?? rooms[0];
                 return (
                   <article className="video-card" key={video.code}>
@@ -684,8 +713,8 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
 
           <section className="section">
             <div className="section-head">
-              <h2>방·사이트</h2>
-              <span>{rooms.length}개 공간</span>
+              <h2>객실 선택</h2>
+              <span>사진과 영상 확인 후 예약</span>
             </div>
             <div className="room-list">
               {rooms.map((room) => (
@@ -709,9 +738,23 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                         <span key={tag}>#{tag}</span>
                       ))}
                     </div>
+                    <div className="room-photo-strip" aria-label={`${room.name} 사진 미리보기`}>
+                      {room.images.map((image) => (
+                        <button
+                          key={image.url}
+                          type="button"
+                          style={{ backgroundImage: `url(${image.url})` }}
+                          onClick={() => {
+                            setSelectedRoomId(room.id);
+                            setScreen("detail");
+                          }}
+                          aria-label={`${image.caption} 보기`}
+                        />
+                      ))}
+                    </div>
                     <div className="card-actions">
                       <b>{formatWon(room.basePrice)}~</b>
-                      <button onClick={() => goBooking(room.id, 1)}>예약</button>
+                      <button onClick={() => goBooking(room.id, 1)}>예약·결제</button>
                     </div>
                   </div>
                 </article>
@@ -732,6 +775,44 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
             <span>{formatWon(selectedRoom.basePrice)}~</span>
           </div>
           <p className="description">{selectedRoom.description}</p>
+          <div className="room-media-section">
+            <div className="section-head">
+              <h2>영상과 방 사진</h2>
+              <span>객실 선택 시 함께 노출</span>
+            </div>
+            <div className="room-media-grid">
+              {selectedRoom.images.map((image) => (
+                <article className="room-media-card" key={image.url}>
+                  <div style={{ backgroundImage: `url(${image.url})` }} />
+                  <span>{image.caption}</span>
+                </article>
+              ))}
+            </div>
+            <div className="room-video-list">
+              {selectedRoomVideos.map((video) => (
+                <article className="video-card" key={video.code}>
+                  <button
+                    className="video-thumb"
+                    style={{ backgroundImage: `url(${video.thumbnailUrl ?? cover(selectedRoom)})` }}
+                    onClick={() => setSelectedVideoCategory(video.category)}
+                    aria-label={`${video.title} 분류 보기`}
+                  >
+                    <i>PLAY</i>
+                  </button>
+                  <span className="video-copy">
+                    <em>{video.tag}</em>
+                    <b>{video.title}</b>
+                    <small>{video.description}</small>
+                    {video.url ? (
+                      <a className="video-open-link" href={video.url} target="_blank" rel="noreferrer">
+                        유튜브 영상 열기
+                      </a>
+                    ) : null}
+                  </span>
+                </article>
+              ))}
+            </div>
+          </div>
           <div className="video-check">
             <b>영상 체크포인트</b>
             <p>입구·주차 → 방/사이트 간격 → 바비큐 → 샤워실 → 밤 불멍 순서로 확인하고 같은 공간을 예약합니다.</p>
@@ -1013,11 +1094,11 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
         <button className={screen === "home" ? "on" : ""} onClick={() => setScreen("home")}>
           홈
         </button>
-        <button onClick={() => goBooking(selectedRoomId, 1)}>검색</button>
+        <button onClick={() => setScreen("detail")}>객실</button>
+        <button onClick={() => goBooking(selectedRoomId, 1)}>예약</button>
         <button className={screen === "mine" ? "on" : ""} onClick={() => setScreen("mine")}>
           내예약
         </button>
-        <button>캠우</button>
         <button>MY</button>
       </nav>
     </main>

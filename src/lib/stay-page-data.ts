@@ -131,6 +131,7 @@ function mapVideo(row: YoutubeCampaignRow, fallback?: YoutubeVideo, firstRoomId?
     code: row.code,
     title: row.title,
     tag: fallback?.tag ?? "YouTube",
+    category: fallback?.category ?? "all",
     description: fallback?.description ?? "Video linked booking campaign",
     roomId: row.room_id ?? fallback?.roomId ?? firstRoomId ?? ""
   };
