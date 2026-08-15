@@ -59,9 +59,42 @@ const magazineItems = [
   }
 ];
 
+const realPhotoStories = [
+  {
+    title: "저수지 뷰가 보이는 독채 내부",
+    label: "객실",
+    image: "/penba/interior-3.jpg"
+  },
+  {
+    title: "비와 햇빛을 막아주는 바베큐 데크",
+    label: "BBQ",
+    image: "/penba/bbq-deck.jpg"
+  },
+  {
+    title: "글램핑 감성이 섞인 야외 공간",
+    label: "마당",
+    image: "/penba/glamping-yard.jpg"
+  },
+  {
+    title: "펜션 앞 저수지와 산 풍경",
+    label: "풍경",
+    image: "/penba/reservoir.jpg"
+  },
+  {
+    title: "꽃길 따라 올라가는 펜션 진입로",
+    label: "진입",
+    image: "/penba/entrance-road.jpg"
+  },
+  {
+    title: "위에서 내려다보는 정원과 데크",
+    label: "정원",
+    image: "/penba/overlook.jpg"
+  }
+];
+
 export default function HomePage() {
   const heroProperty = mockPartnerProperties[0];
-  const featuredVideos = penbaVideoFeed.slice(0, 6);
+  const featuredVideos = penbaVideoFeed.filter((video) => video.propertyId === "baebang-alps").slice(0, 9);
 
   return (
     <main className="penba-home">
@@ -80,7 +113,7 @@ export default function HomePage() {
         <div className="hero-video-stack">
           {featuredVideos.slice(0, 3).map((video) => (
             <a href={video.url} target="_blank" rel="noreferrer" key={`${video.propertyId}-${video.title}`}>
-              <span style={{ backgroundImage: `url(${video.heroUrl})` }} />
+              <span style={{ backgroundImage: `url(${video.thumbnailUrl ?? video.heroUrl})` }} />
               <b>{video.tag}</b>
               <small>{video.duration}</small>
             </a>
@@ -95,6 +128,22 @@ export default function HomePage() {
             <b>{metric.value}</b>
           </div>
         ))}
+      </section>
+
+      <section className="market-section">
+        <div className="section-head">
+          <h2>배방알프스 실제 사진</h2>
+          <span>객실·바베큐장·저수지·진입로</span>
+        </div>
+        <div className="real-photo-grid">
+          {realPhotoStories.map((photo) => (
+            <article className="real-photo-card" key={photo.title}>
+              <div style={{ backgroundImage: `url(${photo.image})` }} />
+              <span>{photo.label}</span>
+              <h3>{photo.title}</h3>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="category-grid" aria-label="펜션 검색 카테고리">
@@ -139,7 +188,7 @@ export default function HomePage() {
         <div className="youtube-link-grid">
           {featuredVideos.map((video) => (
             <article className="youtube-link-card" key={`${video.propertyId}-${video.title}`}>
-              <a className="youtube-thumb" href={video.url} target="_blank" rel="noreferrer" style={{ backgroundImage: `url(${video.heroUrl})` }}>
+              <a className="youtube-thumb" href={video.url} target="_blank" rel="noreferrer" style={{ backgroundImage: `url(${video.thumbnailUrl ?? video.heroUrl})` }}>
                 <span>PLAY</span>
               </a>
               <div>

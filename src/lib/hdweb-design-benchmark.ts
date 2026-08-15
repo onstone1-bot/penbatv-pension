@@ -37,8 +37,7 @@ export const penbaDesignTemplates = [
     name: "영상 히어로형",
     price: "450,000원",
     target: "대표 영상이 강한 독채 펜션",
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+    image: "/penba/sign.jpg",
     tags: ["유튜브 히어로", "독채", "바베큐"]
   },
   {
@@ -46,8 +45,7 @@ export const penbaDesignTemplates = [
     name: "예약 달력 집중형",
     price: "450,000원",
     target: "객실 수가 많고 요금 변동이 있는 펜션",
-    image:
-      "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&q=80",
+    image: "/penba/interior-3.jpg",
     tags: ["실시간예약", "요금표", "관리자"]
   },
   {
@@ -55,8 +53,7 @@ export const penbaDesignTemplates = [
     name: "바베큐 특화형",
     price: "250,000원",
     target: "바베큐장과 야외공간이 매력인 숙소",
-    image:
-      "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80",
+    image: "/penba/bbq-yard.jpg",
     tags: ["BBQ", "타임슬롯", "옵션결제"]
   },
   {
@@ -64,8 +61,7 @@ export const penbaDesignTemplates = [
     name: "감성 갤러리형",
     price: "450,000원",
     target: "사진과 숏폼을 많이 보여주고 싶은 펜션",
-    image:
-      "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=1200&q=80",
+    image: "/penba/reservoir.jpg",
     tags: ["갤러리", "오션뷰", "숏폼"]
   }
 ];

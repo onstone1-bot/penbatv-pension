@@ -104,7 +104,7 @@ dd {
   border-color: rgba(15, 90, 71, 0.16);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 248, 232, 0.88)),
-    url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80");
+    url("/penba/sign.jpg");
   background-size: cover;
   background-position: center;
 }
@@ -290,6 +290,42 @@ dd {
 .category-grid b {
   font-size: 12px;
   overflow-wrap: anywhere;
+}
+
+.real-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.real-photo-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.real-photo-card div {
+  min-height: 220px;
+  background-size: cover;
+  background-position: center;
+}
+
+.real-photo-card span {
+  display: inline-flex;
+  margin: 12px 12px 0;
+  border-radius: 999px;
+  background: #edf7f2;
+  color: var(--green);
+  padding: 6px 9px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.real-photo-card h3 {
+  margin: 8px 12px 14px;
+  font-size: 17px;
+  line-height: 1.35;
 }
 
 .market-section {
@@ -921,7 +957,7 @@ dd {
   border-color: rgba(197, 31, 31, 0.14);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 240, 236, 0.78)),
-    url("https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80");
+    url("/penba/entrance-road.jpg");
   background-size: cover;
   background-position: center;
 }
@@ -1054,7 +1090,7 @@ dd {
   border-color: rgba(15, 90, 71, 0.16);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(237, 247, 242, 0.82)),
-    url("https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=1600&q=80");
+    url("/penba/reservoir.jpg");
   background-size: cover;
   background-position: center;
 }
@@ -1989,6 +2025,7 @@ button {
   gap: 12px;
   padding: 10px;
   text-align: left;
+  align-items: flex-start;
 }
 
 .video-thumb,
@@ -2003,7 +2040,9 @@ button {
   width: 104px;
   height: 78px;
   flex: none;
+  border: 0;
   border-radius: 10px;
+  cursor: pointer;
   overflow: hidden;
 }
 
@@ -2045,6 +2084,18 @@ button {
 .video-copy small {
   color: var(--muted);
   line-height: 1.45;
+}
+
+.video-open-link {
+  display: inline-flex;
+  margin-top: 9px;
+  border-radius: 999px;
+  background: #c51f1f;
+  color: #fff;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
 }
 
 .room-card {
@@ -2836,6 +2887,7 @@ button {
   .calendar-status-toolbar,
   .market-metrics,
   .category-grid,
+  .real-photo-grid,
   .property-grid,
   .youtube-link-grid,
   .collection-grid,

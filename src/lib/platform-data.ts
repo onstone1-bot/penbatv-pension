@@ -10,6 +10,7 @@ export type PartnerVideoLink = {
   tag: string;
   duration: string;
   description: string;
+  thumbnailUrl?: string;
 };
 
 export type PartnerProperty = Stay & {
@@ -46,6 +47,81 @@ export const partnerStatusLabels: Record<PartnerStatus, string> = {
   paused: "중지"
 };
 
+export const baebangAlpsYoutubeLinks: PartnerVideoLink[] = [
+  {
+    title: "배방알프스 전체 공간 소개",
+    url: "https://youtu.be/CGOBDAEbBqc?si=JWTxP0M5IANq39vC",
+    tag: "롱폼",
+    duration: "YouTube",
+    thumbnailUrl: "https://img.youtube.com/vi/CGOBDAEbBqc/hqdefault.jpg",
+    description: "유튜브 롱폼 영상에서 숙소 분위기를 확인하고 예약 화면으로 연결"
+  },
+  {
+    title: "배방알프스 저수지 전망 쇼츠",
+    url: "https://youtube.com/shorts/SLUDFGDzoZ4?si=U0vwkdsFVzgJCF34",
+    tag: "Shorts",
+    duration: "숏폼",
+    thumbnailUrl: "https://img.youtube.com/vi/SLUDFGDzoZ4/hqdefault.jpg",
+    description: "저수지와 산 풍경을 빠르게 보여주는 유튜브 쇼츠"
+  },
+  {
+    title: "바베큐 마당 동선 쇼츠",
+    url: "https://youtube.com/shorts/lVz-IlPW6VQ?si=XL6QDkUJ_yvLfJXS",
+    tag: "BBQ",
+    duration: "숏폼",
+    thumbnailUrl: "https://img.youtube.com/vi/lVz-IlPW6VQ/hqdefault.jpg",
+    description: "바베큐장 이용 전 마당과 외부 동선을 먼저 확인"
+  },
+  {
+    title: "글램핑 감성 공간 쇼츠",
+    url: "https://youtube.com/shorts/BMnTeq-tTO4?si=ykqRHyCeiKGHtFUt",
+    tag: "공간",
+    duration: "숏폼",
+    thumbnailUrl: "https://img.youtube.com/vi/BMnTeq-tTO4/hqdefault.jpg",
+    description: "글램핑 감성이 섞인 외부 공간을 영상으로 소개"
+  },
+  {
+    title: "객실 내부 미리보기 쇼츠",
+    url: "https://youtube.com/shorts/PkQPdz4WHps?si=9_eRkV4G0koGCuUF",
+    tag: "객실",
+    duration: "숏폼",
+    thumbnailUrl: "https://img.youtube.com/vi/PkQPdz4WHps/hqdefault.jpg",
+    description: "독채 객실 내부와 가족 이용 포인트를 짧게 확인"
+  },
+  {
+    title: "야외 바베큐 감성 쇼츠",
+    url: "https://youtube.com/shorts/FMibcJCCSx8?si=FWKicOupJBEzLghE",
+    tag: "바베큐",
+    duration: "숏폼",
+    thumbnailUrl: "https://img.youtube.com/vi/FMibcJCCSx8/hqdefault.jpg",
+    description: "숯불세트와 야외 바베큐 분위기를 예약 전에 확인"
+  },
+  {
+    title: "간판과 진입로 쇼츠",
+    url: "https://youtube.com/shorts/KDs0V0NGYTA?si=73c1245O_7C7GvL8",
+    tag: "진입",
+    duration: "숏폼",
+    thumbnailUrl: "https://img.youtube.com/vi/KDs0V0NGYTA/hqdefault.jpg",
+    description: "처음 방문 고객을 위한 간판, 진입로, 주차 동선 안내"
+  },
+  {
+    title: "배방알프스 공간 투어",
+    url: "https://youtu.be/prvj3pzAokA?si=4xrKXIZZD1Ppu_Xf",
+    tag: "투어",
+    duration: "YouTube",
+    thumbnailUrl: "https://img.youtube.com/vi/prvj3pzAokA/hqdefault.jpg",
+    description: "객실과 외부 공간을 이어서 보는 예약 전 확인 영상"
+  },
+  {
+    title: "바베큐장 이용 안내 영상",
+    url: "https://youtu.be/auNckmC4O1s?si=QRqRTmdQ8xgOeYFT",
+    tag: "이용안내",
+    duration: "YouTube",
+    thumbnailUrl: "https://img.youtube.com/vi/auNckmC4O1s/hqdefault.jpg",
+    description: "바베큐장 이용 방식과 옵션 결제로 이어지는 안내 영상"
+  }
+];
+
 export const mockPartnerProperties: PartnerProperty[] = [
   {
     id: "baebang-alps",
@@ -55,8 +131,7 @@ export const mockPartnerProperties: PartnerProperty[] = [
     concept: "숲과 계곡을 함께 즐기는 독채 펜션과 글램핑",
     rating: 4.8,
     reviewCount: 126,
-    heroUrl:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80",
+    heroUrl: "/penba/sign.jpg",
     ownerName: "김대표",
     ownerPhone: "010-1234-5678",
     roomCount: 2,
@@ -66,31 +141,9 @@ export const mockPartnerProperties: PartnerProperty[] = [
     commissionRate: 8,
     status: "active",
     tags: ["유튜브 리뷰", "독채", "바비큐", "불멍"],
-    featuredVideoUrl: "https://www.youtube.com/results?search_query=계곡+독채+펜션+바베큐",
-    featuredVideoTitle: "계곡 옆 독채 바베큐 30초 투어",
-    videoLinks: [
-      {
-        title: "계곡 옆 독채 바베큐 30초 투어",
-        url: "https://www.youtube.com/results?search_query=계곡+독채+펜션+바베큐",
-        tag: "숏폼",
-        duration: "0:30",
-        description: "유튜브 광고 첫 랜딩용 핵심 영상"
-      },
-      {
-        title: "마당·불멍·바베큐장 동선 보기",
-        url: "https://www.youtube.com/results?search_query=펜션+마당+불멍+바베큐",
-        tag: "바베큐",
-        duration: "1:12",
-        description: "바베큐장 이용 시간 예약으로 연결"
-      },
-      {
-        title: "가족 독채 객실 내부 투어",
-        url: "https://www.youtube.com/results?search_query=가족+독채+펜션+객실+투어",
-        tag: "객실",
-        duration: "2:05",
-        description: "객실 소개 후 달력 예약 화면으로 연결"
-      }
-    ]
+    featuredVideoUrl: baebangAlpsYoutubeLinks[0].url,
+    featuredVideoTitle: baebangAlpsYoutubeLinks[0].title,
+    videoLinks: baebangAlpsYoutubeLinks
   },
   {
     id: "river-forest-stay",
@@ -101,7 +154,7 @@ export const mockPartnerProperties: PartnerProperty[] = [
     rating: 4.7,
     reviewCount: 84,
     heroUrl:
-      "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1400&q=80",
+      "/penba/glamping-yard.jpg",
     ownerName: "이대표",
     ownerPhone: "010-2233-8899",
     roomCount: 5,
@@ -146,7 +199,7 @@ export const mockPartnerProperties: PartnerProperty[] = [
     rating: 4.6,
     reviewCount: 57,
     heroUrl:
-      "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=1400&q=80",
+      "/penba/reservoir.jpg",
     ownerName: "박대표",
     ownerPhone: "010-7788-1100",
     roomCount: 4,

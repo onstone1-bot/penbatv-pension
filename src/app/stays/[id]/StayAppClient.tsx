@@ -618,16 +618,26 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
               {videos.map((video) => {
                 const linkedRoom = rooms.find((room) => room.id === video.roomId) ?? rooms[0];
                 return (
-                  <button className="video-card" key={video.code} onClick={() => chooseVideo(video)}>
-                    <span className="video-thumb" style={{ backgroundImage: `url(${cover(linkedRoom)})` }}>
+                  <article className="video-card" key={video.code}>
+                    <button
+                      className="video-thumb"
+                      style={{ backgroundImage: `url(${video.thumbnailUrl ?? cover(linkedRoom)})` }}
+                      onClick={() => chooseVideo(video)}
+                      aria-label={`${video.title} 객실 보기`}
+                    >
                       <i>PLAY</i>
-                    </span>
+                    </button>
                     <span className="video-copy">
                       <em>{video.tag}</em>
                       <b>{video.title}</b>
                       <small>{video.description}</small>
+                      {video.url ? (
+                        <a className="video-open-link" href={video.url} target="_blank" rel="noreferrer">
+                          유튜브 영상 열기
+                        </a>
+                      ) : null}
                     </span>
-                  </button>
+                  </article>
                 );
               })}
             </div>

@@ -50,6 +50,8 @@ export type BookingOption = {
 
 export type YoutubeVideo = {
   code: string;
+  url?: string;
+  thumbnailUrl?: string;
   title: string;
   tag: string;
   description: string;
@@ -71,8 +73,9 @@ export const mockStay: Stay = {
   concept: "수철저수지를 마주 보는 독채와 소나무 정원 속 글램핑",
   rating: 4.8,
   reviewCount: 126,
-  heroUrl:
-    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80"
+  heroUrl: "/penba/sign.jpg",
+  featuredVideoUrl: "https://youtu.be/CGOBDAEbBqc?si=JWTxP0M5IANq39vC",
+  featuredVideoTitle: "배방알프스 전체 공간 소개"
 };
 
 export const mockRooms: Room[] = [
@@ -90,12 +93,12 @@ export const mockRooms: Room[] = [
     amenities: ["화목난로", "노래방 음향", "주방", "개별 바비큐", "주차 4대"],
     images: [
       {
-        url: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80",
+        url: "/penba/interior-3.jpg",
         caption: "독채펜션 외부",
         isCover: true
       },
       {
-        url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
+        url: "/penba/interior-2.jpg",
         caption: "통창 거실",
         isCover: false
       }
@@ -133,12 +136,12 @@ export const mockRooms: Room[] = [
     amenities: ["개별 화로대", "냉난방", "무선 인터넷", "공용 샤워실", "주차 1대"],
     images: [
       {
-        url: "https://images.unsplash.com/photo-1504851149312-7a075b496cc7?auto=format&fit=crop&w=1200&q=80",
+        url: "/penba/glamping-yard.jpg",
         caption: "돔 글램핑 전경",
         isCover: true
       },
       {
-        url: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&q=80",
+        url: "/penba/bbq-deck.jpg",
         caption: "야간 불멍",
         isCover: false
       }
@@ -188,21 +191,27 @@ export const mockOptions: BookingOption[] = [
 export const mockVideos: YoutubeVideo[] = [
   {
     code: "campheaven_room_01",
-    title: "캠핑천국식 룸투어",
+    url: "https://youtu.be/CGOBDAEbBqc?si=JWTxP0M5IANq39vC",
+    thumbnailUrl: "https://img.youtube.com/vi/CGOBDAEbBqc/hqdefault.jpg",
+    title: "배방알프스 전체 공간 소개",
     tag: "대표 영상",
     description: "입구, 주차, 방 내부, 개별 바비큐 동선을 영상처럼 먼저 확인",
     roomId: "A"
   },
   {
     code: "campheaven_bbq_01",
-    title: "바비큐·불멍 실사용 리뷰",
+    url: "https://youtube.com/shorts/lVz-IlPW6VQ?si=XL6QDkUJ_yvLfJXS",
+    thumbnailUrl: "https://img.youtube.com/vi/lVz-IlPW6VQ/hqdefault.jpg",
+    title: "바베큐 마당 동선 쇼츠",
     tag: "인기 쇼츠",
     description: "저녁 조리 동선과 화로대 간격을 보고 바로 예약으로 연결",
     roomId: "B"
   },
   {
     code: "campheaven_route_01",
-    title: "처음 방문 동선 안내",
+    url: "https://youtube.com/shorts/KDs0V0NGYTA?si=73c1245O_7C7GvL8",
+    thumbnailUrl: "https://img.youtube.com/vi/KDs0V0NGYTA/hqdefault.jpg",
+    title: "간판과 진입로 쇼츠",
     tag: "처음 방문",
     description: "체크인, 샤워실, 분리수거, 주변 산책 코스를 짧게 확인",
     roomId: "A"

@@ -4,13 +4,32 @@ import path from "node:path";
 const root = process.cwd();
 const outDir = path.join(root, "dist", "server");
 
+function imageDataUrl(fileName, mime = "image/jpeg") {
+  const filePath = path.join(root, "public", "penba", fileName);
+  return `data:${mime};base64,${fs.readFileSync(filePath).toString("base64")}`;
+}
+
+const images = {
+  sign: imageDataUrl("sign.jpg"),
+  glamping: imageDataUrl("glamping-yard.jpg"),
+  yardFriends: imageDataUrl("yard-friends.jpg"),
+  bbqYard: imageDataUrl("bbq-yard.jpg"),
+  bbqDeck: imageDataUrl("bbq-deck.jpg"),
+  interior1: imageDataUrl("interior-1.jpg"),
+  interior2: imageDataUrl("interior-2.jpg"),
+  interior3: imageDataUrl("interior-3.jpg"),
+  reservoir: imageDataUrl("reservoir.jpg"),
+  entrance: imageDataUrl("entrance-road.jpg"),
+  overlook: imageDataUrl("overlook.jpg")
+};
+
 const css = `
 :root{color-scheme:light;--bg:#f5f4f1;--ink:#17211d;--muted:#65726c;--green:#0f5a47;--line:rgba(19,28,24,.12);--red:#c51f1f}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:inherit}
-.shell{max-width:1080px;margin:0 auto;padding:34px 18px 96px}.hero,.section,.band{border:1px solid var(--line);border-radius:16px;background:#fff;padding:24px}.hero{display:grid;grid-template-columns:minmax(0,1fr)280px;gap:18px;align-items:end;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(237,247,242,.84)),url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80");background-size:cover;background-position:center}.eyebrow,.muted{color:var(--muted);font-size:13px;font-weight:900}.hero h1{margin:8px 0 10px;font-size:42px;line-height:1.08}.hero p,.section p,.card p{color:var(--muted);line-height:1.65}.actions,.chips,.nav{display:flex;flex-wrap:wrap;gap:8px}.btn{border-radius:10px;background:var(--green);color:#fff;padding:12px 14px;text-decoration:none;font-weight:900}.btn.alt{border:1px solid var(--line);background:#fff;color:var(--ink)}.video-stack{display:grid;gap:10px}.video-stack a{display:grid;grid-template-columns:74px 1fr auto;gap:10px;align-items:center;border:1px solid rgba(255,255,255,.58);border-radius:12px;background:rgba(255,255,255,.84);padding:10px;text-decoration:none}.video-stack span{aspect-ratio:16/10;border-radius:8px;background-size:cover;background-position:center}.video-stack small{color:var(--red);font-weight:900}
-.metrics,.cards,.templates,.features,.packages{display:grid;gap:12px;margin-top:14px}.metrics{grid-template-columns:repeat(3,1fr)}.cards,.templates{grid-template-columns:repeat(3,1fr)}.features{grid-template-columns:repeat(2,1fr)}.packages{grid-template-columns:repeat(3,1fr)}.metric,.card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:16px}.metric b{display:block;margin-top:6px;font-size:24px}.section{margin-top:22px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px}.section h2{margin:0}.chip{border-radius:999px;background:#edf7f2;color:var(--green);padding:7px 9px;font-size:12px;font-weight:900}.image-card{overflow:hidden;padding:0}.image-card .image{display:block;min-height:210px;background-size:cover;background-position:center;text-decoration:none}.image-card .body{padding:14px}.price{font-size:20px;font-weight:900}
+.shell{max-width:1080px;margin:0 auto;padding:34px 18px 96px}.hero,.section,.band{border:1px solid var(--line);border-radius:16px;background:#fff;padding:24px}.hero{display:grid;grid-template-columns:minmax(0,1fr)280px;gap:18px;align-items:end;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(237,247,242,.84)),url("${images.sign}");background-size:cover;background-position:center}.eyebrow,.muted{color:var(--muted);font-size:13px;font-weight:900}.hero h1{margin:8px 0 10px;font-size:42px;line-height:1.08}.hero p,.section p,.card p{color:var(--muted);line-height:1.65}.actions,.chips,.nav{display:flex;flex-wrap:wrap;gap:8px}.btn{border-radius:10px;background:var(--green);color:#fff;padding:12px 14px;text-decoration:none;font-weight:900}.btn.alt{border:1px solid var(--line);background:#fff;color:var(--ink)}.video-stack{display:grid;gap:10px}.video-stack a{display:grid;grid-template-columns:74px 1fr auto;gap:10px;align-items:center;border:1px solid rgba(255,255,255,.58);border-radius:12px;background:rgba(255,255,255,.84);padding:10px;text-decoration:none}.video-stack span{aspect-ratio:16/10;border-radius:8px;background-size:cover;background-position:center}.video-stack small{color:var(--red);font-weight:900}
+.metrics,.cards,.templates,.features,.packages,.photos{display:grid;gap:12px;margin-top:14px}.metrics{grid-template-columns:repeat(3,1fr)}.cards,.templates,.photos{grid-template-columns:repeat(3,1fr)}.features{grid-template-columns:repeat(2,1fr)}.packages{grid-template-columns:repeat(3,1fr)}.metric,.card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:16px}.metric b{display:block;margin-top:6px;font-size:24px}.section{margin-top:22px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px}.section h2{margin:0}.chip{border-radius:999px;background:#edf7f2;color:var(--green);padding:7px 9px;font-size:12px;font-weight:900}.image-card{overflow:hidden;padding:0}.image-card .image{display:block;min-height:210px;background-size:cover;background-position:center;text-decoration:none}.image-card .body{padding:14px}.photo{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#fff}.photo .image{min-height:220px;background-size:cover;background-position:center}.photo span,.photo h3{margin-left:12px;margin-right:12px}.photo h3{font-size:17px}.price{font-size:20px;font-weight:900}
 .calendar{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:14px}.calendar-grid{display:grid;grid-template-columns:190px repeat(7,110px);min-width:960px}.cal-head,.date,.room,.cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px;min-height:72px}.cal-head,.date{background:#f8faf9;font-weight:900}.cell{text-align:center;text-decoration:none}.available{background:#edf7f2;color:var(--green)}.few{background:#fff8e8;color:#875a00}.reserved{background:#fff0ec;color:#a33a1f}.blocked{background:#eef2f6;color:#405161}.wait{background:#f5efff;color:#67409b}.bottom{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(1080px,100%);display:grid;grid-template-columns:repeat(5,1fr);gap:6px;border-top:1px solid var(--line);background:rgba(255,255,255,.96);padding:8px 12px}.bottom a{border-radius:10px;padding:10px 6px;text-align:center;text-decoration:none;color:var(--muted);font-size:12px;font-weight:900}.bottom a.on{background:#edf7f2;color:var(--green)}
-@media(max-width:720px){.shell{padding-inline:14px}.hero,.metrics,.cards,.templates,.features,.packages{grid-template-columns:1fr}.hero h1{font-size:32px}.video-stack a{grid-template-columns:72px 1fr auto}.section-head{display:block}.bottom{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:720px){.shell{padding-inline:14px}.hero,.metrics,.cards,.templates,.features,.packages,.photos{grid-template-columns:1fr}.hero h1{font-size:32px}.video-stack a{grid-template-columns:72px 1fr auto}.section-head{display:block}.bottom{grid-template-columns:repeat(5,1fr)}}
 `;
 
 const routes = {
@@ -42,15 +61,30 @@ const routes = {
 };
 
 const videos = [
-  ["계곡 옆 독채 바베큐 30초 투어", "0:30", "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80"],
-  ["마당·불멍·바베큐장 동선 보기", "1:12", "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=900&q=80"],
-  ["가족 독채 객실 내부 투어", "2:05", "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=900&q=80"]
+  ["배방알프스 전체 공간 소개", "롱폼", "https://img.youtube.com/vi/CGOBDAEbBqc/hqdefault.jpg", "https://youtu.be/CGOBDAEbBqc?si=JWTxP0M5IANq39vC"],
+  ["배방알프스 저수지 전망 쇼츠", "Shorts", "https://img.youtube.com/vi/SLUDFGDzoZ4/hqdefault.jpg", "https://youtube.com/shorts/SLUDFGDzoZ4?si=U0vwkdsFVzgJCF34"],
+  ["바베큐 마당 동선 쇼츠", "BBQ", "https://img.youtube.com/vi/lVz-IlPW6VQ/hqdefault.jpg", "https://youtube.com/shorts/lVz-IlPW6VQ?si=XL6QDkUJ_yvLfJXS"],
+  ["글램핑 감성 공간 쇼츠", "공간", "https://img.youtube.com/vi/BMnTeq-tTO4/hqdefault.jpg", "https://youtube.com/shorts/BMnTeq-tTO4?si=ykqRHyCeiKGHtFUt"],
+  ["객실 내부 미리보기 쇼츠", "객실", "https://img.youtube.com/vi/PkQPdz4WHps/hqdefault.jpg", "https://youtube.com/shorts/PkQPdz4WHps?si=9_eRkV4G0koGCuUF"],
+  ["야외 바베큐 감성 쇼츠", "바베큐", "https://img.youtube.com/vi/FMibcJCCSx8/hqdefault.jpg", "https://youtube.com/shorts/FMibcJCCSx8?si=FWKicOupJBEzLghE"],
+  ["간판과 진입로 쇼츠", "진입", "https://img.youtube.com/vi/KDs0V0NGYTA/hqdefault.jpg", "https://youtube.com/shorts/KDs0V0NGYTA?si=73c1245O_7C7GvL8"],
+  ["배방알프스 공간 투어", "투어", "https://img.youtube.com/vi/prvj3pzAokA/hqdefault.jpg", "https://youtu.be/prvj3pzAokA?si=4xrKXIZZD1Ppu_Xf"],
+  ["바베큐장 이용 안내 영상", "이용안내", "https://img.youtube.com/vi/auNckmC4O1s/hqdefault.jpg", "https://youtu.be/auNckmC4O1s?si=QRqRTmdQ8xgOeYFT"]
 ];
 
 const templates = [
-  ["PB1045", "영상 히어로형", "450,000원", "대표 영상이 강한 독채 펜션", "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80"],
-  ["PB1044", "예약 달력 집중형", "450,000원", "객실 수가 많고 요금 변동이 있는 펜션", "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=900&q=80"],
-  ["PB1042", "바베큐 특화형", "250,000원", "바베큐장과 야외공간이 매력인 숙소", "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=900&q=80"]
+  ["PB1045", "영상 히어로형", "450,000원", "대표 영상이 강한 독채 펜션", images.sign],
+  ["PB1044", "예약 달력 집중형", "450,000원", "객실 수가 많고 요금 변동이 있는 펜션", images.interior3],
+  ["PB1042", "바베큐 특화형", "250,000원", "바베큐장과 야외공간이 매력인 숙소", images.bbqDeck]
+];
+
+const photos = [
+  ["객실", "저수지 뷰가 보이는 독채 내부", images.interior3],
+  ["BBQ", "비와 햇빛을 막아주는 바베큐 데크", images.bbqDeck],
+  ["마당", "글램핑 감성이 섞인 야외 공간", images.glamping],
+  ["풍경", "펜션 앞 저수지와 산 풍경", images.reservoir],
+  ["진입", "꽃길 따라 올라가는 펜션 진입로", images.entrance],
+  ["정원", "위에서 내려다보는 정원과 데크", images.overlook]
 ];
 
 function sectionHome() {
@@ -61,8 +95,12 @@ function sectionHome() {
     <div class="metric"><span class="muted">핵심 포맷</span><b>유튜브 → 예약</b></div>
   </section>
   <section class="section"><div class="section-head"><h2>유튜브 영상 모아보기</h2><span class="muted">숙소별 여러 영상 링크</span></div>
-    <div class="cards">${videos.map(([title, time, image]) => `<article class="card image-card"><a class="image" href="https://www.youtube.com/results?search_query=${encodeURIComponent(title)}" style="background-image:url('${image}')"></a><div class="body"><span class="chip">${time}</span><h3>${title}</h3><p>영상에서 예약 화면으로 바로 연결되는 펜바TV 광고 포맷입니다.</p><a class="btn" href="/booking-calendar-status">예약 현황</a></div></article>`).join("")}</div>
+    <div class="cards">${videos.map(([title, time, image, url]) => `<article class="card image-card"><a class="image" href="${url}" target="_blank" rel="noreferrer" style="background-image:url('${image}')"></a><div class="body"><span class="chip">${time}</span><h3>${title}</h3><p>실제 유튜브 영상에서 예약 화면으로 바로 연결되는 펜바TV 광고 포맷입니다.</p><div class="actions"><a class="btn" href="${url}" target="_blank" rel="noreferrer">유튜브 보기</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a></div></div></article>`).join("")}</div>
   </section>`;
+}
+
+function sectionPhotos() {
+  return `<section class="section"><div class="section-head"><h2>배방알프스 실제 사진</h2><span class="muted">객실·바베큐장·저수지·진입로</span></div><div class="photos">${photos.map(([label, title, image]) => `<article class="photo"><div class="image" style="background-image:url('${image}')"></div><span class="chip">${label}</span><h3>${title}</h3></article>`).join("")}</div></section>`;
 }
 
 function sectionCalendar() {
@@ -102,8 +140,8 @@ function sectionFeatures() {
 function render(pathname) {
   const route = routes[pathname] ?? routes["/"];
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
-    <section class="hero"><div><span class="eyebrow">PenBa TV</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/">고객 홈</a><a class="btn alt" href="/host/make24-benchmark">입점 제안</a><a class="btn alt" href="/host/design-benchmark">디자인 선택</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a></div></div><div class="video-stack">${videos.map(([title, time, image]) => `<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(title)}"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${time}</small></a>`).join("")}</div></section>
-    ${sectionHome()}${sectionCalendar()}${sectionPackages()}${sectionTemplates()}${sectionFeatures()}
+    <section class="hero"><div><span class="eyebrow">PenBa TV</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/">고객 홈</a><a class="btn alt" href="/host/make24-benchmark">입점 제안</a><a class="btn alt" href="/host/design-benchmark">디자인 선택</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, time, image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${time}</small></a>`).join("")}</div></section>
+    ${sectionHome()}${sectionPhotos()}${sectionCalendar()}${sectionPackages()}${sectionTemplates()}${sectionFeatures()}
     <section class="band section"><h2>외부 공유용 펜바TV 데모</h2><p>이 페이지는 외부에서 바로 볼 수 있는 배포용 버전입니다. 실제 예약결제 연동 전까지는 펜바TV 콘셉트, 입점 제안, 디자인 선택, 예약 현황 흐름을 설명하는 공개 데모로 사용하면 됩니다.</p></section>
   </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/booking-calendar-status">예약</a><a href="/host/make24-benchmark">입점</a><a href="/host/design-benchmark">디자인</a><a href="/host/core-features">기능</a></nav></body></html>`;
 }
@@ -130,6 +168,7 @@ const videos = ${JSON.stringify(videos)};
 const templates = ${JSON.stringify(templates)};
 ${label.toString()}
 ${sectionHome.toString()}
+${sectionPhotos.toString()}
 ${sectionCalendar.toString()}
 ${sectionPackages.toString()}
 ${sectionTemplates.toString()}
