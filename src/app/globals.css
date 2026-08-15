@@ -1444,6 +1444,356 @@ dd {
   gap: 14px;
 }
 
+.reservation-system-page {
+  max-width: 1180px;
+}
+
+.checkout-shell {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.checkout-summary,
+.checkout-panel {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  padding: 18px;
+}
+
+.checkout-summary {
+  align-self: start;
+  position: sticky;
+  top: 16px;
+}
+
+.checkout-kicker,
+.checkout-receipt span,
+.checkout-room-card em,
+.checkout-photo-card span,
+.checkout-video-card small,
+.checkout-form-grid label span,
+.checkout-option-list small,
+.checkout-pay-methods small,
+.checkout-done span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.checkout-summary h2 {
+  margin: 8px 0 14px;
+  font-size: 24px;
+}
+
+.checkout-steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.checkout-steps button {
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.checkout-steps .on {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+}
+
+.checkout-receipt {
+  display: grid;
+  gap: 8px;
+}
+
+.checkout-receipt div,
+.checkout-receipt strong {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 10px;
+  border-bottom: 1px solid var(--line);
+  padding: 9px 0;
+}
+
+.checkout-receipt b,
+.checkout-receipt strong b {
+  text-align: right;
+}
+
+.checkout-receipt strong {
+  border-bottom: 0;
+}
+
+.checkout-receipt strong b {
+  color: var(--green);
+  font-size: 22px;
+}
+
+.checkout-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.checkout-calendar button {
+  display: grid;
+  gap: 5px;
+  min-height: 118px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+  text-align: left;
+}
+
+.checkout-calendar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.checkout-calendar b {
+  font-size: 22px;
+}
+
+.checkout-calendar small,
+.checkout-calendar em {
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.checkout-calendar .available,
+.checkout-calendar .few {
+  background: #f7fbf9;
+}
+
+.checkout-calendar .selected {
+  border-color: var(--green);
+  box-shadow: inset 0 0 0 2px rgba(15, 90, 71, 0.18);
+}
+
+.checkout-calendar .few small {
+  color: #875a00;
+}
+
+.checkout-room-grid,
+.checkout-media-grid,
+.checkout-video-grid,
+.checkout-form-grid,
+.checkout-pay-methods {
+  display: grid;
+  gap: 12px;
+}
+
+.checkout-room-grid,
+.checkout-media-grid,
+.checkout-video-grid,
+.checkout-pay-methods {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.checkout-room-card {
+  overflow: hidden;
+  display: grid;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 0;
+  text-align: left;
+}
+
+.checkout-room-card.active {
+  border-color: var(--green);
+  box-shadow: 0 0 0 2px rgba(15, 90, 71, 0.12);
+}
+
+.checkout-room-cover {
+  min-height: 190px;
+  background-size: cover;
+  background-position: center;
+}
+
+.checkout-room-copy {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+}
+
+.checkout-room-copy b {
+  font-size: 20px;
+}
+
+.checkout-room-copy small {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.checkout-media-grid,
+.checkout-video-grid,
+.checkout-slot-row,
+.checkout-option-list,
+.checkout-pay-methods {
+  margin: 12px 0;
+}
+
+.checkout-photo-card,
+.checkout-video-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  text-decoration: none;
+}
+
+.checkout-photo-card div {
+  min-height: 210px;
+  background-size: cover;
+  background-position: center;
+}
+
+.checkout-photo-card span {
+  display: block;
+  padding: 11px 12px;
+}
+
+.checkout-video-card {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+}
+
+.checkout-video-card > span {
+  display: grid;
+  place-items: center;
+  min-height: 92px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+}
+
+.checkout-video-card b,
+.checkout-video-card small {
+  display: block;
+}
+
+.checkout-form-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+.checkout-form-grid label {
+  display: grid;
+  gap: 6px;
+}
+
+.checkout-form-grid input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 12px;
+}
+
+.checkout-slot-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.checkout-slot-row button,
+.checkout-pay-methods button {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  padding: 11px 12px;
+  font-weight: 900;
+}
+
+.checkout-slot-row .active,
+.checkout-pay-methods .active {
+  border-color: var(--green);
+  background: #edf7f2;
+  color: var(--green);
+}
+
+.checkout-option-list {
+  display: grid;
+  gap: 9px;
+}
+
+.checkout-option-list label {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+.checkout-option-list b,
+.checkout-option-list small,
+.checkout-pay-methods b,
+.checkout-pay-methods small {
+  display: block;
+}
+
+.checkout-pay-methods button {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+}
+
+.checkout-back {
+  margin-top: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.checkout-done {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 28px 12px;
+  text-align: center;
+}
+
+.checkout-done h2,
+.checkout-done p {
+  max-width: 620px;
+  margin: 0;
+}
+
+.checkout-done p {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.checkout-done strong {
+  color: var(--green);
+  font-size: 30px;
+}
+
 .settlement-preview-card div {
   display: flex;
   justify-content: space-between;
@@ -3390,6 +3740,13 @@ button {
   .payment-stage-grid,
   .payment-method-grid,
   .payment-program-split,
+  .checkout-shell,
+  .checkout-calendar,
+  .checkout-room-grid,
+  .checkout-media-grid,
+  .checkout-video-grid,
+  .checkout-form-grid,
+  .checkout-pay-methods,
   .program-action-band,
   .service-module-grid,
   .build-step-list,
@@ -3506,6 +3863,34 @@ button {
   .payment-board-row div:last-of-type b,
   .payment-board-row div:last-of-type span {
     text-align: left;
+  }
+
+  .checkout-summary {
+    position: static;
+  }
+
+  .checkout-receipt div,
+  .checkout-receipt strong {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-receipt b,
+  .checkout-receipt strong b {
+    text-align: left;
+  }
+
+  .checkout-calendar button {
+    min-height: 92px;
+  }
+
+  .checkout-video-card {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-video-card > span,
+  .checkout-photo-card div,
+  .checkout-room-cover {
+    min-height: 180px;
   }
 
   .hero-action,
