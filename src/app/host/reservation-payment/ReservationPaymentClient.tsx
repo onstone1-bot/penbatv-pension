@@ -46,7 +46,7 @@ export function ReservationPaymentClient() {
   const [dateId, setDateId] = useState(mockDatePresets[1]?.id ?? mockDatePresets[0]?.id);
   const [calendarIndex, setCalendarIndex] = useState(2);
   const [roomId, setRoomId] = useState(mockRooms[0]?.id ?? "A");
-  const [selectedOptions, setSelectedOptions] = useState<string[]>(["bbq"]);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(["bbq-set"]);
   const [slot, setSlot] = useState(barbecueSlots[1]);
   const [method, setMethod] = useState<PayMethod>("card");
   const [guestName, setGuestName] = useState("김민지");

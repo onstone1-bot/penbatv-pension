@@ -71,6 +71,11 @@ function usableImageUrl(url: string, fallbackUrl?: string) {
   return url.startsWith("https://example.com/") ? fallbackUrl ?? url : url;
 }
 
+function youtubeThumb(url: string | null | undefined) {
+  const match = url?.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([\w-]{6,})/);
+  return match?.[1] ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : undefined;
+}
+
 function mapImage(row: RoomImageRow, fallback?: RoomImage): RoomImage {
   return {
     url: usableImageUrl(row.url, fallback?.url),
@@ -130,9 +135,11 @@ function mapVideo(row: YoutubeCampaignRow, fallback?: YoutubeVideo, firstRoomId?
   return {
     code: row.code,
     title: row.title,
-    tag: fallback?.tag ?? "YouTube",
-    category: fallback?.category ?? "all",
-    description: fallback?.description ?? "Video linked booking campaign",
+    url: row.video_url ?? fallback?.url,
+    thumbnailUrl: row.thumbnail_url ?? youtubeThumb(row.video_url) ?? fallback?.thumbnailUrl,
+    tag: textOr(row.tag, fallback?.tag ?? "YouTube"),
+    category: row.category ?? fallback?.category ?? "all",
+    description: textOr(row.description, fallback?.description ?? "Video linked booking campaign"),
     roomId: row.room_id ?? fallback?.roomId ?? firstRoomId ?? ""
   };
 }

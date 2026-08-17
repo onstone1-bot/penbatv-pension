@@ -31,6 +31,8 @@ export type Database = {
           type: "private_house" | "glamping" | "camp_site";
           base_price: number;
           weekend_extra: number;
+          extra_adult_price: number;
+          extra_child_price: number;
           standard_capacity: number;
           max_capacity: number;
           description: string | null;
@@ -195,6 +197,10 @@ export type Database = {
           title: string;
           video_url: string | null;
           room_id: string | null;
+          category: "all" | "exterior" | "interior";
+          tag: string;
+          description: string | null;
+          thumbnail_url: string | null;
           coupon_amount: number;
           status: "active" | "ended";
           created_at: string;
@@ -228,12 +234,18 @@ export type Database = {
           order_id: string;
           hold_id: string | null;
           room_id: string;
-          provider: "card" | "naverpay" | "tosspay" | "vbank";
-          mode: "mock" | "toss";
+          check_in: string | null;
+          check_out: string | null;
+          provider: "card" | "naverpay" | "tosspay" | "vbank" | "realtime_transfer" | "manual_bank_transfer";
+          mode: "mock" | "toss" | "manual";
           amount: number;
           option_amount: number;
           discount_amount: number;
-          status: "ready" | "paid" | "failed" | "cancelled" | "expired";
+          adult_count: number;
+          child_count: number;
+          option_items: Json;
+          booking_id: string | null;
+          status: "ready" | "paid" | "waiting_deposit" | "failed" | "cancelled" | "expired";
           payment_key: string | null;
           checkout: Json;
           utm_code: string | null;
@@ -246,8 +258,8 @@ export type Database = {
         Insert: Partial<Database["public"]["Tables"]["payment_orders"]["Row"]> & {
           order_id: string;
           room_id: string;
-          provider: "card" | "naverpay" | "tosspay" | "vbank";
-          mode: "mock" | "toss";
+          provider: "card" | "naverpay" | "tosspay" | "vbank" | "realtime_transfer" | "manual_bank_transfer";
+          mode: "mock" | "toss" | "manual";
           amount: number;
           expires_at: string;
         };
@@ -258,7 +270,7 @@ export type Database = {
         Row: {
           id: string;
           booking_id: string;
-          provider: "card" | "naverpay" | "tosspay" | "vbank";
+          provider: "card" | "naverpay" | "tosspay" | "vbank" | "realtime_transfer" | "manual_bank_transfer";
           payment_key: string | null;
           amount: number;
           status: "ready" | "paid" | "failed" | "cancelled" | "refunded";
@@ -267,7 +279,7 @@ export type Database = {
         };
         Insert: Partial<Database["public"]["Tables"]["payments"]["Row"]> & {
           booking_id: string;
-          provider: "card" | "naverpay" | "tosspay" | "vbank";
+          provider: "card" | "naverpay" | "tosspay" | "vbank" | "realtime_transfer" | "manual_bank_transfer";
           amount: number;
         };
         Update: Partial<Database["public"]["Tables"]["payments"]["Row"]>;

@@ -1,0 +1,18 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "editor.formatOnSave": true,
+  "files.exclude": {
+    ".next": true,
+    "node_modules": true,
+    "dist": false
+  },
+  "search.exclude": {
+    ".next": true,
+    "node_modules": true,
+    "dist": true,
+    ".sites-stage": true
+  },
+  "debug.javascript.autoAttachFilter": "smart",
+  "debug.toolBarLocation": "docked"
+}

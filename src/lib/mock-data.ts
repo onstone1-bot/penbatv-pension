@@ -170,22 +170,28 @@ export const mockRooms: Room[] = [
 
 export const mockOptions: BookingOption[] = [
   {
-    id: "bbq",
+    id: "bbq-set",
     name: "참숯 바비큐 세트",
     description: "참숯, 그릴, 집게 포함",
     price: 30000
   },
   {
-    id: "fire",
+    id: "firewood",
     name: "불멍 장작 세트",
-    description: "장작 10kg, 착화제 포함",
+    description: "장작 10kg 기준",
     price: 15000
   },
   {
-    id: "early",
+    id: "early-checkin",
     name: "얼리 체크인",
-    description: "13시 입실",
+    description: "13시 입실 옵션",
     price: 20000
+  },
+  {
+    id: "bbq-only",
+    name: "바베큐장 단독 이용",
+    description: "숙박 없이 바베큐장만 이용",
+    price: 50000
   }
 ];
 

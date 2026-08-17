@@ -1,5 +1,11 @@
-export type PaymentProviderId = "card" | "naverpay" | "tosspay" | "vbank";
-export type PaymentMode = "mock" | "toss";
+export type PaymentProviderId =
+  | "card"
+  | "naverpay"
+  | "tosspay"
+  | "vbank"
+  | "realtime_transfer"
+  | "manual_bank_transfer";
+export type PaymentMode = "mock" | "toss" | "manual";
 
 export type PreparePaymentInput = {
   holdId: string | null;
@@ -10,6 +16,15 @@ export type PreparePaymentInput = {
   totalAmount: number;
   optionAmount: number;
   discountAmount: number;
+  adultCount: number;
+  childCount: number;
+  optionItems: Array<{
+    optionId: string;
+    name?: string;
+    quantity: number;
+    unitPrice: number;
+    amount?: number;
+  }>;
   guestName: string | null;
   guestPhone: string | null;
   utmCode: string | null;
@@ -29,12 +44,18 @@ export type PreparedPayment = {
   utmCode: string | null;
   expiresAt: string;
   checkout: {
-    type: "mock" | "toss-window";
+    type: "mock" | "toss-window" | "manual-bank-transfer";
     url: string | null;
     clientKey: string | null;
-    method: "CARD" | "VIRTUAL_ACCOUNT" | null;
+    method: "CARD" | "VIRTUAL_ACCOUNT" | "TRANSFER" | null;
     successUrl: string;
     failUrl: string;
+    bankTransfer: {
+      bankName: string;
+      accountNo: string;
+      holderName: string;
+      depositDueHours: number;
+    } | null;
   };
 };
 
@@ -55,12 +76,22 @@ function makeOrderId(roomId: string) {
 }
 
 function tossMethod(provider: PaymentProviderId) {
-  return provider === "vbank" ? "VIRTUAL_ACCOUNT" : "CARD";
+  if (provider === "vbank") return "VIRTUAL_ACCOUNT";
+  if (provider === "realtime_transfer") return "TRANSFER";
+  return "CARD";
 }
 
 function paymentMode(provider: PaymentProviderId): PaymentMode {
+  if (provider === "manual_bank_transfer") {
+    return "manual";
+  }
+
   if (
-    (provider === "card" || provider === "tosspay" || provider === "vbank") &&
+    (provider === "card" ||
+      provider === "naverpay" ||
+      provider === "tosspay" ||
+      provider === "vbank" ||
+      provider === "realtime_transfer") &&
     process.env.TOSS_PAYMENTS_CLIENT_KEY &&
     process.env.TOSS_PAYMENTS_SECRET_KEY
   ) {
@@ -68,6 +99,15 @@ function paymentMode(provider: PaymentProviderId): PaymentMode {
   }
 
   return "mock";
+}
+
+function manualBankTransfer() {
+  return {
+    bankName: process.env.PENBATV_BANK_NAME ?? "입금은행 미설정",
+    accountNo: process.env.PENBATV_BANK_ACCOUNT_NO ?? "계좌번호 미설정",
+    holderName: process.env.PENBATV_BANK_HOLDER_NAME ?? "예금주 미설정",
+    depositDueHours: Number(process.env.PENBATV_BANK_DEPOSIT_DUE_HOURS ?? 24)
+  };
 }
 
 export function preparePayment(input: PreparePaymentInput): PreparedPayment {
@@ -93,12 +133,13 @@ export function preparePayment(input: PreparePaymentInput): PreparedPayment {
     utmCode: input.utmCode,
     expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(),
     checkout: {
-      type: mode === "toss" ? "toss-window" : "mock",
+      type: mode === "toss" ? "toss-window" : mode === "manual" ? "manual-bank-transfer" : "mock",
       url: null,
       clientKey: mode === "toss" ? process.env.TOSS_PAYMENTS_CLIENT_KEY ?? null : null,
       method: mode === "toss" ? tossMethod(input.provider) : null,
       successUrl: successUrl.toString(),
-      failUrl: failUrl.toString()
+      failUrl: failUrl.toString(),
+      bankTransfer: mode === "manual" ? manualBankTransfer() : null
     }
   };
 }

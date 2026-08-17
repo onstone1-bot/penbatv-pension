@@ -11,6 +11,7 @@ type BookingStep = 1 | 2 | 3 | 4 | 5;
 type RangeAvailability = "idle" | "checking" | "available" | "unavailable" | "unknown";
 type BookingMode = "request" | "instant";
 type VideoCategory = YoutubeVideo["category"];
+type BarbecueSlot = "17:00" | "18:00" | "19:00" | "none";
 
 type LocalBooking = {
   bookingNo: string;
@@ -23,9 +24,10 @@ type LocalBooking = {
   totalAmount: number;
   guestName: string;
   utmCode: string | null;
+  barbecueSlot: BarbecueSlot;
 };
 
-type PaymentProvider = "card" | "naverpay" | "tosspay" | "vbank";
+type PaymentProvider = "card" | "naverpay" | "tosspay" | "vbank" | "realtime_transfer" | "manual_bank_transfer";
 
 type ActiveHold = {
   id: string;
@@ -37,6 +39,7 @@ type HoldResponse = {
     id: string;
     expires_at: string;
   } | null;
+  quote?: ServerQuote;
   error?: unknown;
 };
 
@@ -44,17 +47,32 @@ type PaymentPrepareResponse = {
   payment?: {
     id: string;
     status: "ready";
-    mode: "mock" | "toss";
+    mode: "mock" | "toss" | "manual";
+    amount: number;
     orderId?: string;
+    orderName?: string;
     checkout?: {
-      type: "mock" | "toss-window";
+      type: "mock" | "toss-window" | "manual-bank-transfer";
       url: string | null;
       clientKey: string | null;
-      method: "CARD" | "VIRTUAL_ACCOUNT" | null;
+      method: "CARD" | "VIRTUAL_ACCOUNT" | "TRANSFER" | null;
       successUrl: string;
       failUrl: string;
+      bankTransfer: {
+        bankName: string;
+        accountNo: string;
+        holderName: string;
+        depositDueHours: number;
+      } | null;
     };
   };
+  error?: unknown;
+};
+
+type PaymentConfirmResponse = {
+  status?: "paid" | "failed" | "waiting_deposit";
+  bookingId?: string;
+  idempotent?: boolean;
   error?: unknown;
 };
 
@@ -65,6 +83,71 @@ type AvailabilityResponse = {
   };
   error?: unknown;
 };
+
+type ServerQuote = {
+  roomId: string;
+  checkIn: string;
+  checkOut: string;
+  adultCount: number;
+  childCount: number;
+  nights: number;
+  roomAmount: number;
+  guestAmount: number;
+  optionAmount: number;
+  discountAmount: number;
+  totalAmount: number;
+  optionItems: Array<{
+    optionId: string;
+    name: string;
+    quantity: number;
+    unitPrice: number;
+    amount: number;
+  }>;
+  priceAuthority: "server";
+};
+
+type QuoteResponse = {
+  quote?: ServerQuote;
+  error?: unknown;
+};
+
+type QuoteStatus = "idle" | "loading" | "ready" | "fallback";
+
+type TossPaymentMethod = "CARD" | "VIRTUAL_ACCOUNT" | "TRANSFER";
+
+type TossPaymentRequest = {
+  method: TossPaymentMethod;
+  amount: {
+    currency: "KRW";
+    value: number;
+  };
+  orderId: string;
+  orderName: string;
+  successUrl: string;
+  failUrl: string;
+  customerName?: string;
+  customerMobilePhone?: string;
+  card?: {
+    flowMode: "DEFAULT";
+  };
+  sandbox?: {
+    paymentResult: "SUCCESS" | "FAIL";
+  };
+};
+
+type TossPaymentInstance = {
+  requestPayment(input: TossPaymentRequest): Promise<void>;
+};
+
+type TossPaymentsInstance = {
+  payment(input: { customerKey: string }): TossPaymentInstance;
+};
+
+declare global {
+  interface Window {
+    TossPayments?: (clientKey: string) => TossPaymentsInstance;
+  }
+}
 
 class ApiResponseError extends Error {
   constructor(
@@ -165,6 +248,140 @@ const bookingModeChoices: Array<{
     badge: "자동 확정"
   }
 ];
+
+const paymentProviderChoices: Array<{
+  id: PaymentProvider;
+  label: string;
+  helper: string;
+}> = [
+  { id: "card", label: "신용/체크카드", helper: "토스페이먼츠 카드 결제창" },
+  { id: "naverpay", label: "네이버페이", helper: "간편결제 선택. 실운영은 가맹/PG 설정 필요" },
+  { id: "tosspay", label: "토스페이", helper: "토스 간편결제" },
+  { id: "realtime_transfer", label: "실시간 계좌이체", helper: "토스페이먼츠 TRANSFER 결제수단" },
+  { id: "vbank", label: "가상계좌", helper: "PG 가상계좌 발급 후 입금 확인" },
+  { id: "manual_bank_transfer", label: "수동 계좌이체", helper: "운영자 입금 확인 후 예약 확정" }
+];
+
+const bookingStepLabels: Array<{
+  step: BookingStep;
+  label: string;
+}> = [
+  { step: 1, label: "일정" },
+  { step: 2, label: "객실" },
+  { step: 3, label: "인원/옵션" },
+  { step: 4, label: "결제" },
+  { step: 5, label: "완료" }
+];
+
+const barbecueSlots: Array<{
+  id: BarbecueSlot;
+  label: string;
+  helper: string;
+}> = [
+  { id: "17:00", label: "17:00", helper: "이른 저녁" },
+  { id: "18:00", label: "18:00", helper: "추천" },
+  { id: "19:00", label: "19:00", helper: "여유 입실" }
+];
+
+function paymentActionLabel(provider: PaymentProvider) {
+  if (provider === "manual_bank_transfer") return "입금대기 예약 접수";
+  if (provider === "realtime_transfer") return "계좌이체 결제 진행";
+  if (provider === "naverpay") return "네이버페이 결제 진행";
+  if (provider === "tosspay") return "토스페이 결제 진행";
+  if (provider === "vbank") return "가상계좌 발급 진행";
+  return "카드 결제 진행";
+}
+
+function loadTossPaymentsScript() {
+  if (typeof window === "undefined") {
+    return Promise.reject(new Error("Toss Payments SDK can only be loaded in the browser."));
+  }
+
+  if (window.TossPayments) {
+    return Promise.resolve();
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>(
+      'script[src="https://js.tosspayments.com/v2/standard"]'
+    );
+
+    if (existing) {
+      existing.addEventListener("load", () => resolve(), { once: true });
+      existing.addEventListener("error", () => reject(new Error("Failed to load Toss Payments SDK.")), {
+        once: true
+      });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://js.tosspayments.com/v2/standard";
+    script.async = true;
+    script.addEventListener("load", () => resolve(), { once: true });
+    script.addEventListener("error", () => reject(new Error("Failed to load Toss Payments SDK.")), {
+      once: true
+    });
+    document.head.appendChild(script);
+  });
+}
+
+function getOrCreateTossCustomerKey() {
+  const storageKey = "penbatv.tossCustomerKey";
+  const existing = window.localStorage.getItem(storageKey);
+
+  if (existing) return existing;
+
+  const next =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? `penbatv_${crypto.randomUUID()}`
+      : `penbatv_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+
+  window.localStorage.setItem(storageKey, next);
+  return next;
+}
+
+async function requestTossPayment(input: {
+  payment: NonNullable<PaymentPrepareResponse["payment"]>;
+  provider: PaymentProvider;
+  guestName: string;
+  guestPhone: string;
+  fallbackOrderName: string;
+}) {
+  const checkout = input.payment.checkout;
+  const clientKey = checkout?.clientKey;
+  const orderId = input.payment.orderId;
+  const method = checkout?.method;
+
+  if (!clientKey || !orderId || !method) {
+    throw new Error("Toss payment session is missing clientKey, orderId, or method.");
+  }
+
+  await loadTossPaymentsScript();
+
+  if (!window.TossPayments) {
+    throw new Error("Toss Payments SDK was not initialized.");
+  }
+
+  const tossPayments = window.TossPayments(clientKey);
+  const payment = tossPayments.payment({ customerKey: getOrCreateTossCustomerKey() });
+  const phone = input.guestPhone.replace(/\D/g, "");
+
+  await payment.requestPayment({
+    method,
+    amount: {
+      currency: "KRW",
+      value: input.payment.amount
+    },
+    orderId,
+    orderName: input.payment.orderName ?? input.fallbackOrderName,
+    successUrl: checkout.successUrl,
+    failUrl: checkout.failUrl,
+    customerName: input.guestName || "예약 고객",
+    ...(phone ? { customerMobilePhone: phone } : {}),
+    ...(method === "CARD" ? { card: { flowMode: "DEFAULT" as const } } : {}),
+    ...(clientKey.startsWith("test_") ? { sandbox: { paymentResult: "SUCCESS" as const } } : {})
+  });
+}
 
 function cover(room: Room) {
   return room.images.find((image) => image.isCover)?.url ?? room.images[0]?.url;
@@ -277,8 +494,14 @@ function youtubeEmbedUrl(url?: string) {
   return match?.[1] ? `https://www.youtube.com/embed/${match[1]}` : null;
 }
 
+function isBarbecueOption(option: Pick<BookingOption, "id" | "name" | "description">) {
+  const text = `${option.id} ${option.name} ${option.description}`.toLowerCase();
+  return text.includes("bbq") || text.includes("barbecue") || text.includes("바비큐") || text.includes("바베큐");
+}
+
 export function StayAppClient({ stay, rooms, options, videos, datePresets, initialDraft }: Props) {
   const initialRoomId = initialDraft.roomId ?? rooms[0]?.id ?? "";
+  const initialBarbecueOptionId = options.find(isBarbecueOption)?.id;
   const [screen, setScreen] = useState<Screen>("home");
   const [selectedRoomId, setSelectedRoomId] = useState(initialRoomId);
   const [selectedDateId, setSelectedDateId] = useState(datePresets[0]?.id ?? "");
@@ -286,7 +509,9 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
   const [selectedCheckOut, setSelectedCheckOut] = useState(datePresets[0]?.checkOut ?? emptyDate.checkOut);
   const [calendarMonth, setCalendarMonth] = useState(() => dateFromISO(datePresets[0]?.checkIn ?? emptyDate.checkIn));
   const [rangeAvailability, setRangeAvailability] = useState<RangeAvailability>("idle");
-  const [selectedOptions, setSelectedOptions] = useState<string[]>(["bbq"]);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(() =>
+    initialBarbecueOptionId ? [initialBarbecueOptionId] : []
+  );
   const [adultCount, setAdultCount] = useState(4);
   const [childCount, setChildCount] = useState(0);
   const [guestName, setGuestName] = useState("");
@@ -295,12 +520,16 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
   const [bookingMode, setBookingMode] = useState<BookingMode>("request");
   const [bookingStep, setBookingStep] = useState<BookingStep>(1);
   const [booking, setBooking] = useState<LocalBooking | null>(null);
+  const [barbecueSlot, setBarbecueSlot] = useState<BarbecueSlot>("18:00");
   const [holdMessage, setHoldMessage] = useState<string | null>(null);
   const [availabilityMessage, setAvailabilityMessage] = useState<string | null>(null);
   const [isSubmittingBooking, setIsSubmittingBooking] = useState(false);
   const [activeHold, setActiveHold] = useState<ActiveHold | null>(null);
   const [holdSecondsLeft, setHoldSecondsLeft] = useState<number | null>(null);
   const [selectedVideoCategory, setSelectedVideoCategory] = useState<VideoCategory>("all");
+  const [serverQuote, setServerQuote] = useState<ServerQuote | null>(null);
+  const [quoteStatus, setQuoteStatus] = useState<QuoteStatus>("idle");
+  const [quoteMessage, setQuoteMessage] = useState<string | null>(null);
 
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId) ?? rooms[0] ?? emptyRoom;
   const selectedDate = {
@@ -320,9 +549,27 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
       ),
     [selectedRoom, selectedCheckIn, selectedCheckOut]
   );
-  const optionAmount = quoteOptions(options, selectedOptions);
-  const coupon = youtubeCoupon(initialDraft.utmCode);
-  const totalAmount = Math.max(0, roomQuote.roomAmount + optionAmount - coupon);
+  const selectedOptionItems = useMemo(
+    () => selectedOptions.map((optionId) => ({ optionId, quantity: 1 })),
+    [selectedOptions]
+  );
+  const optionById = useMemo(() => new Map(options.map((option) => [option.id, option])), [options]);
+  const fallbackOptionAmount = quoteOptions(options, selectedOptions);
+  const fallbackCoupon = youtubeCoupon(initialDraft.utmCode);
+  const optionAmount = serverQuote?.optionAmount ?? fallbackOptionAmount;
+  const coupon = serverQuote?.discountAmount ?? fallbackCoupon;
+  const guestAmount = serverQuote?.guestAmount ?? 0;
+  const totalAmount = serverQuote?.totalAmount ?? Math.max(0, roomQuote.roomAmount + optionAmount - coupon);
+  const guestCount = adultCount + childCount;
+  const hasBarbecueOption = selectedOptions.some((optionId) => {
+    const option = optionById.get(optionId);
+    return option ? isBarbecueOption(option) : isBarbecueOption({ id: optionId, name: "", description: "" });
+  });
+  const selectedBarbecueLabel = hasBarbecueOption
+    ? `${barbecueSlot} 바베큐장`
+    : "선택 없음";
+  const selectedRoomPreviewImages = selectedRoom.images.slice(0, 4);
+  const isActiveHoldExpired = holdSecondsLeft === 0;
   const featuredEmbedUrl = youtubeEmbedUrl(stay.featuredVideoUrl);
   const filteredVideos = useMemo(
     () =>
@@ -335,6 +582,7 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
     () => videos.filter((video) => video.roomId === selectedRoom.id),
     [selectedRoom.id, videos]
   );
+  const bookingRoomVideos = selectedRoomVideos.length > 0 ? selectedRoomVideos : videos.slice(0, 2);
 
   useEffect(() => {
     if (!activeHold) {
@@ -356,6 +604,28 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
 
     return () => window.clearInterval(timer);
   }, [activeHold]);
+
+  useEffect(() => {
+    setActiveHold(null);
+    setHoldSecondsLeft(null);
+    setHoldMessage(null);
+  }, [adultCount, childCount, selectedCheckIn, selectedCheckOut, selectedOptionItems, selectedRoom.id]);
+
+  useEffect(() => {
+    if (guestCount <= selectedRoom.maxCapacity) return;
+
+    const overflow = guestCount - selectedRoom.maxCapacity;
+    setChildCount((current) => {
+      const next = Math.max(0, current - overflow);
+      const remainingOverflow = overflow - (current - next);
+
+      if (remainingOverflow > 0) {
+        setAdultCount((adultCurrent) => Math.max(1, adultCurrent - remainingOverflow));
+      }
+
+      return next;
+    });
+  }, [guestCount, selectedRoom.maxCapacity]);
 
   useEffect(() => {
     if (!selectedRoom.id || !selectedCheckIn || !selectedCheckOut) return;
@@ -396,6 +666,62 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
       cancelled = true;
     };
   }, [selectedRoom.id, selectedCheckIn, selectedCheckOut]);
+
+  useEffect(() => {
+    if (!selectedRoom.id || !selectedCheckIn || !selectedCheckOut) return;
+
+    let cancelled = false;
+
+    async function loadServerQuote() {
+      setQuoteStatus("loading");
+      setQuoteMessage("서버 견적 계산 중입니다.");
+
+      try {
+        const payload = await postJson<QuoteResponse>("/api/quote", {
+          roomId: selectedRoom.id,
+          checkIn: selectedCheckIn,
+          checkOut: selectedCheckOut,
+          adultCount,
+          childCount,
+          optionItems: selectedOptionItems,
+          utmCode: initialDraft.utmCode,
+          utmCampaign: initialDraft.utmCode
+        });
+
+        if (cancelled) return;
+
+        if (payload.quote) {
+          setServerQuote(payload.quote);
+          setQuoteStatus("ready");
+          setQuoteMessage("서버 견적이 반영되었습니다.");
+          return;
+        }
+
+        setServerQuote(null);
+        setQuoteStatus("fallback");
+        setQuoteMessage("서버 견적을 가져오지 못해 임시 예상가를 표시합니다.");
+      } catch {
+        if (cancelled) return;
+        setServerQuote(null);
+        setQuoteStatus("fallback");
+        setQuoteMessage("서버 견적을 가져오지 못해 임시 예상가를 표시합니다.");
+      }
+    }
+
+    loadServerQuote();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    adultCount,
+    childCount,
+    initialDraft.utmCode,
+    selectedCheckIn,
+    selectedCheckOut,
+    selectedOptionItems,
+    selectedRoom.id
+  ]);
 
   function chooseVideo(video: YoutubeVideo) {
     setSelectedRoomId(video.roomId);
@@ -446,6 +772,26 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
     setSelectedRoomId(roomId);
     setAvailabilityMessage(null);
     setActiveHold(null);
+  }
+
+  function toggleOption(optionId: string, checked: boolean) {
+    setSelectedOptions((current) =>
+      checked ? [...current, optionId] : current.filter((id) => id !== optionId)
+    );
+
+    const option = optionById.get(optionId);
+    const isBarbecue = option
+      ? isBarbecueOption(option)
+      : isBarbecueOption({ id: optionId, name: "", description: "" });
+
+    if (isBarbecue && !checked) {
+      setBarbecueSlot("none");
+      return;
+    }
+
+    if (isBarbecue && checked && barbecueSlot === "none") {
+      setBarbecueSlot("18:00");
+    }
   }
 
   function moveCalendarMonth(amount: number) {
@@ -518,37 +864,57 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
     let holdExpiresAt = activeHold?.expiresAt ?? null;
     let paymentSessionId: string | null = null;
 
-    if (bookingMode === "instant" && holdSecondsLeft === 0) {
-      setHoldMessage("Booking hold expired. Please choose the date again.");
-      setIsSubmittingBooking(false);
-      return;
-    }
-
     if (bookingMode === "instant") {
-      try {
-        const holdPayload = await postJson<HoldResponse>("/api/booking-holds", {
-          roomId: selectedRoom.id,
-          checkIn: selectedDate.checkIn,
-          checkOut: selectedDate.checkOut,
-          utmCode: initialDraft.utmCode,
-          holdMinutes: 15
-        });
-        const hold = holdPayload.hold;
+      if (activeHold && !isActiveHoldExpired) {
+        holdId = activeHold.id;
+        holdExpiresAt = activeHold.expiresAt;
+        setHoldMessage("Existing booking hold is active. Preparing payment.");
+      } else {
+        holdId = null;
+        holdExpiresAt = null;
 
-        if (hold) {
-          holdId = hold.id;
-          holdExpiresAt = hold.expires_at;
-          setActiveHold({ id: hold.id, expiresAt: hold.expires_at });
-          setHoldMessage("Booking hold created for 15 minutes.");
-        }
-      } catch (error) {
-        if (error instanceof ApiResponseError && error.status === 409) {
-          setAvailabilityMessage("Selected dates were just held or booked. Please choose another date.");
+        try {
+          const holdPayload = await postJson<HoldResponse>("/api/booking-holds", {
+            roomId: selectedRoom.id,
+            checkIn: selectedDate.checkIn,
+            checkOut: selectedDate.checkOut,
+            adultCount,
+            childCount,
+            optionItems: selectedOptionItems,
+            utmCode: initialDraft.utmCode,
+            holdMinutes: 15
+          });
+          const hold = holdPayload.hold;
+
+          if (hold) {
+            holdId = hold.id;
+            holdExpiresAt = hold.expires_at;
+            setActiveHold({ id: hold.id, expiresAt: hold.expires_at });
+            setHoldMessage("Booking hold created for 15 minutes.");
+          }
+
+          if (holdPayload.quote) {
+            setServerQuote(holdPayload.quote);
+            setQuoteStatus("ready");
+            setQuoteMessage("서버 견적이 반영되었습니다.");
+          }
+        } catch (error) {
+          if (error instanceof ApiResponseError && error.status === 409) {
+            setAvailabilityMessage("Selected dates were just held or booked. Please choose another date.");
+            setIsSubmittingBooking(false);
+            return;
+          }
+
+          setHoldMessage("Booking hold is unavailable. Please try again before payment.");
           setIsSubmittingBooking(false);
           return;
         }
+      }
 
-        setHoldMessage("Live hold is unavailable. Continuing with local mock booking.");
+      if (!holdId) {
+        setHoldMessage("Booking hold is required before payment.");
+        setIsSubmittingBooking(false);
+        return;
       }
 
       try {
@@ -561,16 +927,76 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
           totalAmount,
           optionAmount,
           discountAmount: coupon,
+          adultCount,
+          childCount,
+          optionItems: selectedOptionItems,
           guestName: guestName || null,
           guestPhone: guestPhone || null,
           utmCode: initialDraft.utmCode
         });
-        paymentSessionId = paymentPayload.payment?.id ?? null;
-        if (paymentPayload.payment?.mode === "toss") {
-          setHoldMessage("Toss payment session is ready. Connect the client SDK requestPayment next.");
+        const payment = paymentPayload.payment;
+        paymentSessionId = payment?.id ?? null;
+        if (payment?.mode === "manual" && payment.orderId) {
+          const confirmPayload = await postJson<PaymentConfirmResponse>("/api/payments/confirm", {
+            provider: paymentMethod,
+            paymentKey: `manual_${payment.orderId}`,
+            orderId: payment.orderId,
+            amount: payment.amount
+          });
+
+          if (confirmPayload.status !== "waiting_deposit") {
+            setHoldMessage("수동계좌이체 입금대기 예약 접수에 실패했습니다. 다시 시도해주세요.");
+            setIsSubmittingBooking(false);
+            return;
+          }
+
+          const bank = payment.checkout?.bankTransfer;
+          setHoldMessage(
+            bank
+              ? `입금대기 예약이 접수되었습니다. ${bank.bankName} ${bank.accountNo} ${bank.holderName} 앞으로 ${formatWon(payment.amount)}을 ${bank.depositDueHours}시간 안에 입금해주세요.`
+              : "입금대기 예약이 접수되었습니다. 운영자 안내 계좌로 입금 후 확인을 기다려주세요."
+          );
+        } else if (payment?.mode === "mock" && payment.orderId) {
+          const confirmPayload = await postJson<PaymentConfirmResponse>("/api/payments/confirm", {
+            provider: paymentMethod,
+            paymentKey: `mock_${payment.orderId}`,
+            orderId: payment.orderId,
+            amount: payment.amount
+          });
+
+          if (confirmPayload.status !== "paid") {
+            setHoldMessage("Mock payment confirmation failed. Please try again.");
+            setIsSubmittingBooking(false);
+            return;
+          }
+
+          setHoldMessage("Mock payment confirmed. Booking was saved to the database.");
+        } else if (payment?.mode === "toss") {
+          setHoldMessage(
+            payment.checkout?.method === "TRANSFER"
+              ? "실시간 계좌이체 결제 준비가 완료되었습니다. 다음 단계에서 토스 결제창 requestPayment를 연결하면 됩니다."
+              : "토스페이먼츠 결제창을 여는 중입니다."
+          );
+
+          await requestTossPayment({
+            payment,
+            provider: paymentMethod,
+            guestName,
+            guestPhone,
+            fallbackOrderName: `${selectedRoom.name} ${selectedDate.checkIn}~${selectedDate.checkOut}`
+          });
+
+          return;
         }
-      } catch {
-        setHoldMessage("Payment preparation is unavailable. Saved as local mock booking.");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Payment preparation or confirmation failed.";
+        setHoldMessage(
+          paymentMethod === "card"
+            ? `신용카드 결제창을 열지 못했습니다. ${message}`
+            : `Payment preparation or confirmation failed. ${message}`
+        );
+        setIsSubmittingBooking(false);
+        return;
       }
     }
 
@@ -584,7 +1010,8 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
       checkOut: selectedDate.checkOut,
       totalAmount,
       guestName: guestName || "홍길동",
-      utmCode: initialDraft.utmCode
+      utmCode: initialDraft.utmCode,
+      barbecueSlot
     };
     localStorage.setItem("staylink.lastBooking", JSON.stringify(createdBooking));
     setBooking(createdBooking);
@@ -706,6 +1133,7 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
             <div className="booking-start-total">
               <span>예상 결제금액</span>
               <b>{formatWon(totalAmount)}</b>
+              {quoteMessage && <small>{quoteMessage}</small>}
             </div>
             <button className="primary-action" type="button" onClick={() => goBooking(selectedRoom.id, 4)}>
               선택 완료, 결제 진행
@@ -955,9 +1383,34 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
           <button className="back-button" onClick={() => setScreen("home")}>
             홈으로
           </button>
-          <div className="steps">
-            {[1, 2, 3, 4, 5].map((step) => (
-              <span className={bookingStep >= step ? "on" : ""} key={step} />
+          <div className="booking-flow-summary" aria-label="현재 예약 선택 요약">
+            <div>
+              <span>일정</span>
+              <b>{selectedDate.label}</b>
+            </div>
+            <div>
+              <span>객실</span>
+              <b>{selectedRoom.name}</b>
+            </div>
+            <div>
+              <span>인원</span>
+              <b>성인 {adultCount}명 · 아동 {childCount}명</b>
+            </div>
+            <strong>
+              <span>결제 예정</span>
+              <b>{formatWon(totalAmount)}</b>
+            </strong>
+          </div>
+          <div className="booking-step-tabs" aria-label="예약 진행 단계">
+            {bookingStepLabels.map((item) => (
+              <button
+                className={bookingStep >= item.step ? "on" : ""}
+                key={item.step}
+                type="button"
+                onClick={() => item.step < bookingStep && setBookingStep(item.step)}
+              >
+                {item.label}
+              </button>
             ))}
           </div>
 
@@ -1025,16 +1478,42 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
 
           {bookingStep === 2 && (
             <div className="flow-card">
-              <h2>방·사이트를 선택하세요</h2>
-              {rooms.map((room) => (
-                <button
-                  className={selectedRoomId === room.id ? "choice active" : "choice"}
-                  key={room.id}
-                  onClick={() => chooseRoomForBooking(room.id)}
-                >
-                  {room.name} · {formatWon(room.basePrice)}~
-                </button>
-              ))}
+              <h2>객실과 영상 확인</h2>
+              <div className="room-choice-list">
+                {rooms.map((room) => (
+                  <button
+                    className={selectedRoomId === room.id ? "booking-room-choice active" : "booking-room-choice"}
+                    key={room.id}
+                    type="button"
+                    onClick={() => chooseRoomForBooking(room.id)}
+                  >
+                    <span className="booking-room-photo" style={{ backgroundImage: `url(${cover(room)})` }} />
+                    <span className="booking-room-copy">
+                      <em>{roomTypeLabel(room.type)}</em>
+                      <b>{room.name}</b>
+                      <small>
+                        기준 {room.standardCapacity}인 · 최대 {room.maxCapacity}인 · {formatWon(room.basePrice)}~
+                      </small>
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <div className="booking-room-media" aria-label={`${selectedRoom.name} 사진 미리보기`}>
+                {selectedRoomPreviewImages.map((image) => (
+                  <span key={image.url} style={{ backgroundImage: `url(${image.url})` }}>
+                    <b>{image.caption}</b>
+                  </span>
+                ))}
+              </div>
+              <div className="booking-video-pills" aria-label={`${selectedRoom.name} 관련 영상`}>
+                {bookingRoomVideos.slice(0, 3).map((video) => (
+                  <a href={video.url} key={video.code} rel="noreferrer" target="_blank">
+                    <span style={{ backgroundImage: `url(${video.thumbnailUrl ?? cover(selectedRoom)})` }} />
+                    <b>{video.tag}</b>
+                    <small>{video.title}</small>
+                  </a>
+                ))}
+              </div>
               <button className="primary-action" onClick={() => setBookingStep(3)}>
                 다음
               </button>
@@ -1046,28 +1525,37 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
               <h2>인원과 옵션</h2>
               <div className="counter-row">
                 <span>성인</span>
-                <button onClick={() => setAdultCount(Math.max(1, adultCount - 1))}>-</button>
+                <button type="button" onClick={() => setAdultCount(Math.max(1, adultCount - 1))}>-</button>
                 <b>{adultCount}</b>
-                <button onClick={() => setAdultCount(adultCount + 1)}>+</button>
+                <button
+                  disabled={guestCount >= selectedRoom.maxCapacity}
+                  type="button"
+                  onClick={() => setAdultCount(adultCount + 1)}
+                >
+                  +
+                </button>
               </div>
               <div className="counter-row">
                 <span>아동</span>
-                <button onClick={() => setChildCount(Math.max(0, childCount - 1))}>-</button>
+                <button type="button" onClick={() => setChildCount(Math.max(0, childCount - 1))}>-</button>
                 <b>{childCount}</b>
-                <button onClick={() => setChildCount(childCount + 1)}>+</button>
+                <button
+                  disabled={guestCount >= selectedRoom.maxCapacity}
+                  type="button"
+                  onClick={() => setChildCount(childCount + 1)}
+                >
+                  +
+                </button>
               </div>
+              <p className={guestCount >= selectedRoom.maxCapacity ? "capacity-note warning" : "capacity-note"}>
+                {selectedRoom.name} 최대 {selectedRoom.maxCapacity}명까지 예약할 수 있습니다. 현재 {guestCount}명 선택됨.
+              </p>
               {options.map((option) => (
                 <label className="option-row" key={option.id}>
                   <input
                     type="checkbox"
                     checked={selectedOptions.includes(option.id)}
-                    onChange={(event) =>
-                      setSelectedOptions((current) =>
-                        event.target.checked
-                          ? [...current, option.id]
-                          : current.filter((id) => id !== option.id)
-                      )
-                    }
+                    onChange={(event) => toggleOption(option.id, event.target.checked)}
                   />
                   <span>
                     <b>{option.name}</b>
@@ -1076,6 +1564,21 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                   <strong>{formatWon(option.price)}</strong>
                 </label>
               ))}
+              {hasBarbecueOption && (
+                <div className="slot-choice-grid" aria-label="바베큐장 이용 시간 선택">
+                  {barbecueSlots.map((slot) => (
+                    <button
+                      className={barbecueSlot === slot.id ? "active" : ""}
+                      key={slot.id}
+                      type="button"
+                      onClick={() => setBarbecueSlot(slot.id)}
+                    >
+                      <b>{slot.label}</b>
+                      <span>{slot.helper}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
               {availabilityMessage && <p className="status-note">{availabilityMessage}</p>}
               <button className="primary-action" onClick={goPaymentStep} disabled={isSubmittingBooking}>
                 다음
@@ -1086,6 +1589,18 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
           {bookingStep === 4 && (
             <div className="flow-card">
               <h2>예약자 정보와 예약 방식</h2>
+              <div className="booking-mini-summary">
+                <div>
+                  <span>예약내용</span>
+                  <b>{selectedRoom.name} · {selectedDate.label}</b>
+                </div>
+                <div>
+                  <span>인원/바베큐</span>
+                  <b>
+                    성인 {adultCount}명 · 아동 {childCount}명 · {selectedBarbecueLabel}
+                  </b>
+                </div>
+              </div>
               <input placeholder="예약자 이름" value={guestName} onChange={(event) => setGuestName(event.target.value)} />
               <input placeholder="휴대폰 번호" value={guestPhone} onChange={(event) => setGuestPhone(event.target.value)} />
               <div className="mode-grid">
@@ -1103,15 +1618,21 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                 ))}
               </div>
               {bookingMode === "instant" ? (
-                <select
-                  value={paymentMethod}
-                  onChange={(event) => setPaymentMethod(event.target.value as PaymentProvider)}
-                >
-                  <option value="card">카드</option>
-                  <option value="naverpay">네이버페이</option>
-                  <option value="tosspay">토스페이</option>
-                  <option value="vbank">가상계좌</option>
-                </select>
+                <>
+                  <select
+                    value={paymentMethod}
+                    onChange={(event) => setPaymentMethod(event.target.value as PaymentProvider)}
+                  >
+                    {paymentProviderChoices.map((provider) => (
+                      <option key={provider.id} value={provider.id}>
+                        {provider.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="request-note">
+                    {paymentProviderChoices.find((provider) => provider.id === paymentMethod)?.helper}
+                  </p>
+                </>
               ) : (
                 <p className="request-note">
                   운영자가 객실 상태를 확인한 뒤 문자 또는 알림톡으로 결제 링크를 발송합니다.
@@ -1126,6 +1647,12 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                   <span>옵션</span>
                   <b>{formatWon(optionAmount)}</b>
                 </div>
+                {guestAmount > 0 && (
+                  <div>
+                    <span>인원 추가요금</span>
+                    <b>{formatWon(guestAmount)}</b>
+                  </div>
+                )}
                 {coupon > 0 && (
                   <div>
                     <span>유튜브 쿠폰</span>
@@ -1137,6 +1664,7 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                   <b>{formatWon(totalAmount)}</b>
                 </strong>
               </div>
+              {quoteMessage && <p className="status-note">{quoteMessage}</p>}
               <p className="policy-note">결제 전 취소·환불 규정과 정숙 시간 정책을 확인했습니다.</p>
               {bookingMode === "instant" && holdSecondsLeft !== null && (
                 <div className="hold-timer">
@@ -1144,13 +1672,16 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                   <b>{formatCountdown(holdSecondsLeft)}</b>
                 </div>
               )}
+              {bookingMode === "instant" && isActiveHoldExpired && (
+                <p className="status-note">예약 홀드가 만료되었습니다. 결제 버튼을 다시 눌러 새 홀드를 생성하세요.</p>
+              )}
               {availabilityMessage && <p className="status-note">{availabilityMessage}</p>}
               <button
                 className="primary-action"
                 onClick={completeBooking}
-                disabled={isSubmittingBooking || (bookingMode === "instant" && holdSecondsLeft === 0)}
+                disabled={isSubmittingBooking}
               >
-                {bookingMode === "instant" ? "Mock 결제 완료" : "예약 요청 보내기"}
+                {bookingMode === "instant" ? paymentActionLabel(paymentMethod) : "예약 요청 보내기"}
               </button>
             </div>
           )}
@@ -1163,6 +1694,7 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
               <span>
                 {booking?.roomName} · {booking?.checkIn} - {booking?.checkOut}
               </span>
+              {booking?.barbecueSlot !== "none" && <span>바베큐장 {booking?.barbecueSlot}</span>}
               <strong>{formatWon(booking?.totalAmount ?? totalAmount)}</strong>
               <button className="primary-action" onClick={() => setScreen("mine")}>
                 내 예약 보기

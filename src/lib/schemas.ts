@@ -61,3 +61,25 @@ export const createRoomRateSchema = z.object({
   priority: z.number().int().default(0),
   memo: z.string().nullable().optional()
 });
+
+export const createBookingOptionSchema = z.object({
+  id: z.string().min(1).regex(/^[a-z0-9-]+$/),
+  name: z.string().min(1),
+  description: z.string().nullable().optional(),
+  price: z.number().int().min(0),
+  sortOrder: z.number().int().min(0).default(0),
+  status: z.enum(["active", "hidden"]).default("active")
+});
+
+export const createYoutubeCampaignSchema = z.object({
+  code: z.string().min(1).regex(/^[a-zA-Z0-9_-]+$/),
+  title: z.string().min(1),
+  videoUrl: z.string().url().or(z.literal("")).default(""),
+  roomId: z.string().nullable().optional(),
+  category: z.enum(["all", "exterior", "interior"]).default("all"),
+  tag: z.string().min(1).default("YouTube"),
+  description: z.string().nullable().optional(),
+  thumbnailUrl: z.string().url().or(z.literal("")).default(""),
+  couponAmount: z.number().int().min(0).default(0),
+  status: z.enum(["active", "ended"]).default("active")
+});

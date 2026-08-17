@@ -82,7 +82,12 @@ erDiagram
     uuid id PK
     text code
     text title
+    text video_url
     text room_id FK
+    text category
+    text tag
+    text description
+    text thumbnail_url
     integer coupon_amount
   }
 

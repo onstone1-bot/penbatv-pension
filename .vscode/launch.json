@@ -1,0 +1,58 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "PenBaTV: full stack debug",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["--inspect"],
+      "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+      "args": ["dev", "-p", "3000"],
+      "cwd": "${workspaceFolder}",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "serverReadyAction": {
+        "pattern": "Local:\\s+(https?://localhost:[0-9]+)",
+        "uriFormat": "%s/stays/baebang-alps?utm_source=penbatv&utm_medium=local_debug&utm_campaign=baebang-alps",
+        "action": "debugWithChrome",
+        "webRoot": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "PenBaTV: debug browser only",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000/stays/baebang-alps?utm_source=penbatv&utm_medium=local_debug&utm_campaign=baebang-alps",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true
+    },
+    {
+      "name": "PenBaTV: debug server only",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["--inspect"],
+      "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+      "args": ["dev", "-p", "3000"],
+      "cwd": "${workspaceFolder}",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "PenBaTV: open public demo",
+      "type": "chrome",
+      "request": "launch",
+      "url": "https://penbatv-pension.onstone1.chatgpt.site/stays/baebang-alps?utm_source=penbatv&utm_medium=vscode_public_debug&utm_campaign=baebang-alps",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "PenBaTV: dev server + browser",
+      "configurations": ["PenBaTV: full stack debug"],
+      "stopAll": true
+    }
+  ]
+}

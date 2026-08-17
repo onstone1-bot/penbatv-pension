@@ -146,12 +146,84 @@ export async function createBookingHold(
   return { hold: data, availability };
 }
 
-export async function expireBookingHolds(supabase: Client) {
+export async function getActiveBookingHold(
+  supabase: Client,
+  input: {
+    holdId: string;
+    roomId: string;
+    checkIn: ISODateString;
+    checkOut: ISODateString;
+  }
+) {
+  await expireBookingHolds(supabase);
+
   const { data, error } = await supabase
     .from("booking_holds")
+    .select("id, room_id, check_in, check_out, expires_at")
+    .eq("id", input.holdId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    return {
+      valid: false as const,
+      reason: "missing_or_expired"
+    };
+  }
+
+  if (new Date(data.expires_at).getTime() <= Date.now()) {
+    await expireBookingHolds(supabase);
+
+    return {
+      valid: false as const,
+      reason: "missing_or_expired"
+    };
+  }
+
+  const matchesSelection =
+    data.room_id === input.roomId &&
+    data.check_in === input.checkIn &&
+    data.check_out === input.checkOut;
+
+  if (!matchesSelection) {
+    return {
+      valid: false as const,
+      reason: "selection_mismatch"
+    };
+  }
+
+  return {
+    valid: true as const,
+    hold: data
+  };
+}
+
+export async function expireBookingHolds(supabase: Client) {
+  const { data: referencedOrders, error: referencedError } = await supabase
+    .from("payment_orders")
+    .select("hold_id")
+    .not("hold_id", "is", null);
+
+  if (referencedError) {
+    throw referencedError;
+  }
+
+  const referencedHoldIds = [
+    ...new Set((referencedOrders ?? []).map((order) => order.hold_id).filter(Boolean))
+  ];
+  let query = supabase
+    .from("booking_holds")
     .delete()
-    .lt("expires_at", new Date().toISOString())
-    .select("id");
+    .lt("expires_at", new Date().toISOString());
+
+  if (referencedHoldIds.length > 0) {
+    query = query.not("id", "in", `(${referencedHoldIds.join(",")})`);
+  }
+
+  const { data, error } = await query.select("id");
 
   if (error) {
     throw error;

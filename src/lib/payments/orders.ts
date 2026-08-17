@@ -24,11 +24,16 @@ export async function savePreparedPaymentOrder(
         order_id: payment.orderId,
         hold_id: input.holdId,
         room_id: input.roomId,
+        check_in: input.checkIn,
+        check_out: input.checkOut,
         provider: input.provider,
         mode: payment.mode,
         amount: input.totalAmount,
         option_amount: input.optionAmount,
         discount_amount: input.discountAmount,
+        adult_count: input.adultCount,
+        child_count: input.childCount,
+        option_items: input.optionItems as Json,
         status: "ready",
         checkout: payment.checkout as Json,
         utm_code: input.utmCode,
@@ -67,6 +72,7 @@ export async function getPaymentOrder(orderId: string): Promise<PaymentOrderLook
 export async function markPaymentOrderPaid(input: {
   orderId: string;
   paymentKey: string;
+  bookingId?: string | null;
 }) {
   try {
     const supabase = createAdminClient();
@@ -75,7 +81,32 @@ export async function markPaymentOrderPaid(input: {
       .update({
         status: "paid",
         payment_key: input.paymentKey,
+        booking_id: input.bookingId ?? null,
         confirmed_at: new Date().toISOString()
+      })
+      .eq("order_id", input.orderId);
+
+    if (error) throw error;
+
+    return { persisted: true as const };
+  } catch (error) {
+    return { persisted: false as const, reason: errorMessage(error) };
+  }
+}
+
+export async function markPaymentOrderWaitingDeposit(input: {
+  orderId: string;
+  paymentKey: string;
+  bookingId?: string | null;
+}) {
+  try {
+    const supabase = createAdminClient();
+    const { error } = await supabase
+      .from("payment_orders")
+      .update({
+        status: "waiting_deposit",
+        payment_key: input.paymentKey,
+        booking_id: input.bookingId ?? null
       })
       .eq("order_id", input.orderId);
 

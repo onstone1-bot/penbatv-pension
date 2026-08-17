@@ -38,6 +38,8 @@ create table if not exists public.rooms (
   type text not null check (type in ('private_house', 'glamping', 'camp_site')),
   base_price integer not null default 0 check (base_price >= 0),
   weekend_extra integer not null default 0 check (weekend_extra >= 0),
+  extra_adult_price integer not null default 20000 check (extra_adult_price >= 0),
+  extra_child_price integer not null default 10000 check (extra_child_price >= 0),
   standard_capacity integer not null default 1 check (standard_capacity > 0),
   max_capacity integer not null default 1 check (max_capacity >= standard_capacity),
   description text,
@@ -56,6 +58,10 @@ create table if not exists public.room_images (
   is_cover boolean not null default false,
   constraint room_images_room_url_key unique (room_id, url)
 );
+
+alter table public.rooms
+  add column if not exists extra_adult_price integer not null default 20000 check (extra_adult_price >= 0),
+  add column if not exists extra_child_price integer not null default 10000 check (extra_child_price >= 0);
 
 create table if not exists public.room_rates (
   id uuid primary key default gen_random_uuid(),
@@ -124,6 +130,9 @@ create table if not exists public.booking_option_items (
   created_at timestamptz not null default now()
 );
 
+create unique index if not exists booking_option_items_booking_option_unique_idx
+on public.booking_option_items(booking_id, option_id);
+
 create table if not exists public.room_blocks (
   id uuid primary key default gen_random_uuid(),
   room_id text not null references public.rooms(id),
@@ -140,10 +149,20 @@ create table if not exists public.youtube_campaigns (
   title text not null,
   video_url text,
   room_id text references public.rooms(id),
+  category text not null default 'all' check (category in ('all', 'exterior', 'interior')),
+  tag text not null default 'YouTube',
+  description text,
+  thumbnail_url text,
   coupon_amount integer not null default 0 check (coupon_amount >= 0),
   status text not null default 'active' check (status in ('active', 'ended')),
   created_at timestamptz not null default now()
 );
+
+alter table public.youtube_campaigns
+  add column if not exists category text not null default 'all' check (category in ('all', 'exterior', 'interior')),
+  add column if not exists tag text not null default 'YouTube',
+  add column if not exists description text,
+  add column if not exists thumbnail_url text;
 
 create table if not exists public.utm_events (
   id uuid primary key default gen_random_uuid(),
@@ -160,12 +179,18 @@ create table if not exists public.payment_orders (
   order_id text not null unique,
   hold_id uuid references public.booking_holds(id),
   room_id text not null references public.rooms(id),
-  provider text not null check (provider in ('card', 'naverpay', 'tosspay', 'vbank')),
-  mode text not null default 'mock' check (mode in ('mock', 'toss')),
+  check_in date,
+  check_out date,
+  provider text not null check (provider in ('card', 'naverpay', 'tosspay', 'vbank', 'realtime_transfer', 'manual_bank_transfer')),
+  mode text not null default 'mock' check (mode in ('mock', 'toss', 'manual')),
   amount integer not null check (amount >= 0),
   option_amount integer not null default 0 check (option_amount >= 0),
   discount_amount integer not null default 0 check (discount_amount >= 0),
-  status text not null default 'ready' check (status in ('ready', 'paid', 'failed', 'cancelled', 'expired')),
+  adult_count integer not null default 1 check (adult_count >= 1),
+  child_count integer not null default 0 check (child_count >= 0),
+  option_items jsonb not null default '[]'::jsonb,
+  booking_id uuid references public.bookings(id),
+  status text not null default 'ready' check (status in ('ready', 'paid', 'waiting_deposit', 'failed', 'cancelled', 'expired')),
   payment_key text,
   checkout jsonb not null default '{}'::jsonb,
   utm_code text,
@@ -179,7 +204,7 @@ create table if not exists public.payment_orders (
 create table if not exists public.payments (
   id uuid primary key default gen_random_uuid(),
   booking_id uuid not null references public.bookings(id) on delete cascade,
-  provider text not null check (provider in ('card', 'naverpay', 'tosspay', 'vbank')),
+  provider text not null check (provider in ('card', 'naverpay', 'tosspay', 'vbank', 'realtime_transfer', 'manual_bank_transfer')),
   payment_key text,
   amount integer not null check (amount >= 0),
   status text not null default 'ready' check (status in ('ready', 'paid', 'failed', 'cancelled', 'refunded')),
@@ -204,13 +229,16 @@ create index if not exists room_images_room_id_sort_idx on public.room_images(ro
 create index if not exists room_rates_room_date_idx on public.room_rates(room_id, start_date, end_date, priority desc);
 create index if not exists booking_options_accommodation_sort_idx on public.booking_options(accommodation_id, sort_order);
 create index if not exists bookings_room_date_idx on public.bookings(room_id, check_in, check_out);
+create unique index if not exists bookings_hold_unique_idx on public.bookings(hold_id) where hold_id is not null;
 create index if not exists booking_holds_room_date_idx on public.booking_holds(room_id, check_in, check_out, expires_at);
 create index if not exists booking_option_items_booking_idx on public.booking_option_items(booking_id);
 create index if not exists room_blocks_room_date_idx on public.room_blocks(room_id, check_in, check_out);
 create index if not exists youtube_campaigns_code_idx on public.youtube_campaigns(code);
+create index if not exists youtube_campaigns_room_id_idx on public.youtube_campaigns(room_id);
 create index if not exists utm_events_utm_created_idx on public.utm_events(utm_code, created_at);
 create index if not exists payment_orders_order_idx on public.payment_orders(order_id);
 create index if not exists payment_orders_hold_idx on public.payment_orders(hold_id);
+create index if not exists payment_orders_booking_idx on public.payment_orders(booking_id);
 create index if not exists payment_orders_status_idx on public.payment_orders(status, expires_at);
 create index if not exists payments_booking_idx on public.payments(booking_id);
 create index if not exists settlements_payment_idx on public.settlements(payment_id);

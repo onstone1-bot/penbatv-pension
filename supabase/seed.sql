@@ -70,21 +70,125 @@ on conflict (room_id, start_date, end_date, rate_type, priority) do update set
 
 insert into public.booking_options (id, accommodation_id, name, description, price, sort_order)
 values
-  ('bbq', 'baebang-alps', '참숯 바비큐 세트', '참숯, 그릴, 집게 포함', 30000, 1),
-  ('fire', 'baebang-alps', '불멍 장작 세트', '장작 10kg, 착화제 포함', 15000, 2),
-  ('early', 'baebang-alps', '얼리 체크인', '13시 입실', 20000, 3)
+  ('bbq-set', 'baebang-alps', '참숯 바베큐 세트', '참숯, 그릴, 집게 포함', 30000, 1),
+  ('firewood', 'baebang-alps', '불멍 장작 세트', '장작 10kg 기준', 15000, 2),
+  ('early-checkin', 'baebang-alps', '얼리 체크인', '13시 입실 옵션', 20000, 3),
+  ('bbq-only', 'baebang-alps', '바베큐장 단독 이용', '숙박 없이 바베큐장만 이용', 50000, 4)
 on conflict (id) do update set
   name = excluded.name,
   description = excluded.description,
   price = excluded.price,
   sort_order = excluded.sort_order;
 
-insert into public.youtube_campaigns (code, title, room_id, coupon_amount)
+insert into public.youtube_campaigns (
+  code, title, video_url, room_id, category, tag, description, thumbnail_url, coupon_amount
+)
 values
-  ('campheaven_room_01', '캠핑천국식 룸투어', 'A', 10000),
-  ('campheaven_bbq_01', '바비큐·불멍 실사용 리뷰', 'B', 10000),
-  ('campheaven_route_01', '처음 방문 동선 안내', 'A', 10000)
+  (
+    'campheaven_room_01',
+    '배방알프스 전체 공간 소개',
+    'https://youtu.be/CGOBDAEbBqc?si=JWTxP0M5IANq39vC',
+    'A',
+    'all',
+    '대표 영상',
+    '입구, 주차, 방 내부, 개별 바비큐 동선을 영상처럼 먼저 확인',
+    'https://img.youtube.com/vi/CGOBDAEbBqc/hqdefault.jpg',
+    10000
+  ),
+  (
+    'campheaven_reservoir_01',
+    '저수지 전망과 외부 동선 쇼츠',
+    'https://youtube.com/shorts/SLUDFGDzoZ4?si=U0vwkdsFVzgJCF34',
+    'A',
+    'exterior',
+    '외부',
+    '저수지 전망, 진입로, 마당 분위기를 짧은 영상으로 확인',
+    'https://img.youtube.com/vi/SLUDFGDzoZ4/hqdefault.jpg',
+    10000
+  ),
+  (
+    'campheaven_bbq_01',
+    '바베큐 마당 동선 쇼츠',
+    'https://youtube.com/shorts/lVz-IlPW6VQ?si=XL6QDkUJ_yvLfJXS',
+    'B',
+    'exterior',
+    '인기 쇼츠',
+    '저녁 조리 동선과 화로대 간격을 보고 바로 예약으로 연결',
+    'https://img.youtube.com/vi/lVz-IlPW6VQ/hqdefault.jpg',
+    10000
+  ),
+  (
+    'campheaven_glamping_01',
+    '글램핑 감성 공간 쇼츠',
+    'https://youtube.com/shorts/BMnTeq-tTO4?si=ykqRHyCeiKGHtFUt',
+    'B',
+    'exterior',
+    '외부',
+    '돔 글램핑과 야외 데크, 소나무 정원 분위기를 먼저 확인',
+    'https://img.youtube.com/vi/BMnTeq-tTO4/hqdefault.jpg',
+    10000
+  ),
+  (
+    'campheaven_room_inside_01',
+    '객실 내부 미리보기 쇼츠',
+    'https://youtube.com/shorts/PkQPdz4WHps?si=9_eRkV4G0koGCuUF',
+    'A',
+    'interior',
+    '내부',
+    '거실, 통창, 목조 인테리어, 가족방 구조를 객실 선택 전에 확인',
+    'https://img.youtube.com/vi/PkQPdz4WHps/hqdefault.jpg',
+    10000
+  ),
+  (
+    'campheaven_bbq_night_01',
+    '야외 바베큐 감성 쇼츠',
+    'https://youtube.com/shorts/FMibcJCCSx8?si=FWKicOupJBEzLghE',
+    'B',
+    'exterior',
+    '외부',
+    '바비큐장 테이블, 화로대, 저녁 분위기를 예약 전에 확인',
+    'https://img.youtube.com/vi/FMibcJCCSx8/hqdefault.jpg',
+    10000
+  ),
+  (
+    'campheaven_route_01',
+    '간판과 진입로 쇼츠',
+    'https://youtube.com/shorts/KDs0V0NGYTA?si=73c1245O_7C7GvL8',
+    'A',
+    'exterior',
+    '처음 방문',
+    '체크인, 샤워실, 분리수거, 주변 산책 코스를 짧게 확인',
+    'https://img.youtube.com/vi/KDs0V0NGYTA/hqdefault.jpg',
+    10000
+  ),
+  (
+    'campheaven_tour_01',
+    '배방알프스 공간 투어',
+    'https://youtu.be/prvj3pzAokA?si=4xrKXIZZD1Ppu_Xf',
+    'A',
+    'all',
+    '전체',
+    '전체 시설을 둘러본 뒤 고객 홈에서 원하는 객실로 이동',
+    'https://img.youtube.com/vi/prvj3pzAokA/hqdefault.jpg',
+    10000
+  ),
+  (
+    'campheaven_guide_01',
+    '바베큐장 이용 안내 영상',
+    'https://youtu.be/auNckmC4O1s?si=QRqRTmdQ8xgOeYFT',
+    'B',
+    'interior',
+    '내부',
+    '객실 이용 안내와 바비큐장 예약 전 확인해야 할 이용 기준',
+    'https://img.youtube.com/vi/auNckmC4O1s/hqdefault.jpg',
+    10000
+  )
 on conflict (code) do update set
   title = excluded.title,
+  video_url = excluded.video_url,
   room_id = excluded.room_id,
+  category = excluded.category,
+  tag = excluded.tag,
+  description = excluded.description,
+  thumbnail_url = excluded.thumbnail_url,
   coupon_amount = excluded.coupon_amount;
