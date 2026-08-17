@@ -1,7 +1,19 @@
 import { NextResponse } from "next/server";
 import { getAvailableRooms, getRoomAvailability } from "@/lib/availability";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { ISODateString } from "@/lib/types";
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === "object" && error !== null && "message" in error) {
+    return String((error as { message: unknown }).message);
+  }
+
+  return "Unknown availability error";
+}
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -18,7 +30,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     if (roomId) {
       const availability = await getRoomAvailability(supabase, roomId, checkIn, checkOut);
@@ -28,7 +40,6 @@ export async function GET(request: Request) {
     const rooms = await getAvailableRooms(supabase, accommodationId!, checkIn, checkOut);
     return NextResponse.json({ rooms });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown availability error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

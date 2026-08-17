@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createBookingHold } from "@/lib/availability";
 import { getRoomQuote } from "@/lib/pricing";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { ISODateString } from "@/lib/types";
 
 const holdSchema = z.object({
@@ -13,6 +13,18 @@ const holdSchema = z.object({
   holdMinutes: z.number().int().min(1).max(30).optional()
 });
 
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === "object" && error !== null && "message" in error) {
+    return String((error as { message: unknown }).message);
+  }
+
+  return "Unknown hold error";
+}
+
 export async function POST(request: Request) {
   const parsed = holdSchema.safeParse(await request.json());
 
@@ -21,7 +33,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const result = await createBookingHold(supabase, {
       roomId: parsed.data.roomId,
       checkIn: parsed.data.checkIn as ISODateString,
@@ -43,7 +55,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ...result, quote }, { status: 201 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown hold error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

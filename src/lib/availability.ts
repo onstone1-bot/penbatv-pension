@@ -37,6 +37,15 @@ async function hasOverlappingRows(
   return Boolean(data?.length);
 }
 
+function isDateRangeConflict(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: string }).code === "23P01"
+  );
+}
+
 export async function getRoomAvailability(
   supabase: Client,
   roomId: string,
@@ -91,6 +100,8 @@ export async function createBookingHold(
     holdMinutes?: number;
   }
 ) {
+  await expireBookingHolds(supabase);
+
   const availability = await getRoomAvailability(
     supabase,
     input.roomId,
@@ -116,6 +127,19 @@ export async function createBookingHold(
     .single();
 
   if (error) {
+    if (isDateRangeConflict(error)) {
+      return {
+        hold: null,
+        availability: {
+          roomId: input.roomId,
+          checkIn: input.checkIn,
+          checkOut: input.checkOut,
+          available: false,
+          blockedReason: "active_hold"
+        } satisfies AvailabilityResult
+      };
+    }
+
     throw error;
   }
 

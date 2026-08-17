@@ -3,6 +3,21 @@
 -- supabase migration new init_staylink_schema
 
 create extension if not exists pgcrypto;
+create schema if not exists extensions;
+create extension if not exists btree_gist with schema extensions;
+
+do $$
+begin
+  if exists (
+    select 1
+    from pg_extension e
+    join pg_namespace n on n.oid = e.extnamespace
+    where e.extname = 'btree_gist'
+    and n.nspname <> 'extensions'
+  ) then
+    alter extension btree_gist set schema extensions;
+  end if;
+end $$;
 
 create table if not exists public.accommodations (
   id text primary key,
@@ -199,6 +214,35 @@ create index if not exists payment_orders_hold_idx on public.payment_orders(hold
 create index if not exists payment_orders_status_idx on public.payment_orders(status, expires_at);
 create index if not exists payments_booking_idx on public.payments(booking_id);
 create index if not exists settlements_payment_idx on public.settlements(payment_id);
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'bookings_no_overlap_active'
+  ) then
+    alter table public.bookings
+      add constraint bookings_no_overlap_active
+      exclude using gist (
+        room_id with =,
+        daterange(check_in, check_out, '[)') with &&
+      )
+      where (status in ('hold', 'confirmed'));
+  end if;
+end $$;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'booking_holds_no_overlap'
+  ) then
+    alter table public.booking_holds
+      add constraint booking_holds_no_overlap
+      exclude using gist (
+        room_id with =,
+        daterange(check_in, check_out, '[)') with &&
+      );
+  end if;
+end $$;
 
 alter table public.accommodations enable row level security;
 alter table public.rooms enable row level security;
