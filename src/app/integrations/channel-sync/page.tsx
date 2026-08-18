@@ -4,7 +4,7 @@ const syncMetrics = [
   { label: "연동 대상", value: "4개", detail: "네이버/야놀자/여기어때/iCal" },
   { label: "동기화 방식", value: "iCal", detail: "초기 버전 추천" },
   { label: "충돌 기준", value: "날짜 겹침", detail: "room_blocks 반영" },
-  { label: "운영 상태", value: "설계", detail: "파일럿 후 개발" }
+  { label: "운영 상태", value: "구현", detail: "/api/integrations/ical/sync" }
 ];
 
 const channels = [
@@ -22,6 +22,14 @@ const syncFlow = [
   "정식 버전에서는 양방향 동기화 가능 여부 검토"
 ];
 
+const syncApiChecklist = [
+  "사장님 토큰과 x-penbatv-role=host로 연동 요청",
+  "iCal URL 또는 텍스트에서 VEVENT를 파싱",
+  "calendar_sync_sources와 calendar_sync_events에 동기화 이력 저장",
+  "room_blocks에 외부 예약 차단일 생성",
+  "고객 예약 달력은 room_blocks를 예약불가로 반영"
+];
+
 export default function ChannelSyncPage() {
   return (
     <main className="ops-page">
@@ -30,7 +38,7 @@ export default function ChannelSyncPage() {
           <Link className="home-back-link" href="/">
             펜바TV 메인홈
           </Link>
-          <p className="muted">Week 4 Day 19</p>
+          <p className="muted">Week 5 Day 31</p>
           <h1>외부채널 연동 준비</h1>
           <p>
             네이버예약, 야놀자, 여기어때 같은 외부 예약 채널의 예약일을 펜바TV 달력에 반영해 중복예약을 줄이는 구조입니다.
@@ -77,6 +85,21 @@ export default function ChannelSyncPage() {
             <li key={step}>{step}</li>
           ))}
         </ol>
+      </section>
+
+      <section className="ops-section">
+        <div className="section-head">
+          <h2>iCal 동기화 API</h2>
+          <span>중복 예약 차단 구현</span>
+        </div>
+        <div className="task-list">
+          {syncApiChecklist.map((item) => (
+            <label key={item}>
+              <input type="checkbox" defaultChecked />
+              <span>{item}</span>
+            </label>
+          ))}
+        </div>
       </section>
     </main>
   );

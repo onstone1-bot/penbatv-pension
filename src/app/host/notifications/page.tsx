@@ -43,7 +43,7 @@ export default async function NotificationsPage() {
           <Link className="home-back-link" href="/">
             펜바TV 메인홈
           </Link>
-          <p className="muted">Week 2 Day 11</p>
+          <p className="muted">Week 5 Day 29-30</p>
           <h1>알림톡·CS 운영</h1>
           <p>
             고객 예약 완료, 입실 안내, 바베큐장 이용 시간 알림을 자동화하고 실패 건은 CS 대기열로 관리합니다.
@@ -66,7 +66,7 @@ export default async function NotificationsPage() {
       <section className="ops-section">
         <div className="section-head">
           <h2>실시간 알림 큐</h2>
-          <span>예약 생성 후 자동 적재</span>
+          <span>예약 완료 · 입실 안내 · 바베큐 리마인드</span>
         </div>
         <div className="campaign-table">
           {notifications.map((notification) => (
@@ -107,6 +107,22 @@ export default async function NotificationsPage() {
       </section>
 
       <section className="ops-section owner-dashboard-grid">
+        <article className="ops-card">
+          <h2>5주차 구현 범위</h2>
+          <div className="task-list">
+            {[
+              "29일차 예약 완료 알림톡 또는 문자 구조",
+              "30일차 입실 안내/바베큐 리마인드 알림",
+              "Mock 발송 후 실제 알림톡 공급사 어댑터로 교체",
+              "실패 건은 CS 대기열에서 재발송 또는 수동 연락"
+            ].map((item) => (
+              <label key={item}>
+                <input type="checkbox" defaultChecked />
+                <span>{item}</span>
+              </label>
+            ))}
+          </div>
+        </article>
         <article className="ops-card">
           <h2>CS 대기열</h2>
           <div className="operation-queue-list">

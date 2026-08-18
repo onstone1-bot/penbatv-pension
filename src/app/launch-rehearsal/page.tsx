@@ -28,6 +28,14 @@ const goNoGo = [
   "아드님이 VS Code에서 로컬 실행과 디버깅을 재현할 수 있는가"
 ];
 
+const launchApiFlow = [
+  "POST /api/notifications/queue",
+  "POST /api/notifications/dispatch",
+  "POST /api/integrations/ical/sync",
+  "GET /api/admin/environment",
+  "POST /api/pilot/open"
+];
+
 const rehearsalRoles = [
   { role: "고객 역할", task: "유튜브에서 들어왔다고 가정하고 모바일에서 예약 완료까지 진행" },
   { role: "사장님 역할", task: "객실, 사진, 영상, 예약 현황, 알림 대기 내용을 확인" },
@@ -110,6 +118,21 @@ export default async function LaunchRehearsalPage() {
               <input type="checkbox" />
               <span>{item}</span>
             </label>
+          ))}
+        </div>
+      </section>
+
+      <section className="ops-section">
+        <div className="section-head">
+          <h2>5주차 오픈 API</h2>
+          <span>29일차부터 35일차까지</span>
+        </div>
+        <div className="pipeline-strip">
+          {launchApiFlow.map((item, index) => (
+            <article key={item}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <b>{item}</b>
+            </article>
           ))}
         </div>
       </section>
