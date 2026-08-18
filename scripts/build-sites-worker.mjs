@@ -40,8 +40,8 @@ const css = `
 const routes = {
   "/": {
     title: "펜바TV 펜션 예약 플랫폼",
-    subtitle: "영상으로 보고 예약하는 펜션·바베큐 플랫폼",
-    body: "유튜브 숏폼과 롱폼 영상을 여러 개 연결해 숙소 매력을 먼저 보여주고, 날짜·객실·바베큐장 예약결제로 바로 이어갑니다."
+    subtitle: "펜션 영상이 고객 예약결제로 이어지는 펜바TV",
+    body: "의뢰자 시연용 메인 화면입니다. 유튜브 설명란 링크로 들어온 고객이 숙소 영상과 객실 사진을 확인하고, 달력에서 가능한 날짜를 고른 뒤 객실·인원·바베큐 옵션을 선택해 결제까지 진행합니다."
   },
   "/host/make24-benchmark": {
     title: "펜션 사장님 입점 제안",
@@ -343,6 +343,37 @@ const roomMedia = [
   }
 ];
 
+const mainProperties = [
+  ["배방 알프스", "충남 아산 배방", "숲과 계곡을 함께 즐기는 독채 펜션과 글램핑", "180,000원~", "요청+바로결제", images.sign, "/stays/baebang-alps?utm_source=penbatv&utm_medium=main_property&utm_campaign=baebang-alps"],
+  ["리버 포레스트 스테이", "강원 홍천", "강변 데크와 가족형 객실을 묶은 주말 캠핑 펜션", "150,000원~", "바로결제", images.glamping, "/stays/river-forest-stay?utm_source=penbatv&utm_medium=main_property&utm_campaign=river-forest-stay"],
+  ["오션 캐빈 하우스", "경남 남해", "바다 전망 객실과 숯불 바비큐를 강조한 감성 펜션", "130,000원~", "예약요청", images.reservoir, "/stays/ocean-cabin-house?utm_source=penbatv&utm_medium=main_property&utm_campaign=ocean-cabin-house"]
+];
+
+function sectionMainShortcuts() {
+  const shortcuts = [
+    ["고객 화면", "유튜브 설명란 링크를 누른 고객이 사진, 영상, 일정, 객실, 결제까지 진행합니다.", "/stays/baebang-alps?utm_source=penbatv&utm_medium=main_customer&utm_campaign=baebang-alps", "예약 시연"],
+    ["사장님 관리", "객실, 요금, 사진, 영상, 후기, 주변정보와 예약 현황을 관리합니다.", "/host/rooms", "관리화면"],
+    ["운영자 관리", "입점 승인, 전체 예약, 결제, 정산, 유튜브 성과를 확인합니다.", "/admin/operations", "운영화면"]
+  ];
+  return `<section class="section"><div class="section-head"><h2>시연 바로가기</h2><span class="muted">고객 · 사장님 · 운영자</span></div><div class="cards">${shortcuts.map(([title, body, href, action]) => `<article class="card"><span class="chip">${action}</span><h3>${title}</h3><p>${body}</p><a class="btn" href="${href}">${title} 보기</a></article>`).join("")}</div></section>`;
+}
+
+function sectionMainProperties() {
+  return `<section class="section"><div class="section-head"><h2>상단에서 바로 보여줄 3개 숙소</h2><a class="btn alt" href="/host/properties">입점 등록</a></div><div class="cards">${mainProperties.map(([name, area, body, price, mode, image, href]) => `<article class="card image-card"><a class="image" href="${href}" style="background-image:url('${image}')"></a><div class="body"><span class="chip">${area}</span><h3>${name}</h3><p>${body}</p><div class="price">${price}</div><p><b>${mode}</b></p><div class="actions"><a class="btn" href="${href}">예약 화면</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a></div></div></article>`).join("")}</div></section>`;
+}
+
+function sectionMainScenario() {
+  const steps = [
+    ["01", "유튜브 영상 시청", "전체, 외부, 내부 영상을 보고 실제 공간을 먼저 확인합니다."],
+    ["02", "설명란 펜바TV 링크 클릭", "영상에서 본 숙소의 고객 예약 홈으로 바로 이동합니다."],
+    ["03", "사진·영상 재확인", "객실 내부, 바베큐장, 마당, 저수지 전망을 다시 확인합니다."],
+    ["04", "예약 가능일 선택", "달력에서 예약마감 날짜는 막고 가능한 날짜만 선택합니다."],
+    ["05", "객실·인원·옵션 선택", "객실, 인원, 바베큐 숯불세트, 불멍 장작 등을 선택합니다."],
+    ["06", "서버 견적 후 결제", "서버 금액을 기준으로 테스트 결제와 예약 확정까지 진행합니다."]
+  ];
+  return `<section class="section"><div class="section-head"><h2>유튜브에서 예약결제까지</h2><span class="muted">오늘 설명할 실제 시나리오</span></div><div class="flow-grid">${steps.map(([step, title, body]) => `<article class="card flow-card"><strong>${step}</strong><h3>${title}</h3><p>${body}</p></article>`).join("")}</div></section>`;
+}
+
 function sectionHome() {
   return `
   <section class="metrics" aria-label="펜바TV 운영 지표">
@@ -452,6 +483,13 @@ function sectionFeatures() {
 
 function render(pathname) {
   const route = routes[pathname] ?? routes["/"];
+  if (pathname === "/") {
+    return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
+      <section class="hero"><div><span class="eyebrow">PenBa TV Main Demo</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=hero_demo&utm_campaign=baebang-alps">고객 예약 시연하기</a><a class="btn alt" href="/host/rooms">사장님 관리 보기</a><a class="btn alt" href="/admin/operations">운영자 관리 보기</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
+      ${sectionMainShortcuts()}${sectionMainProperties()}${sectionMainScenario()}${sectionHome()}${sectionCustomerBookingForm()}${sectionPhotos()}
+      <section class="band section"><h2>오늘 시연 포인트</h2><p>이제 메인 화면은 개발 일정 설명보다 고객 예약 흐름을 먼저 보여줍니다. 고객 화면, 사장님 관리화면, 운영자 관리화면으로 바로 이동하고, 입점 숙소 3개 대표 화면과 유튜브 영상 링크를 한눈에 확인할 수 있습니다.</p></section>
+    </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/stays/baebang-alps?utm_source=penbatv&utm_medium=bottom_room&utm_campaign=baebang-alps">객실</a><a href="/booking-calendar-status">예약</a><a href="/host/rooms">사장님</a><a href="/admin/operations">운영자</a></nav><script>${bookingDemoScript}</script></body></html>`;
+  }
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
     <section class="hero"><div><span class="eyebrow">PenBa TV</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/">고객 홈</a><a class="btn alt" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=youtube_description&utm_campaign=baebang-alps">객실 선택</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a><a class="btn alt" href="/host/make24-benchmark">입점 제안</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
     ${sectionCustomerBookingForm()}${sectionPriorityCheckout()}${sectionCustomerYoutubeFlow()}${sectionVideoCategories()}${sectionRoomMediaSelection()}${sectionHome()}${sectionPhotos()}${sectionCalendar()}${sectionDirectBooking()}${sectionOperations()}${sectionPackages()}${sectionTemplates()}${sectionFeatures()}
@@ -485,7 +523,11 @@ const checkoutDemo = ${JSON.stringify(checkoutDemo)};
 const bookingFormDemo = ${JSON.stringify(bookingFormDemo)};
 const bookingDemoScript = ${JSON.stringify(bookingDemoScript)};
 const roomMedia = ${JSON.stringify(roomMedia)};
+const mainProperties = ${JSON.stringify(mainProperties)};
 ${label.toString()}
+${sectionMainShortcuts.toString()}
+${sectionMainProperties.toString()}
+${sectionMainScenario.toString()}
 ${sectionHome.toString()}
 ${sectionCustomerYoutubeFlow.toString()}
 ${sectionVideoCategories.toString()}
