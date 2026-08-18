@@ -42,6 +42,7 @@ async function requestJson(pathname, init = {}) {
     headers: {
       "Content-Type": "application/json",
       "x-admin-token": process.env.STAYLINK_ADMIN_API_TOKEN,
+      "x-penbatv-role": "host",
       ...(init.headers ?? {})
     }
   });

@@ -53,6 +53,54 @@ async function requestJson(pathname, init = {}) {
   return payload;
 }
 
+async function requestJsonResult(pathname, init = {}) {
+  const response = await fetch(`${baseUrl}${pathname}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(init.headers ?? {})
+    }
+  });
+  const payload = await response.json().catch(() => ({}));
+
+  return { ok: response.ok, status: response.status, payload };
+}
+
+async function createHoldForFirstAvailableRange(input) {
+  const availableDates = new Set(input.days.filter((day) => day.available).map((day) => day.date));
+  const candidates = input.days.filter((day) => day.available && availableDates.has(addDays(day.date, 1)));
+
+  for (const candidate of candidates) {
+    const checkIn = candidate.date;
+    const checkOut = addDays(checkIn, 2);
+    const result = await requestJsonResult("/api/booking-holds", {
+      method: "POST",
+      body: JSON.stringify({
+        roomId: input.roomId,
+        checkIn,
+        checkOut,
+        adultCount: 2,
+        childCount: 0,
+        optionItems: [],
+        utmCode: "mvp_open",
+        holdMinutes: 5
+      })
+    });
+
+    if (result.ok && result.payload.hold?.id) {
+      return { hold: result.payload, checkIn, checkOut };
+    }
+
+    if (result.status === 409 && result.payload.availability?.blockedReason === "active_hold") {
+      continue;
+    }
+
+    throw new Error(`${result.status} /api/booking-holds: ${JSON.stringify(result.payload)}`);
+  }
+
+  throw new Error("No available two-night range could create a booking hold for MVP QA.");
+}
+
 async function requestHtml(pathname) {
   const response = await fetch(`${baseUrl}${pathname}`);
   const text = await response.text();
@@ -135,20 +183,20 @@ try {
       endDate: addDays(today, 90)
     })}`
   );
-  const availableDates = new Set((calendar.days ?? []).filter((day) => day.available).map((day) => day.date));
-  const checkIn = (calendar.days ?? []).find((day) =>
-    day.available && availableDates.has(addDays(day.date, 1))
-  )?.date;
-
-  if (!checkIn) throw new Error("No two-night available range found for MVP QA.");
-
-  const checkOut = addDays(checkIn, 2);
   await requestHtml(`/stays/${accommodationId}?utm_source=penbatv&utm_medium=mvp_open&utm_campaign=${accommodationId}`);
   assertSourceMarkers("src/app/stays/[id]/StayAppClient.tsx", [
     "예약일정 선택",
     "객실 사진과 영상",
     "이 방·사이트로 예약하기"
   ]);
+
+  const holdResult = await createHoldForFirstAvailableRange({
+    days: calendar.days ?? [],
+    roomId: room.id
+  });
+  const checkIn = holdResult.checkIn;
+  const checkOut = holdResult.checkOut;
+  created.holdId = holdResult.hold.hold.id;
 
   const quote = await requestJson("/api/quote", {
     method: "POST",
@@ -166,23 +214,6 @@ try {
   if (!quote.quote?.totalAmount || quote.quote.totalAmount <= 0) {
     throw new Error("Server-side quote did not return a positive amount.");
   }
-
-  const hold = await requestJson("/api/booking-holds", {
-    method: "POST",
-    body: JSON.stringify({
-      roomId: room.id,
-      checkIn,
-      checkOut,
-      adultCount: 2,
-      childCount: 0,
-      optionItems: [],
-      utmCode: "mvp_open",
-      holdMinutes: 5
-    })
-  });
-
-  if (!hold.hold?.id) throw new Error("Booking hold was not created.");
-  created.holdId = hold.hold.id;
 
   const payment = await requestJson("/api/payments/prepare", {
     method: "POST",
@@ -202,6 +233,9 @@ try {
   });
 
   if (!payment.payment?.orderId) throw new Error("Payment prepare did not create an order.");
+  if (!payment.orderStorage?.persisted) {
+    throw new Error(`Payment order was not persisted: ${payment.orderStorage?.reason ?? "unknown reason"}`);
+  }
   created.orderIds.push(payment.payment.orderId);
 
   const confirmed = await requestJson("/api/payments/confirm", {

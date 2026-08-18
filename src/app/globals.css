@@ -2720,6 +2720,181 @@ dd {
   margin-top: 6px;
 }
 
+.partner-inquiry-page {
+  min-height: 100vh;
+  background: #f6f8f1;
+  color: #17211d;
+  padding: 22px;
+  padding-bottom: 76px;
+}
+
+.partner-inquiry-hero,
+.partner-inquiry-section {
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.partner-inquiry-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.34fr);
+  gap: 18px;
+  align-items: end;
+  min-height: 420px;
+  border-radius: 24px;
+  background:
+    linear-gradient(105deg, rgba(19, 44, 30, 0.86), rgba(19, 44, 30, 0.28)),
+    url("/penba/bbq-yard.jpg") center / cover no-repeat;
+  color: #fff;
+  padding: 28px;
+  box-shadow: 0 24px 64px rgba(31, 56, 45, 0.16);
+}
+
+.partner-inquiry-hero .muted,
+.partner-inquiry-hero p {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.partner-inquiry-hero h1 {
+  max-width: 720px;
+  margin: 10px 0;
+  font-size: clamp(38px, 6vw, 66px);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.partner-inquiry-hero p {
+  max-width: 680px;
+  line-height: 1.7;
+}
+
+.partner-inquiry-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.partner-inquiry-actions a,
+.partner-inquiry-section .section-head a,
+.partner-inquiry-form button {
+  border: 0;
+  border-radius: 999px;
+  background: #d95d39;
+  color: #fff;
+  padding: 12px 15px;
+  font-weight: 950;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.partner-inquiry-actions a:last-child {
+  background: rgba(255, 255, 255, 0.9);
+  color: #173824;
+}
+
+.partner-inquiry-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.16);
+  padding: 20px;
+  backdrop-filter: blur(12px);
+}
+
+.partner-inquiry-card span {
+  width: fit-content;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #173824;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.partner-inquiry-card b {
+  font-size: 25px;
+  line-height: 1.18;
+}
+
+.partner-inquiry-card small {
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.5;
+}
+
+.partner-inquiry-section {
+  margin-top: 18px;
+  border: 1px solid rgba(32, 80, 62, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 22px;
+  box-shadow: 0 16px 42px rgba(31, 56, 45, 0.08);
+}
+
+.partner-inquiry-section.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.55fr);
+  gap: 16px;
+}
+
+.partner-inquiry-form,
+.partner-inquiry-checklist {
+  display: grid;
+  gap: 12px;
+}
+
+.partner-inquiry-form h2,
+.partner-inquiry-checklist h2 {
+  margin: 0;
+}
+
+.partner-inquiry-form label {
+  display: grid;
+  gap: 7px;
+  color: #5d6a61;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.partner-inquiry-form input,
+.partner-inquiry-form select,
+.partner-inquiry-form textarea {
+  width: 100%;
+  border: 1px solid rgba(32, 80, 62, 0.14);
+  border-radius: 13px;
+  background: #f9fbf8;
+  color: #17211d;
+  padding: 13px;
+  font: inherit;
+  font-weight: 800;
+}
+
+.partner-inquiry-form textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.partner-inquiry-form small {
+  color: #66746c;
+  line-height: 1.5;
+}
+
+.partner-inquiry-checklist > div {
+  display: grid;
+  gap: 8px;
+}
+
+.partner-inquiry-checklist label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid rgba(32, 80, 62, 0.1);
+  border-radius: 14px;
+  background: #f7faf6;
+  padding: 12px;
+  font-weight: 900;
+}
+
 @media (max-width: 900px) {
   .penba-main-home {
     padding-inline: 16px;
@@ -2732,7 +2907,9 @@ dd {
   .main-property-grid,
   .main-story-board,
   .main-video-grid,
-  .main-partner-band {
+  .main-partner-band,
+  .partner-inquiry-hero,
+  .partner-inquiry-section.split {
     grid-template-columns: 1fr;
   }
 
@@ -6460,6 +6637,34 @@ button {
 
 .host-control-hero .muted {
   color: rgba(255, 255, 255, 0.84);
+}
+
+.host-home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.host-home-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #173824;
+  padding: 0 15px;
+  font-size: 13px;
+  font-weight: 950;
+  text-decoration: none;
+  box-shadow: 0 12px 26px rgba(11, 24, 16, 0.18);
+}
+
+.host-home-actions a:last-child {
+  background: rgba(23, 56, 36, 0.78);
+  color: #fff;
 }
 
 .host-control-hero h1 {

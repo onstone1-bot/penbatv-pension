@@ -9,6 +9,15 @@ export type PaymentOrderLookup =
   | { available: false; reason: string };
 
 function errorMessage(error: unknown) {
+  if (typeof error === "object" && error !== null) {
+    const record = error as Record<string, unknown>;
+    const message = record.message;
+    const details = record.details;
+    const hint = record.hint;
+
+    return [message, details, hint].filter((item): item is string => typeof item === "string" && item.length > 0).join(" / ") || JSON.stringify(record);
+  }
+
   return error instanceof Error ? error.message : "Unknown payment order storage error";
 }
 

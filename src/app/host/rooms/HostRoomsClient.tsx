@@ -1030,6 +1030,12 @@ export function HostRoomsClient({
     <main className="host-rooms-page">
       <section className="panel host-control-hero">
         <div className="host-hero-copy">
+          <div className="host-home-actions" aria-label="펜바TV 바로가기">
+            <Link href="/">펜바TV홈</Link>
+            <Link href="/stays/baebang-alps?utm_source=penbatv&utm_medium=host_center&utm_campaign=owner_preview">
+              고객 예약화면
+            </Link>
+          </div>
           <p className="muted">PenBa TV Partner Center</p>
           <h1>{accommodationForm.name} 운영센터</h1>
           <p className="muted">
@@ -1048,7 +1054,7 @@ export function HostRoomsClient({
             <Link href="/host/reservation-payment">예약 결제 프로그램</Link>
             <Link href="/host/make24-benchmark">입점 제안</Link>
             <Link href="/host/design-benchmark">디자인 선택</Link>
-            <Link href="/">입점 펜션 목록</Link>
+            <Link href="/">펜바TV홈</Link>
             <Link href="/host/launch-plan">런칭 가이드</Link>
           </div>
         </div>

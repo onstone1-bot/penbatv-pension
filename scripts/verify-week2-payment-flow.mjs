@@ -54,6 +54,54 @@ async function requestJson(pathname, init) {
   return payload;
 }
 
+async function requestJsonResult(pathname, init = {}) {
+  const response = await fetch(`${baseUrl}${pathname}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(init.headers ?? {})
+    }
+  });
+  const payload = await response.json().catch(() => ({}));
+
+  return { ok: response.ok, status: response.status, payload };
+}
+
+async function createHoldForFirstAvailableRange(input) {
+  const availableDates = new Set(input.days.filter((day) => day.available).map((day) => day.date));
+  const candidates = input.days.filter((day) => day.available && availableDates.has(addDays(day.date, 1)));
+
+  for (const candidate of candidates) {
+    const checkIn = candidate.date;
+    const checkOut = addDays(checkIn, 2);
+    const result = await requestJsonResult("/api/booking-holds", {
+      method: "POST",
+      body: JSON.stringify({
+        roomId: input.roomId,
+        checkIn,
+        checkOut,
+        adultCount: 2,
+        childCount: 0,
+        optionItems: [],
+        utmCode: "campheaven_room_01",
+        holdMinutes: 5
+      })
+    });
+
+    if (result.ok && result.payload.hold?.id) {
+      return { hold: result.payload, checkIn, checkOut };
+    }
+
+    if (result.status === 409 && result.payload.availability?.blockedReason === "active_hold") {
+      continue;
+    }
+
+    throw new Error(`${result.status} /api/booking-holds: ${JSON.stringify(result.payload)}`);
+  }
+
+  throw new Error("No available two-night range could create a booking hold for payment QA.");
+}
+
 async function cleanup(supabase, created) {
   if (created.bookingId) {
     await supabase.from("booking_option_items").delete().eq("booking_id", created.bookingId);
@@ -114,32 +162,14 @@ try {
       endDate: addDays(today, 75)
     })}`
   );
-  const availableDates = new Set(
-    (calendar.days ?? []).filter((day) => day.available).map((day) => day.date)
-  );
-  const checkIn = (calendar.days ?? []).find((day) =>
-    day.available && availableDates.has(addDays(day.date, 1))
-  )?.date;
-
-  if (!checkIn) throw new Error("No two-night available range found for payment QA.");
-
-  const checkOut = addDays(checkIn, 2);
-  const hold = await requestJson("/api/booking-holds", {
-    method: "POST",
-    body: JSON.stringify({
-      roomId: room.id,
-      checkIn,
-      checkOut,
-      adultCount: 2,
-      childCount: 0,
-      optionItems: [],
-      utmCode: "campheaven_room_01",
-      holdMinutes: 5
-    })
+  const holdResult = await createHoldForFirstAvailableRange({
+    days: calendar.days ?? [],
+    roomId: room.id
   });
+  const checkIn = holdResult.checkIn;
+  const checkOut = holdResult.checkOut;
 
-  if (!hold.hold?.id) throw new Error("Hold creation failed.");
-  created.holdId = hold.hold.id;
+  created.holdId = holdResult.hold.hold.id;
 
   const manualPayment = await requestJson("/api/payments/prepare", {
     method: "POST",
@@ -160,6 +190,9 @@ try {
 
   if (!manualPayment.payment?.orderId || manualPayment.payment.mode !== "manual") {
     throw new Error("Manual bank transfer prepare failed.");
+  }
+  if (!manualPayment.orderStorage?.persisted) {
+    throw new Error(`Manual payment order was not persisted: ${manualPayment.orderStorage?.reason ?? "unknown reason"}`);
   }
 
   created.orderIds.push(manualPayment.payment.orderId);
@@ -209,6 +242,9 @@ try {
 
   if (!naverPay.payment?.orderId) {
     throw new Error("Naver Pay prepare did not create an order.");
+  }
+  if (!naverPay.orderStorage?.persisted) {
+    throw new Error(`Naver Pay order was not persisted: ${naverPay.orderStorage?.reason ?? "unknown reason"}`);
   }
 
   created.orderIds.push(naverPay.payment.orderId);

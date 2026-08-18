@@ -247,7 +247,7 @@ export default function HomePage() {
           <p>입점 신청 후 객실, 사진, 영상, 요금, 예약 현황을 직접 관리할 수 있는 화면으로 연결됩니다.</p>
         </div>
         <div>
-          <Link href="/host/proposals">입점 문의</Link>
+          <Link href="/partner-inquiry">입점 문의</Link>
           <Link href="/host/rooms">사장님 관리</Link>
         </div>
       </section>

@@ -25,13 +25,27 @@ export function AuthClient({ defaultProvider = null, statusMessage = null }: Aut
 
   async function signInWithProvider(provider: AuthProvider) {
     setIsLoading(provider);
+
+    if (provider === "naver") {
+      localStorage.setItem(
+        "penbatv.demoProfile",
+        JSON.stringify({
+          provider: "naver",
+          name: "네이버 데모 고객",
+          signedInAt: new Date().toISOString()
+        })
+      );
+      setMessage("네이버 실연동 전 데모 로그인으로 고객홈에 이동합니다. 실제 연동은 네이버 OAuth 콜백 구현 후 연결합니다.");
+      window.location.href = "/customer-home?auth_status=demo&provider=naver";
+      return;
+    }
+
     const supabase = createClient();
-    const oauthProvider = provider === "kakao" ? "kakao" : "custom:naver";
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: oauthProvider as Parameters<typeof supabase.auth.signInWithOAuth>[0]["provider"],
+      provider: "kakao",
       options: {
         redirectTo: `${window.location.origin}/auth/callback?next=/customer-home`,
-        scopes: provider === "kakao" ? "profile_nickname account_email phone_number" : "name email mobile"
+        scopes: "profile_nickname account_email phone_number"
       }
     });
 
