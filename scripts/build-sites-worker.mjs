@@ -36,11 +36,11 @@ const css = `
 .booking-panel{display:grid;grid-template-columns:minmax(0,.9fr)minmax(360px,1.1fr);gap:16px;border:1px solid rgba(15,90,71,.16);border-radius:16px;background:#fff;padding:18px}.booking-panel h2{margin:7px 0 10px;font-size:25px}.booking-panel p{margin:0;color:var(--muted);line-height:1.6}.booking-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.booking-grid label{border:1px solid var(--line);border-radius:10px;background:#f8faf9;padding:12px}.booking-grid span,.pay-card span{display:block;color:var(--muted);font-size:12px;font-weight:900}.booking-grid strong{display:block;margin-top:5px}.pay-card{display:grid;gap:10px}.pay-card>div{display:flex;align-items:center;justify-content:space-between;gap:12px}.pay-card .total{border-top:1px solid var(--line);padding-top:12px}.pay-card .total strong{color:var(--green);font-size:24px}.methods{display:flex!important;flex-wrap:wrap;justify-content:flex-start!important;gap:8px}.methods span{border-radius:999px;background:#edf7f2;color:var(--green);padding:7px 9px}.pay-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:8px}.pay-actions a{border-radius:10px;padding:13px;text-align:center;text-decoration:none;font-weight:900}.pay-actions a:first-child{background:var(--green);color:#fff}.pay-actions a:last-child{border:1px solid var(--line);color:var(--ink)}
 .live-checkout{display:grid;grid-template-columns:minmax(0,.95fr)minmax(320px,.75fr);gap:14px}.live-form,.live-receipt{border:1px solid var(--line);border-radius:14px;background:#fff;padding:18px}.live-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.live-form label{display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:900}.live-form input,.live-form select{width:100%;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit}.payment-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.payment-methods label{border:1px solid var(--line);border-radius:12px;background:#f8faf9;padding:12px;color:var(--ink);cursor:pointer}.payment-methods input{width:auto;margin-right:6px}.live-receipt{position:sticky;top:12px;height:max-content}.live-receipt h2,.live-form h2{margin-top:0}.receipt-lines{display:grid;gap:9px}.receipt-lines div,.receipt-lines strong{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-bottom:8px}.receipt-lines strong{border:0;color:var(--green);font-size:22px}.complete-box{border:1px solid rgba(15,90,71,.18);border-radius:14px;background:#edf7f2;padding:16px;color:var(--green);font-weight:900}.reservation-list{display:grid;gap:10px}.reservation-list article{border:1px solid var(--line);border-radius:12px;background:#fff;padding:14px}.reservation-list h3,.reservation-list p{margin:0}.reservation-list p{margin-top:6px}.form-message{margin-top:12px;border-radius:10px;background:#fff8e8;color:#7b4e00;padding:10px;font-weight:900}.form-message.ok{background:#edf7f2;color:var(--green)}.form-message.no{background:#fff0ec;color:#a33a1f}
 .calendar{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:14px}.calendar-grid{display:grid;grid-template-columns:190px repeat(7,110px);min-width:960px}.cal-head,.date,.room,.cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px;min-height:72px}.cal-head,.date{background:#f8faf9;font-weight:900}.cell{text-align:center;text-decoration:none}.available{background:#edf7f2;color:var(--green)}.few{background:#fff8e8;color:#875a00}.reserved{background:#fff0ec;color:#a33a1f}.blocked{background:#eef2f6;color:#405161}.wait{background:#f5efff;color:#67409b}.bottom{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(1080px,100%);display:grid;grid-template-columns:repeat(5,1fr);gap:6px;border-top:1px solid var(--line);background:rgba(255,255,255,.96);padding:8px 12px}.bottom a{border-radius:10px;padding:10px 6px;text-align:center;text-decoration:none;color:var(--muted);font-size:12px;font-weight:900}.bottom a.on{background:#edf7f2;color:var(--green)}
-.public-customer-app{max-width:960px;padding-bottom:96px}.customer-home-topbar{position:sticky;top:10px;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;border:1px solid rgba(15,90,71,.14);border-radius:14px;background:rgba(255,255,255,.94);padding:12px 14px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.customer-home-topbar a{border-radius:999px;background:var(--green);color:#fff;padding:9px 12px;text-decoration:none;font-size:12px;font-weight:900}.customer-home-topbar span{color:var(--muted);font-size:13px;font-weight:900}.stay-hero-public{position:relative;overflow:hidden;display:grid;align-items:end;min-height:330px;margin-bottom:14px;border-radius:20px;background-size:cover;background-position:center;box-shadow:var(--shadow)}.stay-hero-public:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.58))}.stay-hero-public .hero-copy{position:relative;padding:26px;color:#fff}.stay-hero-public span{display:inline-flex;border-radius:999px;background:rgba(255,255,255,.18);padding:8px 10px;font-size:12px;font-weight:900}.stay-hero-public h1{margin:10px 0 8px;font-size:42px;line-height:1.1}.stay-hero-public p{max-width:660px;margin:0;line-height:1.6}.home-content-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}.home-content-tabs a{border:1px solid var(--line);border-radius:12px;background:#fff;padding:13px;text-align:center;text-decoration:none;font-weight:900}.home-content-tabs .active{background:var(--green);color:#fff}.public-customer-app .booking-form-demo{margin-top:0}.public-proof{margin-top:16px;border:1px solid rgba(15,90,71,.14);border-radius:14px;background:#fff;padding:16px}.public-proof h2{margin:0 0 10px}.public-proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.public-proof-grid a,.public-proof-grid article{display:grid;gap:8px;border:1px solid var(--line);border-radius:12px;background:#f8faf9;padding:12px;text-decoration:none}.public-proof-grid span{height:130px;border-radius:10px;background-size:cover;background-position:center}.public-proof-grid b,.public-proof-grid small{display:block}.public-proof-grid small{color:var(--muted);line-height:1.45}
-@media(max-width:720px){.shell{padding-inline:14px}.hero,.metrics,.cards,.templates,.features,.packages,.photos,.flow-grid,.video-category-grid,.room-media-grid,.booking-panel,.booking-grid,.pay-actions,.checkout-demo,.checkout-grid,.checkout-media,.booking-form-grid,.booking-room-pick,.guest-option-grid,.booking-demo-top,.date-button-grid,.date-inputs,.demo-room-grid,.booking-demo-actions,.route-focus,.route-task-grid,.live-checkout,.live-form-grid,.payment-methods,.public-proof-grid{grid-template-columns:1fr}.hero h1{font-size:32px}.video-stack a{grid-template-columns:72px 1fr auto}.section-head{display:block}.bottom{grid-template-columns:repeat(5,1fr)}.room-choice-card .media{grid-template-columns:1fr}.room-choice-card .side-photo{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.room-choice-card .main-photo,.room-choice-card .side-photo{min-height:170px}.live-receipt{position:static}.public-customer-app{padding-inline:14px}.customer-home-topbar{top:6px}.stay-hero-public{min-height:286px;margin-inline:-2px}.stay-hero-public h1{font-size:30px}.home-content-tabs{grid-template-columns:1fr 1fr}}
+.public-customer-app{max-width:960px;padding-bottom:96px}.customer-home-topbar{position:sticky;top:10px;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;border:1px solid rgba(15,90,71,.14);border-radius:14px;background:rgba(255,255,255,.94);padding:12px 14px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.customer-home-topbar a{border-radius:999px;background:var(--green);color:#fff;padding:9px 12px;text-decoration:none;font-size:12px;font-weight:900}.customer-home-topbar span{color:var(--muted);font-size:13px;font-weight:900}.stay-hero-public{position:relative;overflow:hidden;display:grid;align-items:end;min-height:330px;margin-bottom:14px;border-radius:20px;background-size:cover;background-position:center;box-shadow:var(--shadow)}.stay-hero-public:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.58))}.stay-hero-public .hero-copy{position:relative;padding:26px;color:#fff}.stay-hero-public span{display:inline-flex;border-radius:999px;background:rgba(255,255,255,.18);padding:8px 10px;font-size:12px;font-weight:900}.stay-hero-public h1{margin:10px 0 8px;font-size:42px;line-height:1.1}.stay-hero-public p{max-width:660px;margin:0;line-height:1.6}.home-content-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}.home-content-tabs a{border:1px solid var(--line);border-radius:12px;background:#fff;padding:13px;text-align:center;text-decoration:none;font-weight:900}.home-content-tabs .active{background:var(--green);color:#fff}.public-customer-app .booking-form-demo{margin-top:0}.public-proof{margin-top:16px;border:1px solid rgba(15,90,71,.14);border-radius:14px;background:#fff;padding:16px}.public-proof h2{margin:0 0 10px}.public-proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.public-proof-grid a,.public-proof-grid article{display:grid;gap:8px;border:1px solid var(--line);border-radius:12px;background:#f8faf9;padding:12px;text-decoration:none}.public-proof-grid span{height:130px;border-radius:10px;background-size:cover;background-position:center}.public-proof-grid b,.public-proof-grid small{display:block}.public-proof-grid small{color:var(--muted);line-height:1.45}.public-route-hero{margin-top:0;background-image:linear-gradient(135deg,rgba(255,255,255,.96),rgba(237,247,242,.88)),var(--route-image)}.public-route-hero h1{font-size:40px}.public-notice{border:1px solid rgba(15,90,71,.14);border-radius:14px;background:#edf7f2;padding:14px;color:var(--green);font-weight:900}.form-grid-demo{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.form-grid-demo label{display:grid;gap:6px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:12px;color:var(--muted);font-size:12px;font-weight:900}.form-grid-demo input,.form-grid-demo textarea,.form-grid-demo select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;color:var(--ink)}.form-grid-demo textarea{min-height:86px;resize:vertical}.wide-field{grid-column:1/-1}.status-table{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#fff}.status-row{display:grid;grid-template-columns:1.1fr .8fr .8fr 1fr;gap:8px;border-bottom:1px solid var(--line);padding:12px}.status-row:last-child{border-bottom:0}.status-row.header{background:#f8faf9;font-weight:900}.status-row b{color:var(--green)}
+@media(max-width:720px){.shell{padding-inline:14px}.hero,.metrics,.cards,.templates,.features,.packages,.photos,.flow-grid,.video-category-grid,.room-media-grid,.booking-panel,.booking-grid,.pay-actions,.checkout-demo,.checkout-grid,.checkout-media,.booking-form-grid,.booking-room-pick,.guest-option-grid,.booking-demo-top,.date-button-grid,.date-inputs,.demo-room-grid,.booking-demo-actions,.route-focus,.route-task-grid,.live-checkout,.live-form-grid,.payment-methods,.public-proof-grid,.form-grid-demo,.status-row{grid-template-columns:1fr}.hero h1{font-size:32px}.video-stack a{grid-template-columns:72px 1fr auto}.section-head{display:block}.bottom{grid-template-columns:repeat(5,1fr)}.room-choice-card .media{grid-template-columns:1fr}.room-choice-card .side-photo{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.room-choice-card .main-photo,.room-choice-card .side-photo{min-height:170px}.live-receipt{position:static}.public-customer-app{padding-inline:14px}.customer-home-topbar{top:6px}.stay-hero-public{min-height:286px;margin-inline:-2px}.stay-hero-public h1{font-size:30px}.home-content-tabs{grid-template-columns:1fr 1fr}.public-route-hero h1{font-size:30px}}
 `;
 
-const siteVersionLabel = "업데이트 화면 v20 · 실제 예약 기능 우선 적용";
+const siteVersionLabel = "공개 배포 정비 v22 · 로컬 시연 흐름 반영";
 
 const routes = {
   "/": {
@@ -784,6 +784,157 @@ function sectionPublicProof() {
   </div></section>`;
 }
 
+function renderDocument(route, pathname, content, active = "홈") {
+  const activeClass = (name) => active === name ? " class=\"on\"" : "";
+  return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
+    <div class="version-banner"><span>${siteVersionLabel}</span><small>공개 URL 경로별 재정비: ${pathname}</small></div>
+    ${content}
+  </main><nav class="bottom"><a${activeClass("홈")} href="/">홈</a><a${activeClass("객실")} href="/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=bottom_room&utm_campaign=baebang-alps">객실</a><a${activeClass("예약")} href="/booking-calendar-status">예약</a><a${activeClass("내예약")} href="/my">내예약</a><a${activeClass("사장님")} href="/host/rooms">사장님</a></nav><script>${bookingDemoScript}</script><script>${checkoutScript}</script></body></html>`;
+}
+
+function sectionPublicRouteHero(pathname, config = {}) {
+  const route = routes[pathname] ?? routes["/"];
+  const image = config.image ?? images.sign;
+  const eyebrow = config.eyebrow ?? route.title;
+  const title = config.title ?? route.subtitle;
+  const body = config.body ?? route.body;
+  const actions = config.actions ?? [
+    ["고객 홈", "/"],
+    ["고객 예약 시연", "/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=route_hero&utm_campaign=baebang-alps"],
+    ["예약 현황", "/booking-calendar-status"]
+  ];
+  return `<section class="hero public-route-hero" style="--route-image:url('${image}')"><div><span class="eyebrow">${eyebrow}</span><h1>${title}</h1><p>${body}</p><div class="actions">${actions.map(([label, href], index) => `<a class="btn${index === 0 ? "" : " alt"}" href="${href}">${label}</a>`).join("")}</div></div><div class="video-stack">${videos.slice(0, 3).map(([videoTitle, label, , thumb, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${thumb}')"></span><b>${videoTitle}</b><small>${label}</small></a>`).join("")}</div></section>`;
+}
+
+function sectionMake24Process() {
+  const steps = [
+    ["01", "무료 촬영 제안", "첫 입점 펜션은 유튜브 촬영과 고객 예약 홈 구성을 묶어서 제안합니다."],
+    ["02", "자료 등록", "사장님이 객실, 요금, 사진, 영상 링크, 바베큐 옵션을 입력합니다."],
+    ["03", "디자인 선택", "영상형, 예약형, 바베큐형 중 숙소에 맞는 상세 페이지 포맷을 고릅니다."],
+    ["04", "예약결제 테스트", "예약 가능일, 객실 선택, 견적 계산, 결제 진행을 실제 시나리오로 점검합니다."],
+    ["05", "유튜브 링크 연결", "영상 설명란과 고정 댓글에서 해당 숙소 고객 홈으로 연결합니다."],
+    ["06", "운영 리포트", "예약, 결제, 유튜브 유입, 정산 예정금액을 사장님과 운영자가 확인합니다."]
+  ];
+  return `<section class="section"><div class="section-head"><h2>입점 제작 과정</h2><span class="muted">촬영 제안부터 고객 예약 오픈까지</span></div><div class="flow-grid">${steps.map(([step, title, body]) => `<article class="card flow-card"><strong>${step}</strong><h3>${title}</h3><p>${body}</p></article>`).join("")}</div></section>`;
+}
+
+function sectionHostRegistrationDemo() {
+  return `<section class="section"><div class="section-head"><h2>사장님 등록 관리</h2><span class="muted">입력하면 고객 홈에 반영되는 항목</span></div><div class="form-grid-demo">
+    <label>숙소명<input value="배방알프스"></label>
+    <label>지역<input value="충남 아산 배방"></label>
+    <label>객실명<input value="독채펜션 A"></label>
+    <label>기준/최대 인원<input value="기준 4명 / 최대 8명"></label>
+    <label>대표 유튜브 링크<input value="https://youtu.be/CGOBDAEbBqc"></label>
+    <label>영상 분류<select><option>전체 투어 영상</option><option>외부·바베큐</option><option>객실 내부</option></select></label>
+    <label class="wide-field">객실 소개<textarea>저수지 전망, 목조 독채, 바베큐 데크를 갖춘 가족·단체형 펜션입니다.</textarea></label>
+  </div><div class="actions" style="margin-top:12px"><a class="btn" href="/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=host_preview&utm_campaign=baebang-alps">고객 화면 미리보기</a><a class="btn alt" href="/booking-calendar-status">예약 현황 보기</a></div></section>`;
+}
+
+function sectionOwnerReservationStatus() {
+  const rows = [
+    ["2026-08-22", "독채펜션 A", "김민지", "결제완료"],
+    ["2026-08-23", "돔 글램핑 B", "박성훈", "예약대기"],
+    ["2026-08-24", "독채펜션 A", "방막기", "마감"]
+  ];
+  return `<section class="section"><div class="section-head"><h2>사장님 예약 현황</h2><span class="muted">날짜별 예약·결제 상태</span></div><div class="status-table"><div class="status-row header"><span>날짜</span><span>객실</span><span>예약자</span><span>상태</span></div>${rows.map(([date, room, guest, status]) => `<div class="status-row"><span>${date}</span><span>${room}</span><span>${guest}</span><b>${status}</b></div>`).join("")}</div></section>`;
+}
+
+function sectionDesignApplication() {
+  return `<section class="section"><div class="section-head"><h2>선택한 디자인이 적용되는 위치</h2><span class="muted">고객 홈 자동 반영</span></div><div class="cards">
+    <article class="card"><span class="chip">Hero</span><h3>상단 대표 영상·사진</h3><p>사장님이 등록한 대표 이미지와 유튜브 링크가 고객 홈 첫 화면에 반영됩니다.</p></article>
+    <article class="card"><span class="chip">Rooms</span><h3>객실 카드</h3><p>객실별 내부·외부 사진과 영상 분류가 객실 선택 단계에 표시됩니다.</p></article>
+    <article class="card"><span class="chip">Booking</span><h3>예약 결제</h3><p>선택한 디자인 안에서 달력, 인원, 옵션, 결제 버튼이 자연스럽게 이어집니다.</p></article>
+  </div></section>`;
+}
+
+function renderHostMake24Page(pathname) {
+  const route = routes[pathname];
+  return renderDocument(route, pathname, `${sectionPublicRouteHero(pathname, {
+    eyebrow: "MAKE24 Pension Benchmark",
+    title: "펜션 사장님 입점 제안 페이지 구조",
+    body: "메이크24식 펜션 제작 제안 화면을 참고하되, 펜바TV는 유튜브 촬영과 예약결제, 사장님 관리화면까지 연결하는 입점 상품으로 보여줍니다.",
+    image: images.entrance,
+    actions: [["입점 등록", "/host/properties"], ["예약 결제 프로그램", "/host/reservation-payment"], ["디자인 선택", "/host/design-benchmark"], ["고객 홈", "/"]]
+  })}${sectionPackages()}${sectionMake24Process()}${sectionHostRegistrationDemo()}${sectionOperations()}`, "사장님");
+}
+
+function renderDesignBenchmarkPage(pathname) {
+  const route = routes[pathname];
+  return renderDocument(route, pathname, `${sectionPublicRouteHero(pathname, {
+    eyebrow: "HDWEB Design Benchmark",
+    title: "펜바TV 펜션 디자인 선택형 화면",
+    body: "입점 사장님이 영상형, 예약형, 바베큐형 디자인을 고르면 고객 예약 홈의 첫 화면, 객실 카드, 예약 영역에 같은 방향성이 반영됩니다.",
+    image: images.interior3,
+    actions: [["입점 등록", "/host/properties"], ["입점 제안", "/host/make24-benchmark"], ["예약 결제 프로그램", "/host/reservation-payment"]]
+  })}${sectionTemplates()}${sectionDesignApplication()}${sectionRoomMediaSelection()}`, "사장님");
+}
+
+function renderReservationPaymentPage(pathname) {
+  const route = routes[pathname];
+  return renderDocument(route, pathname, `${sectionPublicRouteHero(pathname, {
+    eyebrow: "Reservation Payment Program",
+    title: "예약 선점부터 결제 승인과 정산까지",
+    body: "고객이 날짜와 객실을 고르면 예약 가능 여부를 확인하고, 결제 전 15분 홀드, 견적 계산, 결제 승인, 예약 확정, 사장님 확인으로 이어집니다.",
+    image: images.bbqDeck,
+    actions: [["고객 예약 시연", "/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=reservation_payment_public&utm_campaign=baebang-alps"], ["결제 화면", "/checkout"], ["예약 현황", "/booking-calendar-status"]]
+  })}${sectionPriorityCheckout()}${sectionReservationPaymentProgram()}${sectionCheckoutLive()}`, "예약");
+}
+
+function renderBookingCalendarPage(pathname) {
+  const route = routes[pathname];
+  return renderDocument(route, pathname, `${sectionPublicRouteHero(pathname, {
+    eyebrow: "Ddnayo Calendar Benchmark",
+    title: "객실별 날짜 상태와 바베큐장 타임슬롯",
+    body: "떠나요식 예약 달력처럼 날짜별 예약가능, 잔여소량, 예약완료, 마감, 예약대기를 먼저 보여주고 가능한 날짜만 예약 화면으로 연결합니다.",
+    image: images.reservoir,
+    actions: [["예약 가능한 날짜 선택", "/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=calendar_public&utm_campaign=baebang-alps"], ["고객 홈", "/"], ["사장님 현황", "/host/rooms"]]
+  })}${sectionCalendar()}${sectionDirectBooking()}${sectionCustomerBookingForm()}`, "예약");
+}
+
+function renderHostRoomsPage(pathname) {
+  const route = routes[pathname];
+  return renderDocument(route, pathname, `${sectionPublicRouteHero(pathname, {
+    eyebrow: "Owner Workspace",
+    title: "객실·사진·유튜브·옵션 등록 후 고객 홈 자동 반영",
+    body: "사장님은 이 화면에서 숙소 기본정보, 객실, 사진, 유튜브 영상, 네이버 블로그·리뷰, 주변 맛집과 가볼만한곳을 관리합니다.",
+    image: images.interior2,
+    actions: [["고객 화면 미리보기", "/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=owner_preview&utm_campaign=baebang-alps"], ["예약 현황", "/booking-calendar-status"], ["운영자 관리", "/admin/operations"]]
+  })}${sectionHostRegistrationDemo()}${sectionRoomMediaSelection()}${sectionOwnerReservationStatus()}${sectionOperations()}`, "사장님");
+}
+
+function renderAdminOperationsPage(pathname) {
+  const route = routes[pathname];
+  return renderDocument(route, pathname, `${sectionPublicRouteHero(pathname, {
+    eyebrow: "Admin Operations",
+    title: "입점·예약·결제·정산·유튜브 성과 통합 관리",
+    body: "운영자는 여러 펜션을 유치했을 때 입점 승인, 전체 예약, 결제 상태, 정산 예정금액, UTM 전환 성과를 한 화면에서 확인합니다.",
+    image: images.overlook,
+    actions: [["입점 승인 관리", "/host/proposals"], ["예약 결제 현황", "/host/reservation-payment"], ["고객 홈", "/"]]
+  })}${sectionAdminDemo()}${sectionReservationPaymentProgram()}${sectionOperations()}`, "사장님");
+}
+
+function renderMyPage(pathname) {
+  const route = routes[pathname];
+  return renderDocument(route, pathname, `${sectionPublicRouteHero(pathname, {
+    eyebrow: "Member / My Booking",
+    title: "예약 확인·찜·결제상태·회원정보 관리",
+    body: "네이버·카카오 간편가입 후 고객이 본인의 예약 내역, 결제 상태, 찜한 숙소, 입실 안내를 다시 확인하는 화면입니다.",
+    image: images.sign,
+    actions: [["고객 예약 시연", "/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=my_public&utm_campaign=baebang-alps"], ["예약 현황", "/booking-calendar-status"], ["홈", "/"]]
+  })}${sectionMyReservations()}${sectionMemberDemo()}${sectionMainProperties()}`, "내예약");
+}
+
+function renderPlatformGuidePage(pathname) {
+  const route = routes[pathname];
+  return renderDocument(route, pathname, `${sectionPublicRouteHero(pathname, {
+    eyebrow: "PenBa TV Planning Guide",
+    title: "펜바TV 전체 구조를 설명하는 기존 메인 화면",
+    body: "이 페이지는 고객 시연 화면과 별도로, 플랫폼 컨셉과 MVP 개발 범위를 의뢰자에게 설명할 때 사용하는 자료형 화면입니다.",
+    image: images.bbqYard,
+    actions: [["고객 예약 시연", "/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=guide_public&utm_campaign=baebang-alps"], ["사장님 관리", "/host/rooms"], ["운영자 관리", "/admin/operations"]]
+  })}${sectionMainShortcuts()}${sectionMainScenario()}${sectionFeatures()}${sectionMemberDemo()}`, "홈");
+}
+
 function renderPublicStayPage(pathname) {
   const route = routes[pathname] ?? routes["/stays/baebang-alps"];
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="public-customer-app">
@@ -834,6 +985,30 @@ function render(pathname) {
   const route = routes[pathname] ?? routes["/"];
   if (pathname.startsWith("/stays/")) {
     return renderPublicStayPage(pathname);
+  }
+  if (pathname === "/host/make24-benchmark") {
+    return renderHostMake24Page(pathname);
+  }
+  if (pathname === "/host/design-benchmark") {
+    return renderDesignBenchmarkPage(pathname);
+  }
+  if (pathname === "/host/reservation-payment") {
+    return renderReservationPaymentPage(pathname);
+  }
+  if (pathname === "/booking-calendar-status") {
+    return renderBookingCalendarPage(pathname);
+  }
+  if (pathname === "/host/rooms") {
+    return renderHostRoomsPage(pathname);
+  }
+  if (pathname === "/admin/operations") {
+    return renderAdminOperationsPage(pathname);
+  }
+  if (pathname === "/my") {
+    return renderMyPage(pathname);
+  }
+  if (pathname === "/platform-guide") {
+    return renderPlatformGuidePage(pathname);
   }
   if (pathname === "/") {
     return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
@@ -906,6 +1081,20 @@ ${sectionCheckoutLive.toString()}
 ${sectionBookingComplete.toString()}
 ${sectionMyReservations.toString()}
 ${sectionPublicProof.toString()}
+${renderDocument.toString()}
+${sectionPublicRouteHero.toString()}
+${sectionMake24Process.toString()}
+${sectionHostRegistrationDemo.toString()}
+${sectionOwnerReservationStatus.toString()}
+${sectionDesignApplication.toString()}
+${renderHostMake24Page.toString()}
+${renderDesignBenchmarkPage.toString()}
+${renderReservationPaymentPage.toString()}
+${renderBookingCalendarPage.toString()}
+${renderHostRoomsPage.toString()}
+${renderAdminOperationsPage.toString()}
+${renderMyPage.toString()}
+${renderPlatformGuidePage.toString()}
 ${renderPublicStayPage.toString()}
 ${sectionAdminDemo.toString()}
 ${pageSections.toString()}
@@ -914,7 +1103,7 @@ export default {
   async fetch(request) {
     const url = new URL(request.url);
     const pathname = url.pathname.replace(/\\/$/, "") || "/";
-    const page = routes[pathname] ? pathname : "/";
+    const page = routes[pathname] || pathname.startsWith("/stays/") ? pathname : "/";
     return new Response(render(page), {
       headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=60" }
     });
