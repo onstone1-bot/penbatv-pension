@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata = {
-  title: "STAYLINK CAMP",
-  description: "유튜브 영상에서 방·사이트 예약까지 연결하는 캠핑 예약 플랫폼"
+  title: "펜바TV | 유튜브 펜션·바베큐 예약 플랫폼",
+  description: "유튜브 영상에서 펜션 사진, 객실 선택, 예약일정, 바베큐 옵션, 결제까지 연결하는 펜바TV 웹앱"
 };
 
 export const viewport = {
