@@ -645,6 +645,43 @@ function sectionFeatures() {
   return `<section class="section"><div class="section-head"><h2>기능 소개</h2><span class="muted">펜션 운영 핵심 모듈</span></div><div class="features">${features.map((name) => `<article class="card"><span class="chip">${name}</span><p>펜바TV는 ${name} 기능을 유튜브 유입과 예약결제 흐름에 맞춰 구성합니다.</p></article>`).join("")}</div></section>`;
 }
 
+function sectionMemberDemo() {
+  const items = [
+    ["네이버 간편가입", "본인인증 후 예약자 정보를 자동 입력합니다.", "/auth?provider=naver"],
+    ["카카오 간편가입", "모바일 고객이 빠르게 로그인하고 예약을 이어갑니다.", "/auth?provider=kakao"],
+    ["내예약 확인", "예약번호, 결제상태, 입실 안내, 바베큐 시간을 확인합니다.", "/my"],
+    ["찜한 숙소", "관심 펜션을 저장하고 다음 예약 때 다시 볼 수 있습니다.", "/my"]
+  ];
+  return `<section class="section"><div class="section-head"><h2>회원가입·고객 정보 관리</h2><span class="muted">간편가입 · 내예약 · 찜 · MY</span></div><div class="cards">${items.map(([title, body, href]) => `<article class="card"><span class="chip">Member</span><h3>${title}</h3><p>${body}</p><a class="btn" href="${href}">${title} 보기</a></article>`).join("")}</div></section>`;
+}
+
+function sectionAdminDemo() {
+  const items = [
+    ["입점 승인 대기", "5건", "무료촬영 제안, 자료 수집, 검수 단계 확인"],
+    ["오늘 예약", "12건", "객실 예약, 바베큐 타임슬롯, 결제 상태 집계"],
+    ["정산 예정", "2,430,000원", "사장님별 결제금액과 수수료 차감 전 금액"],
+    ["유튜브 전환", "18.4%", "설명란 링크 유입 대비 예약 시작 비율"]
+  ];
+  return `<section class="section"><div class="section-head"><h2>운영자 통합 집계</h2><span class="muted">입점 · 예약 · 결제 · 정산 · UTM</span></div><div class="metrics">${items.map(([label, value, body]) => `<div class="metric"><span class="muted">${label}</span><b>${value}</b><p>${body}</p></div>`).join("")}</div></section>`;
+}
+
+function pageSections(pathname) {
+  const focus = routeFocus(pathname);
+  if (focus.type === "customer") {
+    return `${sectionRouteFocus(pathname)}${sectionCustomerBookingForm()}${sectionRoomMediaSelection()}${sectionVideoCategories()}${sectionPhotos()}${sectionDirectBooking()}`;
+  }
+  if (focus.type === "host") {
+    return `${sectionRouteFocus(pathname)}${sectionOperations()}${sectionReservationPaymentProgram()}${sectionPackages()}${sectionTemplates()}${sectionFeatures()}`;
+  }
+  if (focus.type === "admin") {
+    return `${sectionRouteFocus(pathname)}${sectionAdminDemo()}${sectionReservationPaymentProgram()}${sectionOperations()}`;
+  }
+  if (focus.type === "auth") {
+    return `${sectionRouteFocus(pathname)}${sectionMemberDemo()}${sectionMainProperties()}`;
+  }
+  return `${sectionRouteFocus(pathname)}${sectionMainShortcuts()}${sectionMainScenario()}${sectionFeatures()}`;
+}
+
 function render(pathname) {
   const route = routes[pathname] ?? routes["/"];
   if (pathname === "/") {
@@ -658,7 +695,7 @@ function render(pathname) {
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
     <div class="version-banner"><span>${siteVersionLabel}</span><small>현재 주소: ${pathname}</small></div>
     <section class="hero"><div><span class="eyebrow">PenBa TV</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/">고객 홈</a><a class="btn alt" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=youtube_description&utm_campaign=baebang-alps">객실 선택</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a><a class="btn alt" href="/host/make24-benchmark">입점 제안</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
-    ${sectionRouteFocus(pathname)}${sectionCustomerBookingForm()}${sectionPriorityCheckout()}${sectionCustomerYoutubeFlow()}${sectionVideoCategories()}${sectionRoomMediaSelection()}${sectionHome()}${sectionPhotos()}${sectionCalendar()}${sectionDirectBooking()}${sectionOperations()}${sectionPackages()}${sectionTemplates()}${sectionFeatures()}
+    ${pageSections(pathname)}
     <section class="band section"><h2>외부 공유용 펜바TV 고객 데모</h2><p>이 페이지는 유튜브 설명란 링크를 누른 고객이 보게 될 흐름을 기준으로 구성했습니다. 영상으로 신뢰를 만들고, 객실 사진과 예약 현황을 본 뒤 예약·결제 선택으로 이어지는 구조입니다.</p></section>
   </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/stays/baebang-alps?utm_source=penbatv&utm_medium=bottom_room&utm_campaign=baebang-alps">객실</a><a href="/booking-calendar-status">예약</a><a href="/host/make24-benchmark">입점</a><a href="/host/core-features">기능</a></nav><script>${bookingDemoScript}</script></body></html>`;
 }
@@ -711,6 +748,9 @@ ${sectionReservationPaymentProgram.toString()}
 ${sectionPackages.toString()}
 ${sectionTemplates.toString()}
 ${sectionFeatures.toString()}
+${sectionMemberDemo.toString()}
+${sectionAdminDemo.toString()}
+${pageSections.toString()}
 ${render.toString()}
 export default {
   async fetch(request) {
