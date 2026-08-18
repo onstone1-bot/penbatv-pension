@@ -67,6 +67,7 @@ export default function HomePage() {
           <b>펜션·바베큐 예약 플랫폼</b>
         </Link>
         <nav aria-label="상단 바로가기">
+          <Link href="/platform-guide">설명용 기존 메인</Link>
           <Link href="/auth?provider=naver">네이버 가입</Link>
           <Link href="/auth?provider=kakao">카카오 가입</Link>
           <Link href="/my">MY</Link>
@@ -86,6 +87,7 @@ export default function HomePage() {
               고객 예약 시연하기
             </Link>
             <Link href="/host/rooms">사장님 관리 보기</Link>
+            <Link href="/platform-guide">기존 메인 설명 보기</Link>
           </div>
         </div>
         <div className="main-hero-photo">
@@ -234,7 +236,7 @@ export default function HomePage() {
 
       <nav className="home-bottom-tabs" aria-label="모바일 하단 메뉴">
         <Link className="on" href="/">홈</Link>
-        <Link href="/customer-home">고객홈</Link>
+        <Link href="/platform-guide">설명</Link>
         <Link href={`/stays/${heroProperty.id}?utm_source=penbatv&utm_medium=bottom_booking&utm_campaign=${heroProperty.id}`}>
           예약
         </Link>

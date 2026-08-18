@@ -43,6 +43,11 @@ const routes = {
     subtitle: "펜션 영상이 고객 예약결제로 이어지는 펜바TV",
     body: "의뢰자 시연용 메인 화면입니다. 유튜브 설명란 링크로 들어온 고객이 숙소 영상과 객실 사진을 확인하고, 달력에서 가능한 날짜를 고른 뒤 객실·인원·바베큐 옵션을 선택해 결제까지 진행합니다."
   },
+  "/platform-guide": {
+    title: "펜바TV 플랫폼 설명용 기존 메인",
+    subtitle: "펜바TV 전체 구조를 설명하는 기존 메인 화면",
+    body: "이 화면은 플랫폼의 큰 그림을 설명할 때 쓰는 별도 페이지입니다. 고객, 사장님, 운영자 구조와 MVP 기준, 개발 일정, 예약결제 프로그램 범위를 한 화면에서 설명합니다."
+  },
   "/host/make24-benchmark": {
     title: "펜션 사장님 입점 제안",
     subtitle: "유튜브 촬영 + 예약결제 + 관리자 콘솔",
@@ -485,10 +490,10 @@ function render(pathname) {
   const route = routes[pathname] ?? routes["/"];
   if (pathname === "/") {
     return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
-      <section class="hero"><div><span class="eyebrow">PenBa TV Main Demo</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=hero_demo&utm_campaign=baebang-alps">고객 예약 시연하기</a><a class="btn alt" href="/host/rooms">사장님 관리 보기</a><a class="btn alt" href="/admin/operations">운영자 관리 보기</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
+      <section class="hero"><div><span class="eyebrow">PenBa TV Main Demo</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=hero_demo&utm_campaign=baebang-alps">고객 예약 시연하기</a><a class="btn alt" href="/host/rooms">사장님 관리 보기</a><a class="btn alt" href="/admin/operations">운영자 관리 보기</a><a class="btn alt" href="/platform-guide">기존 메인 설명 보기</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
       ${sectionMainShortcuts()}${sectionMainProperties()}${sectionMainScenario()}${sectionHome()}${sectionCustomerBookingForm()}${sectionPhotos()}
       <section class="band section"><h2>오늘 시연 포인트</h2><p>이제 메인 화면은 개발 일정 설명보다 고객 예약 흐름을 먼저 보여줍니다. 고객 화면, 사장님 관리화면, 운영자 관리화면으로 바로 이동하고, 입점 숙소 3개 대표 화면과 유튜브 영상 링크를 한눈에 확인할 수 있습니다.</p></section>
-    </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/stays/baebang-alps?utm_source=penbatv&utm_medium=bottom_room&utm_campaign=baebang-alps">객실</a><a href="/booking-calendar-status">예약</a><a href="/host/rooms">사장님</a><a href="/admin/operations">운영자</a></nav><script>${bookingDemoScript}</script></body></html>`;
+    </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/platform-guide">설명</a><a href="/booking-calendar-status">예약</a><a href="/host/rooms">사장님</a><a href="/admin/operations">운영자</a></nav><script>${bookingDemoScript}</script></body></html>`;
   }
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
     <section class="hero"><div><span class="eyebrow">PenBa TV</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/">고객 홈</a><a class="btn alt" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=youtube_description&utm_campaign=baebang-alps">객실 선택</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a><a class="btn alt" href="/host/make24-benchmark">입점 제안</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
