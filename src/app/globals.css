@@ -2139,12 +2139,22 @@ dd {
   background: #fff;
 }
 
-.main-home-topbar nav a:nth-child(1) {
+.main-home-topbar nav a:nth-child(1),
+.main-home-topbar nav a:nth-child(2) {
+  color: #18362a;
+}
+
+.main-home-topbar nav a:nth-child(3) {
+  background: #173728;
+  color: #fff;
+}
+
+.main-home-topbar nav a.naver-login {
   background: #03c75a;
   color: #fff;
 }
 
-.main-home-topbar nav a:nth-child(2) {
+.main-home-topbar nav a.kakao-login {
   background: #fee500;
   color: #191600;
 }
@@ -2188,7 +2198,7 @@ dd {
   min-height: 460px;
   border-radius: 26px;
   background:
-    linear-gradient(120deg, rgba(255, 255, 255, 0.96), rgba(240, 250, 244, 0.9) 52%, rgba(255, 246, 230, 0.92)),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.96), rgba(241, 249, 243, 0.9) 48%, rgba(255, 236, 211, 0.9)),
     url("/penba/reservoir.jpg") center / cover no-repeat;
   padding: 30px;
   box-shadow: 0 30px 80px rgba(36, 67, 53, 0.16);
@@ -2217,8 +2227,8 @@ dd {
   max-width: 680px;
   margin: 0;
   color: #14241c;
-  font-size: 48px;
-  line-height: 1.08;
+  font-size: 46px;
+  line-height: 1.1;
 }
 
 .main-hero-copy p {
@@ -2237,7 +2247,7 @@ dd {
 .main-section-head > a,
 .main-card-actions a:first-child,
 .main-partner-band a:first-child {
-  background: #14533d;
+  background: #173728;
   color: #fff;
 }
 
@@ -2291,6 +2301,112 @@ dd {
   margin-top: 5px;
   color: #5d6a61;
   font-weight: 800;
+}
+
+.main-search-panel {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 18px;
+  align-items: end;
+  margin-top: -34px;
+  border: 1px solid rgba(32, 80, 62, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 18px;
+  box-shadow: 0 22px 60px rgba(31, 56, 45, 0.14);
+  backdrop-filter: blur(14px);
+}
+
+.main-search-panel > div span,
+.main-story-board > div span {
+  color: #b46233;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.main-search-panel h2,
+.main-story-board h2,
+.main-story-board p {
+  margin: 0;
+}
+
+.main-search-panel h2 {
+  margin-top: 5px;
+  font-size: 22px;
+}
+
+.main-search-panel form {
+  display: grid;
+  grid-template-columns: 1.1fr repeat(4, minmax(0, 1fr)) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.main-search-panel label {
+  display: grid;
+  gap: 6px;
+  color: #5d6a61;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.main-search-panel select,
+.main-search-panel input {
+  min-height: 46px;
+  width: 100%;
+  border: 1px solid rgba(32, 80, 62, 0.14);
+  border-radius: 12px;
+  background: #f8fbf8;
+  color: #17211d;
+  padding: 0 11px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.main-search-panel button {
+  min-height: 46px;
+  border: 0;
+  border-radius: 999px;
+  background: #d95d39;
+  color: #fff;
+  padding: 0 18px;
+  font-weight: 950;
+  cursor: pointer;
+  box-shadow: 0 12px 26px rgba(217, 93, 57, 0.22);
+}
+
+.main-trust-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.main-trust-strip article {
+  border: 1px solid rgba(32, 80, 62, 0.1);
+  border-radius: 16px;
+  background: #fff;
+  padding: 15px;
+  box-shadow: 0 12px 28px rgba(31, 56, 45, 0.06);
+}
+
+.main-trust-strip b,
+.main-trust-strip span {
+  display: block;
+}
+
+.main-trust-strip b {
+  color: #173728;
+  font-size: 16px;
+}
+
+.main-trust-strip span {
+  margin-top: 5px;
+  color: #66746c;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
 }
 
 .main-role-grid,
@@ -2390,6 +2506,20 @@ dd {
   aspect-ratio: 4 / 3;
 }
 
+.main-property-image > span {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+  border-radius: 999px;
+  background: rgba(23, 55, 40, 0.86);
+  color: #fff;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 950;
+  backdrop-filter: blur(8px);
+}
+
 .main-property-body {
   display: grid;
   gap: 10px;
@@ -2461,6 +2591,26 @@ dd {
   margin-right: 10px;
   color: #b46233;
   font-weight: 950;
+}
+
+.main-story-board {
+  grid-template-columns: minmax(280px, 0.62fr) minmax(0, 1fr);
+  align-items: center;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.95), rgba(255, 247, 238, 0.9)),
+    url("/penba/bbq-yard.jpg") center / cover no-repeat;
+}
+
+.main-story-board h2 {
+  margin-top: 7px;
+  color: #14241c;
+  font-size: 30px;
+}
+
+.main-story-board p {
+  margin-top: 10px;
+  color: #617068;
+  line-height: 1.65;
 }
 
 .main-demo-status {
@@ -2547,6 +2697,52 @@ dd {
 
 .main-partner-band h2 {
   margin-top: 6px;
+}
+
+@media (max-width: 900px) {
+  .penba-main-home {
+    padding-inline: 16px;
+  }
+
+  .main-home-hero,
+  .main-search-panel,
+  .main-search-panel form,
+  .main-trust-strip,
+  .main-property-grid,
+  .main-story-board,
+  .main-video-grid,
+  .main-partner-band {
+    grid-template-columns: 1fr;
+  }
+
+  .main-search-panel {
+    margin-top: 14px;
+  }
+
+  .main-search-panel button {
+    width: 100%;
+  }
+
+  .main-home-topbar {
+    align-items: flex-start;
+  }
+
+  .main-home-topbar nav {
+    width: 100%;
+  }
+
+  .main-hero-copy h1 {
+    font-size: 36px;
+  }
+
+  .main-section-head,
+  .main-partner-band {
+    align-items: flex-start;
+  }
+
+  .main-section-head {
+    display: grid;
+  }
 }
 
 .calendar-status-page {
@@ -6995,9 +7191,13 @@ button {
   .market-hero,
   .penba-hero,
   .main-home-hero,
+  .main-search-panel,
+  .main-search-panel form,
+  .main-trust-strip,
   .main-role-grid,
   .main-property-grid,
   .main-section.split,
+  .main-story-board,
   .main-video-grid,
   .main-partner-band,
   .guide-hero,

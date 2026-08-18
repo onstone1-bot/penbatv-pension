@@ -31,6 +31,27 @@ create table if not exists public.accommodations (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  role text not null default 'customer' check (role in ('customer', 'host', 'operator')),
+  provider text,
+  provider_user_id text,
+  email text,
+  name text,
+  phone text,
+  avatar_url text,
+  status text not null default 'active' check (status in ('active', 'pending', 'suspended')),
+  last_sign_in_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create unique index if not exists profiles_provider_user_id_unique_idx
+on public.profiles(provider, provider_user_id)
+where provider is not null and provider_user_id is not null;
+
+create index if not exists profiles_role_status_idx on public.profiles(role, status);
+
 create table if not exists public.rooms (
   id text primary key,
   accommodation_id text not null references public.accommodations(id) on delete cascade,
@@ -375,6 +396,7 @@ begin
 end $$;
 
 alter table public.accommodations enable row level security;
+alter table public.profiles enable row level security;
 alter table public.rooms enable row level security;
 alter table public.room_images enable row level security;
 alter table public.room_rates enable row level security;
@@ -398,6 +420,15 @@ alter table public.pilot_runs enable row level security;
 create policy "anon can read active accommodations"
 on public.accommodations for select to anon
 using (status = 'active');
+
+create policy "authenticated users can read own profile"
+on public.profiles for select to authenticated
+using ((select auth.uid()) = id);
+
+create policy "authenticated users can update own customer profile"
+on public.profiles for update to authenticated
+using ((select auth.uid()) = id)
+with check ((select auth.uid()) = id and role = 'customer');
 
 create policy "anon can read active rooms"
 on public.rooms for select to anon
@@ -473,8 +504,10 @@ grant select on public.youtube_campaigns to anon;
 grant select on public.naver_links to anon;
 grant select on public.nearby_places to anon;
 grant insert on public.utm_events to anon;
+grant select, update on public.profiles to authenticated;
 
 grant select, insert, update, delete on all tables in schema public to service_role;
+grant select, insert, update, delete on public.profiles to service_role;
 grant select, insert, update, delete on public.notification_queue to service_role;
 grant select, insert, update, delete on public.calendar_sync_sources to service_role;
 grant select, insert, update, delete on public.calendar_sync_events to service_role;
