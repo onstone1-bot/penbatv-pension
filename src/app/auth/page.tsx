@@ -26,13 +26,54 @@ const roleCards = [
 ];
 
 const implementationSteps = [
-  "Supabase Auth 또는 외부 OAuth로 네이버/카카오 로그인 연결",
-  "profiles 테이블에 user_id, role, name, phone, status 저장",
-  "역할에 따라 고객 MY, 사장님 콘솔, 운영자 콘솔로 이동",
+  "Supabase Auth 세션을 서버 쿠키로 유지",
+  "로그인 성공 후 profiles 테이블에 고객 프로필 자동 저장",
+  "고객은 MY, 사장님은 사장님 콘솔, 운영자는 운영자 콘솔로 이동",
   "예약/결제 API는 로그인 사용자와 서버 권한을 기준으로 검증"
 ];
 
-export default function AuthPlanningPage() {
+const setupChecklist = [
+  "Supabase Auth Redirect URL에 /auth/callback 등록",
+  "카카오 개발자센터 REST API Key와 Client Secret 발급",
+  "Supabase Kakao Provider에 카카오 키 입력",
+  "네이버 개발자센터 Client ID/Secret 발급",
+  "네이버는 Supabase custom OAuth/OIDC 또는 별도 콜백 방식으로 연결",
+  "Vercel 환경변수와 Supabase 운영 프로젝트 값 일치 확인"
+];
+
+type AuthPlanningPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function first(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value ?? null;
+}
+
+function authStatusMessage(status: string | null, profileStatus: string | null, message: string | null) {
+  if (status === "success" && profileStatus === "saved") {
+    return "로그인 성공: 고객 프로필이 DB에 저장되었습니다.";
+  }
+
+  if (status === "success" && profileStatus === "needs_db_check") {
+    return `로그인은 성공했지만 프로필 저장 확인이 필요합니다. ${message ?? ""}`.trim();
+  }
+
+  if (status === "error") {
+    return `로그인 실패: ${message ?? "OAuth 설정을 확인해 주세요."}`;
+  }
+
+  return null;
+}
+
+export default async function AuthPlanningPage({ searchParams }: AuthPlanningPageProps) {
+  const query = await searchParams;
+  const provider = first(query.provider);
+  const authStatus = first(query.auth_status);
+  const profileStatus = first(query.profile_status);
+  const authMessage = first(query.auth_message) ?? first(query.profile_message);
+  const statusMessage = authStatusMessage(authStatus, profileStatus, authMessage);
+  const defaultProvider = provider === "naver" || provider === "kakao" ? provider : null;
+
   return (
     <main className="auth-page">
       <section className="auth-hero">
@@ -40,10 +81,11 @@ export default function AuthPlanningPage() {
           <Link className="home-back-link" href="/">
             펜바TV 메인홈
           </Link>
-          <p className="muted">Week 1 Day 2</p>
-          <h1>회원가입과 권한 구조 설계</h1>
+          <p className="muted">Week 2 Day 8-14</p>
+          <h1>네이버·카카오 간편 로그인</h1>
           <p>
-            고객은 네이버·카카오로 쉽게 가입하고, 사장님과 운영자는 승인된 권한에 따라 다른 관리 화면으로 이동하는 구조입니다.
+            고객은 네이버·카카오로 가입하고, 로그인 성공 시 펜바TV DB의 고객 프로필이 자동 생성됩니다.
+            이후 MY 화면에서 예약 확인, 찜한 숙소, 회원정보 관리를 이어갑니다.
           </p>
         </div>
         <div className="auth-device-preview" aria-label="가입 후 이동 화면 예시">
@@ -58,10 +100,10 @@ export default function AuthPlanningPage() {
 
       <section className="auth-section">
         <div className="section-head">
-          <h2>가입 방식</h2>
-          <span>고객 로그인 · 역할별 이동</span>
+          <h2>간편 로그인</h2>
+          <span>OAuth · DB 자동가입 · 고객홈 이동</span>
         </div>
-        <AuthClient />
+        <AuthClient defaultProvider={defaultProvider} statusMessage={statusMessage} />
       </section>
 
       <section className="auth-section">
@@ -90,14 +132,28 @@ export default function AuthPlanningPage() {
 
       <section className="auth-section auth-implementation-panel">
         <div>
-          <h2>개발 구현 기준</h2>
+          <h2>2주차 구현 기준</h2>
           <p>
-            지금 화면은 권한 구조를 이해하기 위한 설계 데모입니다. 실제 개발에서는 로그인 성공 후 서버에서 역할을 확인하고,
-            허용된 화면과 API만 접근하게 해야 합니다.
+            로그인 버튼만 두는 것이 아니라, Supabase 세션, 고객 프로필 저장, MY 화면 조회까지 한 흐름으로 동작해야 합니다.
           </p>
         </div>
         <ol>
           {implementationSteps.map((step) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="auth-section auth-implementation-panel">
+        <div>
+          <h2>외부 설정 체크리스트</h2>
+          <p>
+            아래 설정은 네이버/카카오 개발자센터와 Supabase 대시보드에서 직접 확인해야 합니다. 코드 연결은 준비되어 있고,
+            이 설정이 끝나면 실제 로그인 테스트가 가능합니다.
+          </p>
+        </div>
+        <ol>
+          {setupChecklist.map((step) => (
             <li key={step}>{step}</li>
           ))}
         </ol>

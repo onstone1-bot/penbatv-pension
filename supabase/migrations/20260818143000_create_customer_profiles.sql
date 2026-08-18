@@ -19,6 +19,15 @@ where provider is not null and provider_user_id is not null;
 
 create index if not exists profiles_role_status_idx on public.profiles(role, status);
 
+alter table public.bookings
+  add column if not exists customer_id uuid references public.profiles(id) on delete set null;
+
+alter table public.payment_orders
+  add column if not exists customer_id uuid references public.profiles(id) on delete set null;
+
+create index if not exists bookings_customer_created_idx on public.bookings(customer_id, created_at desc);
+create index if not exists payment_orders_customer_created_idx on public.payment_orders(customer_id, created_at desc);
+
 alter table public.profiles enable row level security;
 
 drop policy if exists "authenticated users can read own profile" on public.profiles;
@@ -33,4 +42,6 @@ using ((select auth.uid()) = id)
 with check ((select auth.uid()) = id and role = 'customer');
 
 grant select, update on public.profiles to authenticated;
+grant select on public.bookings to authenticated;
+grant select on public.payment_orders to authenticated;
 grant select, insert, update, delete on public.profiles to service_role;

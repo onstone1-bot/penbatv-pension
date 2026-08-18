@@ -10,6 +10,7 @@ export type EasyPayProvider = "NAVERPAY" | "TOSSPAY";
 
 export type PreparePaymentInput = {
   holdId: string | null;
+  customerId?: string | null;
   roomId: string;
   checkIn: string;
   checkOut: string;

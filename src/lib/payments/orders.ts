@@ -23,6 +23,7 @@ export async function savePreparedPaymentOrder(
       .insert({
         order_id: payment.orderId,
         hold_id: input.holdId,
+        customer_id: input.customerId ?? null,
         room_id: input.roomId,
         check_in: input.checkIn,
         check_out: input.checkOut,

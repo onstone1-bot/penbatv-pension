@@ -126,6 +126,7 @@ create table if not exists public.bookings (
   booking_no text not null unique,
   room_id text not null references public.rooms(id),
   hold_id uuid references public.booking_holds(id),
+  customer_id uuid references public.profiles(id) on delete set null,
   check_in date not null,
   check_out date not null,
   adult_count integer not null default 1 check (adult_count >= 1),
@@ -233,6 +234,7 @@ create table if not exists public.payment_orders (
   id uuid primary key default gen_random_uuid(),
   order_id text not null unique,
   hold_id uuid references public.booking_holds(id),
+  customer_id uuid references public.profiles(id) on delete set null,
   room_id text not null references public.rooms(id),
   check_in date,
   check_out date,
@@ -341,6 +343,7 @@ create index if not exists room_images_room_id_sort_idx on public.room_images(ro
 create index if not exists room_rates_room_date_idx on public.room_rates(room_id, start_date, end_date, priority desc);
 create index if not exists booking_options_accommodation_sort_idx on public.booking_options(accommodation_id, sort_order);
 create index if not exists bookings_room_date_idx on public.bookings(room_id, check_in, check_out);
+create index if not exists bookings_customer_created_idx on public.bookings(customer_id, created_at desc);
 create unique index if not exists bookings_hold_unique_idx on public.bookings(hold_id) where hold_id is not null;
 create index if not exists booking_holds_room_date_idx on public.booking_holds(room_id, check_in, check_out, expires_at);
 create index if not exists booking_option_items_booking_idx on public.booking_option_items(booking_id);
@@ -352,6 +355,7 @@ create index if not exists naver_links_room_id_idx on public.naver_links(room_id
 create index if not exists nearby_places_accommodation_sort_idx on public.nearby_places(accommodation_id, place_type, sort_order);
 create index if not exists utm_events_utm_created_idx on public.utm_events(utm_code, created_at);
 create index if not exists payment_orders_order_idx on public.payment_orders(order_id);
+create index if not exists payment_orders_customer_created_idx on public.payment_orders(customer_id, created_at desc);
 create index if not exists payment_orders_hold_idx on public.payment_orders(hold_id);
 create index if not exists payment_orders_booking_idx on public.payment_orders(booking_id);
 create index if not exists payment_orders_status_idx on public.payment_orders(status, expires_at);
@@ -430,6 +434,14 @@ on public.profiles for update to authenticated
 using ((select auth.uid()) = id)
 with check ((select auth.uid()) = id and role = 'customer');
 
+create policy "authenticated users can read own bookings"
+on public.bookings for select to authenticated
+using ((select auth.uid()) = customer_id);
+
+create policy "authenticated users can read own payment orders"
+on public.payment_orders for select to authenticated
+using ((select auth.uid()) = customer_id);
+
 create policy "anon can read active rooms"
 on public.rooms for select to anon
 using (status = 'active');
@@ -505,6 +517,8 @@ grant select on public.naver_links to anon;
 grant select on public.nearby_places to anon;
 grant insert on public.utm_events to anon;
 grant select, update on public.profiles to authenticated;
+grant select on public.bookings to authenticated;
+grant select on public.payment_orders to authenticated;
 
 grant select, insert, update, delete on all tables in schema public to service_role;
 grant select, insert, update, delete on public.profiles to service_role;

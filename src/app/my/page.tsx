@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCurrentCustomer } from "@/lib/auth/current-user";
 import { mockPartnerProperties } from "@/lib/platform-data";
 import { formatWon } from "@/lib/local-quote";
 import { getCustomerReservations } from "@/lib/customer-reservations";
@@ -20,13 +21,6 @@ function bookingStatusLabel(status: string, paymentStatus: string) {
   return "확인중";
 }
 
-const profileItems = [
-  { label: "예약자", value: "김고객" },
-  { label: "연락처", value: "010-8485-1113" },
-  { label: "기본 인원", value: "성인 2명, 아동 1명" },
-  { label: "차량", value: "1대" }
-];
-
 const myMenus = [
   "예약자 정보 수정",
   "결제수단 관리",
@@ -45,8 +39,20 @@ const notificationRules = [
 
 export default async function MyPage({ searchParams }: MyPageProps) {
   const query = await searchParams;
-  const phone = first(query.phone);
+  const currentCustomer = await getCurrentCustomer();
+  const profile = currentCustomer?.profile ?? null;
+  const user = currentCustomer?.user ?? null;
+  const phone = first(query.phone) ?? profile?.phone ?? user?.phone ?? null;
+  const displayName = profile?.name ?? user?.user_metadata?.name ?? user?.email?.split("@")[0] ?? "고객";
+  const provider = profile?.provider ?? user?.app_metadata?.provider ?? "guest";
+  const profileItems = [
+    { label: "예약자", value: displayName },
+    { label: "연락처", value: phone ?? "로그인 후 자동 입력" },
+    { label: "이메일", value: profile?.email ?? user?.email ?? "미등록" },
+    { label: "가입방식", value: provider === "kakao" ? "카카오" : provider === "custom:naver" || provider === "naver" ? "네이버" : "비로그인" }
+  ];
   const reservationResult = await getCustomerReservations({
+    customerId: profile?.id ?? null,
     guestPhone: phone,
     limit: 10
   });
@@ -60,17 +66,17 @@ export default async function MyPage({ searchParams }: MyPageProps) {
           <Link className="home-back-link" href="/">
             펜바TV 메인홈
           </Link>
-          <p className="muted">Week 2 Day 13</p>
-          <h1>고객 정보관리 화면</h1>
+          <p className="muted">Week 2 Day 8-14</p>
+          <h1>내 예약과 회원정보</h1>
           <p>
-            고객이 예약자 정보, 실제 예약 현황, 결제 상태, 찜한 숙소, 알림 설정을 관리하는 MY 화면입니다.
+            네이버·카카오 로그인 후 저장된 고객 프로필과 예약 현황, 찜한 숙소, 알림 설정을 관리하는 화면입니다.
           </p>
         </div>
         <div className="my-profile-card">
           <span>MY</span>
-          <b>김고객님</b>
-          <small>네이버 본인인증 가입 고객</small>
-          <Link href="/customer-home">고객홈 구조 보기</Link>
+          <b>{displayName}님</b>
+          <small>{user ? "로그인 세션 확인됨" : "로그인하면 예약자 정보가 자동 저장됩니다"}</small>
+          {user ? <Link href="/auth/signout">로그아웃</Link> : <Link href="/auth">네이버·카카오 로그인</Link>}
         </div>
       </section>
 
@@ -88,7 +94,7 @@ export default async function MyPage({ searchParams }: MyPageProps) {
               </div>
             ))}
           </div>
-          <button type="button">정보 수정</button>
+          <Link className="my-inline-action" href="/auth">로그인/정보 연결</Link>
         </article>
 
         <article className="my-panel">
@@ -111,10 +117,12 @@ export default async function MyPage({ searchParams }: MyPageProps) {
           <h2>내 예약</h2>
           <span>예약 확인 · 결제 상태 · 변경 요청</span>
         </div>
-        {phone ? (
+        {profile?.id ? (
+          <p className="request-note">로그인 고객 ID와 저장된 예약자 정보 기준으로 예약을 조회했습니다.</p>
+        ) : phone ? (
           <p className="request-note">휴대폰 번호 {phone} 기준으로 예약을 조회했습니다.</p>
         ) : (
-          <p className="request-note">로그인 전 데모에서는 최근 예약 데이터를 기준으로 표시합니다.</p>
+          <p className="request-note">로그인하면 고객 DB 프로필과 연결된 예약만 표시됩니다.</p>
         )}
         <div className="my-reservation-list">
           {reservations.map((reservation) => (

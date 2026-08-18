@@ -134,6 +134,7 @@ export type Database = {
           booking_no: string;
           room_id: string;
           hold_id: string | null;
+          customer_id: string | null;
           check_in: string;
           check_out: string;
           adult_count: number;
@@ -311,6 +312,7 @@ export type Database = {
           id: string;
           order_id: string;
           hold_id: string | null;
+          customer_id: string | null;
           room_id: string;
           check_in: string | null;
           check_out: string | null;

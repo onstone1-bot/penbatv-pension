@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { getCurrentCustomer } from "@/lib/auth/current-user";
 import { preparePayment } from "@/lib/payments/provider";
 import { savePreparedPaymentOrder } from "@/lib/payments/orders";
 import { getActiveBookingHold } from "@/lib/availability";
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
   try {
     const url = new URL(request.url);
     const supabase = createAdminClient();
+    const currentCustomer = await getCurrentCustomer();
     const optionItems =
       parsed.data.optionItems.length > 0
         ? parsed.data.optionItems
@@ -81,6 +83,7 @@ export async function POST(request: Request) {
     });
     const input = {
       holdId: parsed.data.holdId ?? null,
+      customerId: currentCustomer?.profile?.id ?? currentCustomer?.user.id ?? null,
       roomId: parsed.data.roomId,
       checkIn: parsed.data.checkIn,
       checkOut: parsed.data.checkOut,
@@ -91,8 +94,8 @@ export async function POST(request: Request) {
       adultCount: quote.adultCount,
       childCount: quote.childCount,
       optionItems: quote.optionItems,
-      guestName: parsed.data.guestName ?? null,
-      guestPhone: parsed.data.guestPhone ?? null,
+      guestName: parsed.data.guestName ?? currentCustomer?.profile?.name ?? null,
+      guestPhone: parsed.data.guestPhone ?? currentCustomer?.profile?.phone ?? currentCustomer?.user.phone ?? null,
       utmCode: parsed.data.utmCode ?? null,
       requestOrigin: url.origin
     };

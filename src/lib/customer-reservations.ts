@@ -22,23 +22,31 @@ function normalizePhone(value: string | null | undefined) {
 }
 
 export async function getCustomerReservations(input: {
+  customerId?: string | null;
   guestPhone?: string | null;
   limit?: number;
 } = {}) {
   const limit = input.limit ?? 10;
   const phone = normalizePhone(input.guestPhone);
+  const customerId = input.customerId ?? null;
   const supabase = createAdminClient();
-  const { data: bookings, error: bookingError } = await supabase
+
+  let bookingQuery = supabase
     .from("bookings")
     .select(
-      "id, booking_no, room_id, check_in, check_out, adult_count, child_count, guest_name, guest_phone, status, payment_status, total_amount, created_at"
+      "id, booking_no, room_id, customer_id, check_in, check_out, adult_count, child_count, guest_name, guest_phone, status, payment_status, total_amount, created_at"
     )
-    .order("created_at", { ascending: false })
-    .limit(phone ? 50 : limit);
+    .order("created_at", { ascending: false });
+
+  if (customerId) {
+    bookingQuery = bookingQuery.eq("customer_id", customerId);
+  }
+
+  const { data: bookings, error: bookingError } = await bookingQuery.limit(phone && !customerId ? 50 : limit);
 
   if (bookingError) throw bookingError;
 
-  const filteredBookings = phone
+  const filteredBookings = phone && !customerId
     ? (bookings ?? []).filter((booking) => normalizePhone(booking.guest_phone) === phone).slice(0, limit)
     : (bookings ?? []);
   const roomIds = [...new Set(filteredBookings.map((booking) => booking.room_id))];
