@@ -1,6 +1,18 @@
 import { getServerEnv } from "@/lib/env";
 
-export function requireAdminToken(request: Request) {
+export type PenbaRole = "customer" | "host" | "operator";
+
+export function getRequestRole(request: Request): PenbaRole {
+  const role = request.headers.get("x-penbatv-role");
+
+  if (role === "customer" || role === "host" || role === "operator") {
+    return role;
+  }
+
+  return "operator";
+}
+
+export function requireAdminToken(request: Request, allowedRoles: PenbaRole[] = ["host", "operator"]) {
   const configuredToken = getServerEnv().STAYLINK_ADMIN_API_TOKEN;
 
   if (!configuredToken) {
@@ -12,4 +24,20 @@ export function requireAdminToken(request: Request) {
   if (requestToken !== configuredToken) {
     throw new Error("Invalid admin token.");
   }
+
+  const requestRole = getRequestRole(request);
+
+  if (!allowedRoles.includes(requestRole)) {
+    throw new Error(`Role ${requestRole} is not allowed for this operation.`);
+  }
+
+  return { role: requestRole };
+}
+
+export function requireHostToken(request: Request) {
+  return requireAdminToken(request, ["host", "operator"]);
+}
+
+export function requireOperatorToken(request: Request) {
+  return requireAdminToken(request, ["operator"]);
 }

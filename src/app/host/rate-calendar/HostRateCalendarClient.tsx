@@ -86,7 +86,10 @@ export function HostRateCalendarClient() {
   const [setCount, setSetCount] = useState(1);
   const [syncChannel, setSyncChannel] = useState(channelPresets[0]);
   const [icalUrl, setIcalUrl] = useState("");
+  const [icalText, setIcalText] = useState("");
   const [syncPolicy, setSyncPolicy] = useState<SyncPolicy>("import_only");
+  const [adminToken, setAdminToken] = useState("");
+  const [syncMessage, setSyncMessage] = useState("외부 iCal을 가져오면 해당 날짜가 예약 불가로 자동 차단됩니다.");
 
   const days = useMemo(() => buildMonthDays(calendarMonth), [calendarMonth]);
   const range = normalizeRange(dragStart, dragEnd);
@@ -149,6 +152,44 @@ export function HostRateCalendarClient() {
   function endRange(dayIso: string) {
     setDragEnd(dayIso);
     setIsDragging(false);
+  }
+
+  async function syncExternalCalendar() {
+    if (!adminToken.trim()) {
+      setSyncMessage("사장님 또는 운영자 토큰을 먼저 입력해 주세요.");
+      return;
+    }
+
+    if (!icalUrl.trim() && !icalText.trim()) {
+      setSyncMessage("iCal URL 또는 테스트용 iCal 텍스트를 입력해 주세요.");
+      return;
+    }
+
+    setSyncMessage("외부 달력을 동기화하는 중입니다.");
+
+    const response = await fetch("/api/integrations/ical/sync", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-token": adminToken,
+        "x-penbatv-role": "host"
+      },
+      body: JSON.stringify({
+        roomId: selectedRoomId,
+        provider: syncChannel,
+        icalUrl: icalUrl.trim() || undefined,
+        icalText: icalText.trim() || undefined,
+        syncPolicy
+      })
+    });
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      setSyncMessage(payload.error ?? "외부 달력 동기화에 실패했습니다.");
+      return;
+    }
+
+    setSyncMessage(`외부 예약 ${payload.eventCount}건을 읽고 차단일 ${payload.blockCount}건을 반영했습니다.`);
   }
 
   return (
@@ -340,6 +381,15 @@ export function HostRateCalendarClient() {
           <p className="muted">
             초기 버전은 iCal 가져오기 전용으로 중복 예약을 막고, 채널별 정식 API는 제휴 문서 확보 후 양방향으로 확장합니다.
           </p>
+          <label>
+            <span>관리 토큰</span>
+            <input
+              type="password"
+              value={adminToken}
+              onChange={(event) => setAdminToken(event.target.value)}
+              placeholder="STAYLINK_ADMIN_API_TOKEN"
+            />
+          </label>
           <div className="form-grid">
             <label>
               <span>채널</span>
@@ -367,6 +417,14 @@ export function HostRateCalendarClient() {
               placeholder="https://.../calendar.ics"
             />
           </label>
+          <label>
+            <span>테스트 iCal 텍스트</span>
+            <textarea
+              value={icalText}
+              onChange={(event) => setIcalText(event.target.value)}
+              placeholder={"BEGIN:VCALENDAR\nBEGIN:VEVENT\nUID:naver-20260829\nDTSTART;VALUE=DATE:20260829\nDTEND;VALUE=DATE:20260831\nSUMMARY:네이버 예약\nEND:VEVENT\nEND:VCALENDAR"}
+            />
+          </label>
           <div className="insert-preview">
             <span>calendar_sync_sources insert preview</span>
             <pre>
@@ -384,6 +442,10 @@ export function HostRateCalendarClient() {
               )}
             </pre>
           </div>
+          <p className="sync-message">{syncMessage}</p>
+          <button className="primary-action" type="button" onClick={syncExternalCalendar}>
+            외부 예약 차단일 동기화
+          </button>
         </div>
       </section>
     </main>

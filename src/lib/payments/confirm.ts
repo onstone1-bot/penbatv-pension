@@ -7,6 +7,7 @@ import {
 } from "@/lib/payments/orders";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/supabase/database.types";
+import { enqueueBookingNotifications } from "@/lib/notifications";
 
 type PaymentOrderRow = Database["public"]["Tables"]["payment_orders"]["Row"];
 
@@ -160,6 +161,7 @@ async function finalizePaidPaymentOrder(input: {
     paymentKey: input.paymentKey,
     bookingId: booking.id
   });
+  await enqueueBookingNotifications(booking.id);
 
   return { bookingId: booking.id, idempotent: false };
 }
@@ -257,6 +259,7 @@ async function recordManualTransferPaymentOrder(input: {
     paymentKey: input.paymentKey,
     bookingId: booking.id
   });
+  await enqueueBookingNotifications(booking.id);
 
   return { bookingId: booking.id, idempotent: false };
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { confirmPreparedPayment } from "@/lib/payments/confirm";
+import { getPaymentOrder } from "@/lib/payments/orders";
 
 type PaymentSuccessPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -25,10 +26,12 @@ export default async function PaymentSuccessPage({ searchParams }: PaymentSucces
   const orderId = first(query.orderId);
   const amount = parseAmount(first(query.amount));
   const canConfirm = Boolean(paymentKey && orderId && amount !== null);
+  const storedOrder = orderId ? await getPaymentOrder(orderId) : null;
+  const provider = storedOrder?.available && storedOrder.order ? storedOrder.order.provider : "card";
   const result = canConfirm
     ? (
         await confirmPreparedPayment({
-          provider: "card",
+          provider,
           paymentKey: paymentKey!,
           orderId: orderId!,
           amount: amount!,
@@ -58,6 +61,8 @@ export default async function PaymentSuccessPage({ searchParams }: PaymentSucces
           <dd>{amount?.toLocaleString("ko-KR") ?? "-"} KRW</dd>
           <dt>mode</dt>
           <dd>{resultMode(result)}</dd>
+          <dt>provider</dt>
+          <dd>{provider}</dd>
           <dt>status</dt>
           <dd>{result?.status ?? "missing query"}</dd>
         </dl>

@@ -14,6 +14,15 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     }
 
     const supabase = createAdminClient();
+    if (parsed.data.isCover) {
+      const { error: coverResetError } = await supabase
+        .from("room_images")
+        .update({ is_cover: false })
+        .eq("room_id", id);
+
+      if (coverResetError) throw coverResetError;
+    }
+
     const { data, error } = await supabase
       .from("room_images")
       .insert({

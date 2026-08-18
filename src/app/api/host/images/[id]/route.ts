@@ -27,6 +27,23 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     ) as RoomImageUpdate;
 
     const supabase = createAdminClient();
+    if (parsed.data.isCover) {
+      const { data: targetImage, error: targetError } = await supabase
+        .from("room_images")
+        .select("room_id")
+        .eq("id", id)
+        .single();
+
+      if (targetError) throw targetError;
+
+      const { error: coverResetError } = await supabase
+        .from("room_images")
+        .update({ is_cover: false })
+        .eq("room_id", targetImage.room_id);
+
+      if (coverResetError) throw coverResetError;
+    }
+
     const { data, error } = await supabase
       .from("room_images")
       .update(updatePayload)

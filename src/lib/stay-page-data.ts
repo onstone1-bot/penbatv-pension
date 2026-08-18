@@ -2,12 +2,16 @@ import { createClient } from "@/lib/supabase/server";
 import type { Database, Json } from "@/lib/supabase/database.types";
 import {
   mockDatePresets,
+  mockNearbyPlaces,
   mockOptions,
+  mockNaverLinks,
   mockRooms,
   mockStay,
   mockVideos,
   type BookingOption,
   type DatePreset,
+  type NaverLink,
+  type NearbyPlace,
   type Room,
   type RoomImage,
   type RoomRate,
@@ -22,12 +26,16 @@ type RoomImageRow = Database["public"]["Tables"]["room_images"]["Row"];
 type RoomRateRow = Database["public"]["Tables"]["room_rates"]["Row"];
 type BookingOptionRow = Database["public"]["Tables"]["booking_options"]["Row"];
 type YoutubeCampaignRow = Database["public"]["Tables"]["youtube_campaigns"]["Row"];
+type NaverLinkRow = Database["public"]["Tables"]["naver_links"]["Row"];
+type NearbyPlaceRow = Database["public"]["Tables"]["nearby_places"]["Row"];
 
 export type StayPageData = {
   stay: Stay;
   rooms: Room[];
   options: BookingOption[];
   videos: YoutubeVideo[];
+  naverLinks: NaverLink[];
+  nearbyPlaces: NearbyPlace[];
   datePresets: DatePreset[];
   source: "supabase" | "mock";
   fallbackReason?: string;
@@ -41,6 +49,8 @@ function fallbackData(accommodationId: string, reason?: string): StayPageData {
     rooms: mockRooms,
     options: mockOptions,
     videos: mockVideos,
+    naverLinks: mockNaverLinks,
+    nearbyPlaces: mockNearbyPlaces,
     datePresets: mockDatePresets,
     source: "mock",
     fallbackReason: reason
@@ -144,6 +154,38 @@ function mapVideo(row: YoutubeCampaignRow, fallback?: YoutubeVideo, firstRoomId?
   };
 }
 
+function mapNaverLink(row: NaverLinkRow, fallback?: NaverLink): NaverLink {
+  return {
+    id: row.id,
+    accommodationId: row.accommodation_id,
+    roomId: row.room_id ?? fallback?.roomId ?? null,
+    type: row.link_type,
+    title: row.title,
+    url: row.url,
+    author: textOr(row.author, fallback?.author ?? "네이버"),
+    excerpt: textOr(row.excerpt, fallback?.excerpt ?? "네이버 외부 후기를 확인할 수 있습니다."),
+    rating: row.rating ?? fallback?.rating ?? null,
+    publishedAt: row.published_at ?? fallback?.publishedAt ?? null
+  };
+}
+
+function mapNearbyPlace(row: NearbyPlaceRow, fallback?: NearbyPlace): NearbyPlace {
+  return {
+    id: row.id,
+    accommodationId: row.accommodation_id,
+    type: row.place_type,
+    name: row.name,
+    category: row.category,
+    address: textOr(row.address, fallback?.address ?? ""),
+    distanceLabel: textOr(row.distance_label, fallback?.distanceLabel ?? ""),
+    travelTime: textOr(row.travel_time, fallback?.travelTime ?? ""),
+    description: textOr(row.description, fallback?.description ?? "숙소 주변에서 함께 둘러보기 좋은 장소입니다."),
+    url: row.url ?? fallback?.url ?? null,
+    mapUrl: row.map_url ?? fallback?.mapUrl ?? null,
+    imageUrl: row.image_url ?? fallback?.imageUrl ?? null
+  };
+}
+
 function mapStay(row: AccommodationRow, accommodationId: string, rooms: Room[]): Stay {
   const firstCover = rooms.flatMap((room) => room.images).find((image) => image.isCover)?.url;
 
@@ -166,7 +208,7 @@ function resultErrorMessage(errors: Array<Error | null>) {
 export async function getStayPageData(accommodationId: string): Promise<StayPageData> {
   try {
     const supabase = await createClient();
-    const [stayResult, roomsResult, optionsResult, campaignsResult] = await Promise.all([
+    const [stayResult, roomsResult, optionsResult, campaignsResult, naverLinksResult, nearbyPlacesResult] = await Promise.all([
       supabase.from("accommodations").select("*").eq("id", accommodationId).eq("status", "active").single(),
       supabase.from("rooms").select("*").eq("accommodation_id", accommodationId).eq("status", "active").order("name"),
       supabase
@@ -175,16 +217,37 @@ export async function getStayPageData(accommodationId: string): Promise<StayPage
         .eq("accommodation_id", accommodationId)
         .eq("status", "active")
         .order("sort_order"),
-      supabase.from("youtube_campaigns").select("*").eq("status", "active").order("created_at")
+      supabase.from("youtube_campaigns").select("*").eq("status", "active").order("created_at"),
+      supabase
+        .from("naver_links")
+        .select("*")
+        .eq("accommodation_id", accommodationId)
+        .eq("status", "active")
+        .order("sort_order"),
+      supabase
+        .from("nearby_places")
+        .select("*")
+        .eq("accommodation_id", accommodationId)
+        .eq("status", "active")
+        .order("sort_order")
     ]);
 
-    if (stayResult.error || roomsResult.error || optionsResult.error || campaignsResult.error) {
+    if (
+      stayResult.error ||
+      roomsResult.error ||
+      optionsResult.error ||
+      campaignsResult.error ||
+      naverLinksResult.error ||
+      nearbyPlacesResult.error
+    ) {
       throw new Error(
         resultErrorMessage([
           stayResult.error,
           roomsResult.error,
           optionsResult.error,
-          campaignsResult.error
+          campaignsResult.error,
+          naverLinksResult.error,
+          nearbyPlacesResult.error
         ])
       );
     }
@@ -223,6 +286,14 @@ export async function getStayPageData(accommodationId: string): Promise<StayPage
         campaignsResult.data?.map((campaign) =>
           mapVideo(campaign, mockVideos.find((fallback) => fallback.code === campaign.code), rooms[0]?.id)
         ) ?? mockVideos,
+      naverLinks:
+        naverLinksResult.data?.map((link) =>
+          mapNaverLink(link, mockNaverLinks.find((fallback) => fallback.id === link.id))
+        ) ?? mockNaverLinks,
+      nearbyPlaces:
+        nearbyPlacesResult.data?.map((place) =>
+          mapNearbyPlace(place, mockNearbyPlaces.find((fallback) => fallback.id === place.id))
+        ) ?? mockNearbyPlaces,
       datePresets: mockDatePresets,
       source: "supabase"
     };

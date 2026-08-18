@@ -29,6 +29,8 @@ export default async function StayLandingPage({ params, searchParams }: PageProp
       rooms={data.rooms}
       options={data.options}
       videos={data.videos}
+      naverLinks={data.naverLinks}
+      nearbyPlaces={data.nearbyPlaces}
       datePresets={data.datePresets}
       initialDraft={draft}
     />

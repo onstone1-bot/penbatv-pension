@@ -4,16 +4,24 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   mockOptions,
+  mockNaverLinks,
+  mockNearbyPlaces,
   mockRooms,
   mockVideos,
   type BookingOption,
+  type NaverLink,
+  type NearbyPlace,
   type Room,
+  type Stay,
   type YoutubeVideo
 } from "@/lib/mock-data";
 import { formatWon } from "@/lib/local-quote";
 
 type RequestStatus = "확인필요" | "결제대기" | "확정";
 type VideoCategory = YoutubeVideo["category"];
+type NaverLinkType = NaverLink["type"];
+type NearbyPlaceType = NearbyPlace["type"];
+type ManagementView = "rooms" | "videos" | "naver" | "nearby" | "options";
 
 type RoomForm = {
   accommodationId: string;
@@ -55,6 +63,54 @@ type OptionForm = {
   description: string;
   price: number;
   sortOrder: number;
+};
+
+type NaverLinkForm = {
+  accommodationId: string;
+  roomId: string;
+  id: string;
+  type: NaverLinkType;
+  title: string;
+  url: string;
+  author: string;
+  excerpt: string;
+  rating: number;
+  publishedAt: string;
+  sortOrder: number;
+};
+
+type NearbyPlaceForm = {
+  accommodationId: string;
+  id: string;
+  type: NearbyPlaceType;
+  name: string;
+  category: string;
+  address: string;
+  distanceLabel: string;
+  travelTime: string;
+  description: string;
+  url: string;
+  mapUrl: string;
+  imageUrl: string;
+  sortOrder: number;
+};
+
+type AccommodationForm = {
+  id: string;
+  name: string;
+  area: string;
+  address: string;
+  concept: string;
+  status: "active" | "hidden";
+};
+
+type HostRoomsClientProps = {
+  initialStay?: Stay;
+  initialRooms?: Room[];
+  initialOptions?: BookingOption[];
+  initialVideos?: YoutubeVideo[];
+  initialNaverLinks?: NaverLink[];
+  initialNearbyPlaces?: NearbyPlace[];
 };
 
 const reservationRequests: Array<{
@@ -105,6 +161,8 @@ const operationChecklist = [
   "객실/사이트 등록 후 고객 화면 노출 확인",
   "객실별 내부/외부 사진 URL 연결",
   "전체/외부/내부 유튜브 영상 연결",
+  "네이버 블로그·리뷰 링크 등록",
+  "주변 가볼만한곳·주변맛집 등록",
   "바베큐·불멍·얼리체크인 옵션 등록",
   "달력 요금과 예약막기까지 최종 확인"
 ];
@@ -151,6 +209,36 @@ const initialOptionForm: OptionForm = {
   sortOrder: 10
 };
 
+const initialNaverLinkForm: NaverLinkForm = {
+  accommodationId: "baebang-alps",
+  roomId: mockRooms[0]?.id ?? "A",
+  id: "",
+  type: "blog",
+  title: "",
+  url: "",
+  author: "네이버 블로그",
+  excerpt: "",
+  rating: 4.8,
+  publishedAt: "2026-08-17",
+  sortOrder: 10
+};
+
+const initialNearbyPlaceForm: NearbyPlaceForm = {
+  accommodationId: "baebang-alps",
+  id: "",
+  type: "attraction",
+  name: "",
+  category: "산책·사진",
+  address: "",
+  distanceLabel: "차량 약 15분",
+  travelTime: "15분",
+  description: "",
+  url: "",
+  mapUrl: "https://map.naver.com/",
+  imageUrl: "/penba/reservoir.jpg",
+  sortOrder: 10
+};
+
 function slugify(value: string) {
   const slug = value
     .trim()
@@ -186,6 +274,14 @@ function youtubeThumb(url: string) {
   return match?.[1] ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : undefined;
 }
 
+function naverTypeLabel(type: NaverLinkType) {
+  return type === "blog" ? "네이버 블로그" : "네이버 리뷰";
+}
+
+function nearbyTypeLabel(type: NearbyPlaceType) {
+  return type === "attraction" ? "주변 가볼만한곳" : "주변맛집";
+}
+
 async function postHostJson(url: string, adminToken: string, body: Record<string, unknown>) {
   const response = await fetch(url, {
     method: "POST",
@@ -204,16 +300,83 @@ async function postHostJson(url: string, adminToken: string, body: Record<string
   return response.json();
 }
 
-export function HostRoomsClient() {
-  const [rooms, setRooms] = useState<Room[]>(mockRooms);
-  const [videos, setVideos] = useState<YoutubeVideo[]>(mockVideos);
-  const [options, setOptions] = useState<BookingOption[]>(mockOptions);
+async function sendHostJson(
+  url: string,
+  adminToken: string,
+  method: "POST" | "PATCH" | "DELETE",
+  body?: Record<string, unknown>
+) {
+  const response = await fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "x-admin-token": adminToken
+    },
+    ...(body ? { body: JSON.stringify(body) } : {})
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(typeof payload.error === "string" ? payload.error : "host api request failed");
+  }
+
+  return response.json();
+}
+
+function initialAccommodationForm(stay?: Stay): AccommodationForm {
+  return {
+    id: stay?.id ?? "baebang-alps",
+    name: stay?.name ?? "배방알프스",
+    area: stay?.area ?? "충남 아산 배방",
+    address: stay?.address ?? "",
+    concept: stay?.concept ?? "",
+    status: "active"
+  };
+}
+
+export function HostRoomsClient({
+  initialStay,
+  initialRooms,
+  initialOptions,
+  initialVideos,
+  initialNaverLinks,
+  initialNearbyPlaces
+}: HostRoomsClientProps) {
+  const loadedRooms = initialRooms?.length ? initialRooms : mockRooms;
+  const [rooms, setRooms] = useState<Room[]>(loadedRooms);
+  const [videos, setVideos] = useState<YoutubeVideo[]>(initialVideos?.length ? initialVideos : mockVideos);
+  const [naverLinks, setNaverLinks] = useState<NaverLink[]>(initialNaverLinks?.length ? initialNaverLinks : mockNaverLinks);
+  const [nearbyPlaces, setNearbyPlaces] = useState<NearbyPlace[]>(initialNearbyPlaces?.length ? initialNearbyPlaces : mockNearbyPlaces);
+  const [options, setOptions] = useState<BookingOption[]>(initialOptions?.length ? initialOptions : mockOptions);
+  const [accommodationForm, setAccommodationForm] = useState<AccommodationForm>(initialAccommodationForm(initialStay));
   const [adminToken, setAdminToken] = useState("");
-  const [selectedRoomId, setSelectedRoomId] = useState(mockRooms[0]?.id ?? "A");
-  const [roomForm, setRoomForm] = useState<RoomForm>(initialRoomForm);
-  const [imageForm, setImageForm] = useState<ImageForm>(initialImageForm);
-  const [videoForm, setVideoForm] = useState<VideoForm>(initialVideoForm);
-  const [optionForm, setOptionForm] = useState<OptionForm>(initialOptionForm);
+  const [selectedRoomId, setSelectedRoomId] = useState(loadedRooms[0]?.id ?? "A");
+  const [roomForm, setRoomForm] = useState<RoomForm>({
+    ...initialRoomForm,
+    accommodationId: initialStay?.id ?? "baebang-alps"
+  });
+  const [imageForm, setImageForm] = useState<ImageForm>({
+    ...initialImageForm,
+    roomId: loadedRooms[0]?.id ?? "A"
+  });
+  const [videoForm, setVideoForm] = useState<VideoForm>({
+    ...initialVideoForm,
+    roomId: loadedRooms[0]?.id ?? "A"
+  });
+  const [optionForm, setOptionForm] = useState<OptionForm>({
+    ...initialOptionForm,
+    accommodationId: initialStay?.id ?? "baebang-alps"
+  });
+  const [naverLinkForm, setNaverLinkForm] = useState<NaverLinkForm>({
+    ...initialNaverLinkForm,
+    accommodationId: initialStay?.id ?? "baebang-alps",
+    roomId: loadedRooms[0]?.id ?? "A"
+  });
+  const [nearbyPlaceForm, setNearbyPlaceForm] = useState<NearbyPlaceForm>({
+    ...initialNearbyPlaceForm,
+    accommodationId: initialStay?.id ?? "baebang-alps"
+  });
+  const [managementView, setManagementView] = useState<ManagementView>("rooms");
   const [message, setMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -226,8 +389,19 @@ export function HostRoomsClient() {
   const roomNameById = useMemo(() => new Map(rooms.map((room) => [room.id, room.name])), [rooms]);
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId) ?? rooms[0];
   const selectedRoomVideos = videos.filter((video) => video.roomId === selectedRoomId);
+  const selectedRoomNaverLinks = naverLinks.filter((link) => !link.roomId || link.roomId === selectedRoomId);
+  const attractionPlaces = nearbyPlaces.filter((place) => place.type === "attraction");
+  const restaurantPlaces = nearbyPlaces.filter((place) => place.type === "restaurant");
   const previewAccommodationId = roomForm.accommodationId.trim() || optionForm.accommodationId.trim() || "baebang-alps";
   const customerPreviewUrl = `/stays/${previewAccommodationId}?utm_source=penbatv&utm_medium=host_content_preview&utm_campaign=${previewAccommodationId}`;
+  const visibleContentCount = rooms.length + videos.length + naverLinks.length + nearbyPlaces.length + options.length;
+  const managementTabs: Array<{ id: ManagementView; label: string; count: number }> = [
+    { id: "rooms", label: "객실", count: rooms.length },
+    { id: "videos", label: "영상", count: videos.length },
+    { id: "naver", label: "네이버", count: naverLinks.length },
+    { id: "nearby", label: "주변정보", count: nearbyPlaces.length },
+    { id: "options", label: "옵션", count: options.length }
+  ];
 
   function updateRoomField<K extends keyof RoomForm>(key: K, value: RoomForm[K]) {
     setRoomForm((current) => ({ ...current, [key]: value }));
@@ -243,6 +417,52 @@ export function HostRoomsClient() {
 
   function updateOptionField<K extends keyof OptionForm>(key: K, value: OptionForm[K]) {
     setOptionForm((current) => ({ ...current, [key]: value }));
+  }
+
+  function updateNaverLinkField<K extends keyof NaverLinkForm>(key: K, value: NaverLinkForm[K]) {
+    setNaverLinkForm((current) => ({ ...current, [key]: value }));
+  }
+
+  function updateNearbyPlaceField<K extends keyof NearbyPlaceForm>(key: K, value: NearbyPlaceForm[K]) {
+    setNearbyPlaceForm((current) => ({ ...current, [key]: value }));
+  }
+
+  function updateAccommodationField<K extends keyof AccommodationForm>(key: K, value: AccommodationForm[K]) {
+    setAccommodationForm((current) => ({ ...current, [key]: value }));
+  }
+
+  async function saveAccommodation() {
+    if (!accommodationForm.id.trim() || !accommodationForm.name.trim() || !accommodationForm.area.trim()) {
+      setMessage("숙소 ID, 숙소명, 지역은 필수입니다.");
+      return;
+    }
+
+    if (!adminToken.trim()) {
+      setMessage("숙소 기본정보 수정은 운영 저장 토큰을 입력해야 DB에 반영됩니다.");
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      await sendHostJson(
+        `/api/host/accommodations/${encodeURIComponent(accommodationForm.id)}`,
+        adminToken.trim(),
+        "PATCH",
+        {
+          name: accommodationForm.name,
+          area: accommodationForm.area,
+          address: accommodationForm.address || null,
+          concept: accommodationForm.concept || null,
+          status: accommodationForm.status
+        }
+      );
+      setMessage("숙소 기본정보를 운영 DB에 수정했습니다. 고객 화면 새로고침 시 반영됩니다.");
+    } catch {
+      setMessage("숙소 기본정보 수정에 실패했습니다. 운영 저장 토큰과 숙소 ID를 확인해주세요.");
+    }
+
+    setIsSaving(false);
   }
 
   async function saveRoom() {
@@ -284,7 +504,7 @@ export function HostRoomsClient() {
 
     if (adminToken.trim()) {
       try {
-        await postHostJson("/api/host/rooms", adminToken.trim(), {
+        const payload = {
           id: nextRoom.id,
           accommodationId: roomForm.accommodationId,
           name: nextRoom.name,
@@ -296,13 +516,32 @@ export function HostRoomsClient() {
           description: nextRoom.description,
           tags: nextRoom.tags,
           amenities: nextRoom.amenities.map((name) => ({ name }))
-        });
-        setMessage("객실을 화면과 DB에 등록했습니다.");
+        };
+        const existingRoom = rooms.some((room) => room.id === nextRoom.id);
+
+        if (existingRoom) {
+          await sendHostJson(`/api/host/rooms/${encodeURIComponent(nextRoom.id)}`, adminToken.trim(), "PATCH", {
+            name: nextRoom.name,
+            type: nextRoom.type,
+            basePrice: nextRoom.basePrice,
+            weekendExtra: nextRoom.weekendExtra,
+            standardCapacity: nextRoom.standardCapacity,
+            maxCapacity: nextRoom.maxCapacity,
+            description: nextRoom.description,
+            tags: nextRoom.tags,
+            amenities: nextRoom.amenities.map((name) => ({ name })),
+            status: "active"
+          });
+        } else {
+          await postHostJson("/api/host/rooms", adminToken.trim(), payload);
+        }
+
+        setMessage("객실을 화면과 DB에 등록/수정했습니다.");
       } catch {
-        setMessage("화면에는 객실을 등록했습니다. 관리자 토큰 또는 DB 저장 상태는 다시 확인해주세요.");
+        setMessage("객실은 운영 화면에 반영했습니다. 운영 DB 저장은 토큰 또는 저장 상태를 확인해주세요.");
       }
     } else {
-      setMessage("객실 초안을 화면에 등록했습니다. 관리자 토큰을 넣으면 DB 저장까지 시도합니다.");
+      setMessage("객실을 임시 저장했습니다. 운영 저장 토큰을 입력하면 DB까지 반영됩니다.");
     }
 
     setRoomForm({ ...initialRoomForm, accommodationId: roomForm.accommodationId });
@@ -344,10 +583,10 @@ export function HostRoomsClient() {
         });
         setMessage("객실 사진을 화면과 DB에 등록했습니다.");
       } catch {
-        setMessage("화면에는 사진을 등록했습니다. DB 저장은 관리자 토큰 또는 URL 중복 여부를 확인해주세요.");
+        setMessage("사진은 운영 화면에 반영했습니다. 운영 DB 저장은 토큰 또는 URL 중복 여부를 확인해주세요.");
       }
     } else {
-      setMessage("사진 초안을 화면에 등록했습니다. 관리자 토큰을 넣으면 DB 저장까지 시도합니다.");
+      setMessage("사진을 임시 저장했습니다. 운영 저장 토큰을 입력하면 DB까지 반영됩니다.");
     }
 
     setImageForm({ ...initialImageForm, roomId: imageForm.roomId, sortOrder: imageForm.sortOrder + 1 });
@@ -391,10 +630,10 @@ export function HostRoomsClient() {
         });
         setMessage("유튜브 영상을 화면과 DB 캠페인에 등록했습니다.");
       } catch {
-        setMessage("화면에는 영상을 등록했습니다. DB 저장은 관리자 토큰 또는 캠페인 코드 중복 여부를 확인해주세요.");
+        setMessage("영상은 운영 화면에 반영했습니다. 운영 DB 저장은 토큰 또는 캠페인 코드 중복 여부를 확인해주세요.");
       }
     } else {
-      setMessage("영상 초안을 화면에 등록했습니다. 관리자 토큰을 넣으면 DB 저장까지 시도합니다.");
+      setMessage("영상을 임시 저장했습니다. 운영 저장 토큰을 입력하면 DB 캠페인까지 반영됩니다.");
     }
 
     setVideoForm({ ...initialVideoForm, roomId: videoForm.roomId, category: videoForm.category, tag: videoForm.tag });
@@ -434,38 +673,409 @@ export function HostRoomsClient() {
         );
         setMessage("부대옵션을 화면과 DB에 등록했습니다.");
       } catch {
-        setMessage("화면에는 옵션을 등록했습니다. DB 저장은 관리자 토큰 또는 옵션 ID를 확인해주세요.");
+        setMessage("옵션은 운영 화면에 반영했습니다. 운영 DB 저장은 토큰 또는 옵션 ID를 확인해주세요.");
       }
     } else {
-      setMessage("옵션 초안을 화면에 등록했습니다. 관리자 토큰을 넣으면 DB 저장까지 시도합니다.");
+      setMessage("옵션을 임시 저장했습니다. 운영 저장 토큰을 입력하면 DB까지 반영됩니다.");
     }
 
     setOptionForm({ ...initialOptionForm, accommodationId: optionForm.accommodationId, sortOrder: optionForm.sortOrder + 1 });
     setIsSaving(false);
   }
 
-  function hideRoom(roomId: string) {
+  async function saveNaverLink() {
+    if (!naverLinkForm.accommodationId.trim() || !naverLinkForm.title.trim() || !naverLinkForm.url.trim()) {
+      setMessage("숙소 ID, 제목, 네이버 링크 URL은 필수입니다.");
+      return;
+    }
+
+    const linkId =
+      naverLinkForm.id.trim() || slugify(`${naverLinkForm.type}-${naverLinkForm.roomId || "stay"}-${naverLinkForm.title}`);
+    const nextLink: NaverLink = {
+      id: linkId,
+      accommodationId: naverLinkForm.accommodationId.trim(),
+      roomId: naverLinkForm.roomId || null,
+      type: naverLinkForm.type,
+      title: naverLinkForm.title.trim(),
+      url: naverLinkForm.url.trim(),
+      author: naverLinkForm.author || naverTypeLabel(naverLinkForm.type),
+      excerpt: naverLinkForm.excerpt || "사장님이 등록한 네이버 외부 후기입니다.",
+      rating: naverLinkForm.type === "review" ? naverLinkForm.rating : null,
+      publishedAt: naverLinkForm.publishedAt || null
+    };
+
+    setIsSaving(true);
+    setNaverLinks((current) => [nextLink, ...current.filter((link) => link.id !== nextLink.id)]);
+
+    if (adminToken.trim()) {
+      try {
+        await postHostJson("/api/host/naver-links", adminToken.trim(), {
+          id: nextLink.id,
+          accommodationId: nextLink.accommodationId,
+          roomId: nextLink.roomId,
+          type: nextLink.type,
+          title: nextLink.title,
+          url: nextLink.url,
+          author: nextLink.author,
+          excerpt: nextLink.excerpt,
+          rating: nextLink.rating,
+          publishedAt: nextLink.publishedAt,
+          sortOrder: naverLinkForm.sortOrder,
+          status: "active"
+        });
+        setMessage("네이버 블로그·리뷰 링크를 화면과 DB에 등록했습니다.");
+      } catch {
+        setMessage("네이버 링크는 운영 화면에 반영했습니다. 운영 DB 저장은 토큰 또는 URL/ID를 확인해주세요.");
+      }
+    } else {
+      setMessage("네이버 링크를 임시 저장했습니다. 운영 저장 토큰을 입력하면 DB까지 반영됩니다.");
+    }
+
+    setNaverLinkForm({
+      ...initialNaverLinkForm,
+      accommodationId: naverLinkForm.accommodationId,
+      roomId: naverLinkForm.roomId,
+      type: naverLinkForm.type,
+      author: naverTypeLabel(naverLinkForm.type),
+      sortOrder: naverLinkForm.sortOrder + 1
+    });
+    setIsSaving(false);
+  }
+
+  async function saveNearbyPlace() {
+    if (!nearbyPlaceForm.accommodationId.trim() || !nearbyPlaceForm.name.trim()) {
+      setMessage("숙소 ID와 장소명은 필수입니다.");
+      return;
+    }
+
+    const placeId = nearbyPlaceForm.id.trim() || slugify(`${nearbyPlaceForm.type}-${nearbyPlaceForm.name}`);
+    const nextPlace: NearbyPlace = {
+      id: placeId,
+      accommodationId: nearbyPlaceForm.accommodationId.trim(),
+      type: nearbyPlaceForm.type,
+      name: nearbyPlaceForm.name.trim(),
+      category: nearbyPlaceForm.category || nearbyTypeLabel(nearbyPlaceForm.type),
+      address: nearbyPlaceForm.address,
+      distanceLabel: nearbyPlaceForm.distanceLabel,
+      travelTime: nearbyPlaceForm.travelTime,
+      description: nearbyPlaceForm.description || "사장님이 등록한 주변 추천 장소입니다.",
+      url: nearbyPlaceForm.url || null,
+      mapUrl: nearbyPlaceForm.mapUrl || null,
+      imageUrl: nearbyPlaceForm.imageUrl || null
+    };
+
+    setIsSaving(true);
+    setNearbyPlaces((current) => [nextPlace, ...current.filter((place) => place.id !== nextPlace.id)]);
+
+    if (adminToken.trim()) {
+      try {
+        await postHostJson("/api/host/nearby-places", adminToken.trim(), {
+          id: nextPlace.id,
+          accommodationId: nextPlace.accommodationId,
+          type: nextPlace.type,
+          name: nextPlace.name,
+          category: nextPlace.category,
+          address: nextPlace.address,
+          distanceLabel: nextPlace.distanceLabel,
+          travelTime: nextPlace.travelTime,
+          description: nextPlace.description,
+          url: nextPlace.url ?? "",
+          mapUrl: nextPlace.mapUrl ?? "",
+          imageUrl: nextPlace.imageUrl ?? "",
+          sortOrder: nearbyPlaceForm.sortOrder,
+          status: "active"
+        });
+        setMessage("주변 가볼만한곳·주변맛집을 화면과 DB에 등록했습니다.");
+      } catch {
+        setMessage("주변정보는 운영 화면에 반영했습니다. 운영 DB 저장은 토큰 또는 장소 ID를 확인해주세요.");
+      }
+    } else {
+      setMessage("주변정보를 임시 저장했습니다. 운영 저장 토큰을 입력하면 DB까지 반영됩니다.");
+    }
+
+    setNearbyPlaceForm({
+      ...initialNearbyPlaceForm,
+      accommodationId: nearbyPlaceForm.accommodationId,
+      type: nearbyPlaceForm.type,
+      category: nearbyPlaceForm.type === "attraction" ? "산책·사진" : "한식·맛집",
+      sortOrder: nearbyPlaceForm.sortOrder + 1
+    });
+    setIsSaving(false);
+  }
+
+  async function hideRoom(roomId: string) {
     setRooms((current) => current.filter((room) => room.id !== roomId));
+    setSelectedRoomId((current) => (current === roomId ? rooms.find((room) => room.id !== roomId)?.id ?? "" : current));
+
+    if (adminToken.trim()) {
+      try {
+        await sendHostJson(`/api/host/rooms/${encodeURIComponent(roomId)}`, adminToken.trim(), "DELETE");
+        setMessage("객실을 화면과 운영 DB에서 비공개 처리했습니다.");
+      } catch {
+        setMessage("객실은 화면에서 비공개 처리했습니다. 운영 DB 반영은 토큰 또는 객실 ID를 확인해주세요.");
+      }
+      return;
+    }
+
+    setMessage("객실을 화면에서 비공개 처리했습니다. 운영 저장 토큰을 입력하면 DB까지 반영됩니다.");
+  }
+
+  function loadRoomDraft(room: Room) {
+    setSelectedRoomId(room.id);
+    setRoomForm({
+      accommodationId: previewAccommodationId,
+      id: room.id,
+      name: room.name,
+      type: room.type,
+      basePrice: room.basePrice,
+      weekendExtra: room.weekendExtra,
+      standardCapacity: room.standardCapacity,
+      maxCapacity: room.maxCapacity,
+      description: room.description,
+      tags: room.tags.join(", "),
+      amenities: room.amenities.join(", ")
+    });
+    setImageForm((current) => ({ ...current, roomId: room.id }));
+    setVideoForm((current) => ({ ...current, roomId: room.id }));
+    setMessage(`${room.name} 객실 정보를 수정폼으로 불러왔습니다.`);
+  }
+
+  function loadVideoDraft(video: YoutubeVideo) {
+    setSelectedRoomId(video.roomId);
+    setVideoForm({
+      roomId: video.roomId,
+      code: video.code,
+      title: video.title,
+      url: video.url ?? "",
+      tag: video.tag,
+      category: video.category,
+      description: video.description,
+      couponAmount: 10000
+    });
+    setMessage(`${video.title} 영상을 수정폼으로 불러왔습니다.`);
+  }
+
+  function loadOptionDraft(option: BookingOption) {
+    setOptionForm({
+      accommodationId: previewAccommodationId,
+      id: option.id,
+      name: option.name,
+      description: option.description,
+      price: option.price,
+      sortOrder: 10
+    });
+    setMessage(`${option.name} 옵션을 수정폼으로 불러왔습니다.`);
+  }
+
+  function loadNaverLinkDraft(link: NaverLink) {
+    setNaverLinkForm({
+      accommodationId: link.accommodationId,
+      roomId: link.roomId ?? "",
+      id: link.id,
+      type: link.type,
+      title: link.title,
+      url: link.url,
+      author: link.author,
+      excerpt: link.excerpt,
+      rating: link.rating ?? 4.8,
+      publishedAt: link.publishedAt ?? "",
+      sortOrder: 10
+    });
+    if (link.roomId) {
+      setSelectedRoomId(link.roomId);
+    }
+    setMessage(`${link.title} 네이버 링크를 수정폼으로 불러왔습니다.`);
+  }
+
+  function loadNearbyPlaceDraft(place: NearbyPlace) {
+    setNearbyPlaceForm({
+      accommodationId: place.accommodationId,
+      id: place.id,
+      type: place.type,
+      name: place.name,
+      category: place.category,
+      address: place.address,
+      distanceLabel: place.distanceLabel,
+      travelTime: place.travelTime,
+      description: place.description,
+      url: place.url ?? "",
+      mapUrl: place.mapUrl ?? "",
+      imageUrl: place.imageUrl ?? "",
+      sortOrder: 10
+    });
+    setMessage(`${place.name} 주변정보를 수정폼으로 불러왔습니다.`);
+  }
+
+  async function removeVideo(code: string) {
+    const video = videos.find((item) => item.code === code);
+    setVideos((current) => current.filter((video) => video.code !== code));
+
+    if (adminToken.trim() && video) {
+      try {
+        await postHostJson("/api/host/youtube-campaigns", adminToken.trim(), {
+          code: video.code,
+          title: video.title,
+          videoUrl: video.url ?? "",
+          roomId: video.roomId,
+          category: video.category,
+          tag: video.tag,
+          description: video.description,
+          thumbnailUrl: video.thumbnailUrl ?? "",
+          couponAmount: 0,
+          status: "ended"
+        });
+        setMessage("영상을 화면과 운영 DB에서 비공개 처리했습니다.");
+      } catch {
+        setMessage("영상은 화면에서 비공개 처리했습니다. 운영 DB 반영은 토큰 또는 캠페인 코드를 확인해주세요.");
+      }
+      return;
+    }
+
+    setMessage("영상을 화면에서 비공개 처리했습니다. 운영 저장 토큰을 입력하면 DB까지 반영됩니다.");
+  }
+
+  async function removeOption(id: string) {
+    const option = options.find((item) => item.id === id);
+    setOptions((current) => current.filter((option) => option.id !== id));
+
+    if (adminToken.trim() && option) {
+      try {
+        await postHostJson(
+          `/api/host/accommodations/${encodeURIComponent(previewAccommodationId)}/options`,
+          adminToken.trim(),
+          {
+            id: option.id,
+            name: option.name,
+            description: option.description,
+            price: option.price,
+            sortOrder: 10,
+            status: "hidden"
+          }
+        );
+        setMessage("옵션을 화면과 운영 DB에서 비공개 처리했습니다.");
+      } catch {
+        setMessage("옵션은 화면에서 비공개 처리했습니다. 운영 DB 반영은 토큰 또는 옵션 ID를 확인해주세요.");
+      }
+      return;
+    }
+
+    setMessage("옵션을 화면에서 비공개 처리했습니다. 운영 저장 토큰을 입력하면 DB까지 반영됩니다.");
+  }
+
+  async function removeNaverLink(id: string) {
+    const link = naverLinks.find((item) => item.id === id);
+    setNaverLinks((current) => current.filter((link) => link.id !== id));
+
+    if (adminToken.trim() && link) {
+      try {
+        await postHostJson("/api/host/naver-links", adminToken.trim(), {
+          id: link.id,
+          accommodationId: link.accommodationId,
+          roomId: link.roomId ?? null,
+          type: link.type,
+          title: link.title,
+          url: link.url,
+          author: link.author,
+          excerpt: link.excerpt,
+          rating: link.rating ?? null,
+          publishedAt: link.publishedAt ?? null,
+          sortOrder: 10,
+          status: "hidden"
+        });
+        setMessage("네이버 링크를 화면과 운영 DB에서 비공개 처리했습니다.");
+      } catch {
+        setMessage("네이버 링크는 화면에서 비공개 처리했습니다. 운영 DB 반영은 토큰 또는 링크 ID를 확인해주세요.");
+      }
+      return;
+    }
+
+    setMessage("네이버 링크를 화면에서 비공개 처리했습니다. 운영 저장 토큰을 입력하면 DB까지 반영됩니다.");
+  }
+
+  async function removeNearbyPlace(id: string) {
+    const place = nearbyPlaces.find((item) => item.id === id);
+    setNearbyPlaces((current) => current.filter((place) => place.id !== id));
+
+    if (adminToken.trim() && place) {
+      try {
+        await postHostJson("/api/host/nearby-places", adminToken.trim(), {
+          id: place.id,
+          accommodationId: place.accommodationId,
+          type: place.type,
+          name: place.name,
+          category: place.category,
+          address: place.address,
+          distanceLabel: place.distanceLabel,
+          travelTime: place.travelTime,
+          description: place.description,
+          url: place.url ?? "",
+          mapUrl: place.mapUrl ?? "",
+          imageUrl: place.imageUrl ?? "",
+          sortOrder: 10,
+          status: "hidden"
+        });
+        setMessage("주변정보를 화면과 운영 DB에서 비공개 처리했습니다.");
+      } catch {
+        setMessage("주변정보는 화면에서 비공개 처리했습니다. 운영 DB 반영은 토큰 또는 장소 ID를 확인해주세요.");
+      }
+      return;
+    }
+
+    setMessage("주변정보를 화면에서 비공개 처리했습니다. 운영 저장 토큰을 입력하면 DB까지 반영됩니다.");
   }
 
   return (
-    <main>
-      <section className="panel">
-        <p className="muted">Step 8 Content Sync</p>
-        <h1>사장님 등록·운영 작업대</h1>
-        <p className="muted">
-          여러 펜션을 입점시킬 때 필요한 객실, 사진, 유튜브 영상, 바베큐 옵션 입력값이 고객 예약 홈에 반영되는 흐름을 맞춥니다.
-        </p>
-        <div className="host-nav">
-          <Link href="/host/properties">펜션 입점 등록</Link>
-          <Link href="/host/rate-calendar">요금·옵션 설정</Link>
-          <Link href="/host/core-features">핵심 기능</Link>
-          <Link href="/host/reservation-payment">예약 결제 프로그램</Link>
-          <Link href="/host/make24-benchmark">입점 제안</Link>
-          <Link href="/host/design-benchmark">디자인 선택</Link>
-          <Link href="/">입점 펜션 목록</Link>
-          <Link href="/host/launch-plan">런칭 가이드</Link>
+    <main className="host-rooms-page">
+      <section className="panel host-control-hero">
+        <div className="host-hero-copy">
+          <p className="muted">PenBa TV Partner Center</p>
+          <h1>{accommodationForm.name} 운영센터</h1>
+          <p className="muted">
+            유튜브 영상을 보고 들어온 고객에게 노출될 객실, 사진, 영상, 후기, 주변정보, 예약 옵션을 한 화면에서 관리합니다.
+          </p>
+          <div className="host-live-status" aria-label="운영 상태">
+            <span>운영중</span>
+            <span>고객 예약 화면 연결</span>
+            <span>노출 콘텐츠 {visibleContentCount}개</span>
+            <span>오늘 확인 {requestCount}건</span>
+          </div>
+          <div className="host-nav">
+            <Link href="/host/properties">펜션 입점 등록</Link>
+            <Link href="/host/rate-calendar">요금·옵션 설정</Link>
+            <Link href="/host/core-features">핵심 기능</Link>
+            <Link href="/host/reservation-payment">예약 결제 프로그램</Link>
+            <Link href="/host/make24-benchmark">입점 제안</Link>
+            <Link href="/host/design-benchmark">디자인 선택</Link>
+            <Link href="/">입점 펜션 목록</Link>
+            <Link href="/host/launch-plan">런칭 가이드</Link>
+          </div>
         </div>
+        <div className="host-hero-visual" aria-label="배방알프스 사진">
+          <span style={{ backgroundImage: "url(/penba/reservoir.jpg)" }}>
+            <b>저수지 전망</b>
+          </span>
+          <span style={{ backgroundImage: "url(/penba/bbq-yard.jpg)" }}>
+            <b>바베큐 마당</b>
+          </span>
+          <span style={{ backgroundImage: "url(/penba/interior-3.jpg)" }}>
+            <b>목조 독채</b>
+          </span>
+        </div>
+      </section>
+
+      <section className="host-travel-mood" aria-label="펜션 여행 분위기">
+        <article style={{ backgroundImage: "url(/penba/overlook.jpg)" }}>
+          <span>소나무 정원</span>
+          <b>위에서 내려다보는 조용한 휴식 동선</b>
+        </article>
+        <article style={{ backgroundImage: "url(/penba/bbq-deck.jpg)" }}>
+          <span>개별 바베큐</span>
+          <b>숙박과 당일 바베큐 이용을 함께 운영</b>
+        </article>
+        <article style={{ backgroundImage: "url(/penba/entrance-road.jpg)" }}>
+          <span>진입 안내</span>
+          <b>고객이 찾아오기 쉬운 현장 사진 구성</b>
+        </article>
       </section>
 
       <section className="host-dashboard-grid" aria-label="예약 운영 요약">
@@ -485,17 +1095,19 @@ export function HostRoomsClient() {
 
       <section className="host-section">
         <div className="section-head">
-          <h2>7~8단계 등록·자동 반영 흐름</h2>
-          <span>입점 후 고객 홈 자동 구성</span>
+          <h2>운영 업무 흐름</h2>
+          <span>등록부터 예약 확인까지</span>
         </div>
         <div className="onboarding-step-grid">
           {[
-            ["01", "펜션 기본 정보", "숙소명, 지역, 주소, 예약 방식"],
-            ["02", "객실/사이트", "객실명, 타입, 기준/최대 인원, 요금"],
-            ["03", "사진", "대표 이미지, 내부, 외부, 바베큐장"],
-            ["04", "유튜브", "전체, 외부, 내부 영상과 객실 연결"],
-            ["05", "옵션", "바베큐, 불멍, 얼리체크인, 단독 이용"],
-            ["06", "예약 현황", "홀드, 결제대기, 확정 예약 확인"]
+            ["01", "펜션 정보", "상호, 주소, 예약 정책을 등록합니다."],
+            ["02", "객실 관리", "객실명, 인원, 요금, 노출 여부를 관리합니다."],
+            ["03", "사진 관리", "대표 이미지와 내부·외부·바베큐장 사진을 연결합니다."],
+            ["04", "영상 관리", "전체, 외부, 내부 유튜브 영상을 객실과 연결합니다."],
+            ["05", "후기 관리", "네이버 블로그와 리뷰 링크를 고객 화면에 노출합니다."],
+            ["06", "주변정보", "가볼만한곳과 맛집을 여행 코스로 구성합니다."],
+            ["07", "옵션 관리", "바베큐, 불멍, 얼리체크인 같은 결제 옵션을 관리합니다."],
+            ["08", "예약 현황", "예약 요청, 결제 대기, 확정 내역을 확인합니다."]
           ].map(([step, title, body]) => (
             <article key={step}>
               <span>{step}</span>
@@ -508,26 +1120,255 @@ export function HostRoomsClient() {
 
       <section className="host-section">
         <div className="section-head">
-          <h2>DB 저장 연결</h2>
-          <span>선택 입력</span>
+          <h2>운영 저장 상태</h2>
+          <span>Supabase 연결</span>
         </div>
         <div className="host-token-row">
           <label>
-            <span>관리자 API 토큰</span>
+            <span>운영 저장 토큰</span>
             <input
               value={adminToken}
               onChange={(event) => setAdminToken(event.target.value)}
-              placeholder="입력하면 Supabase 저장까지 시도"
+              placeholder="입력하면 운영 DB 저장까지 반영"
             />
           </label>
           <p>
-            토큰이 없으면 화면에서만 등록되는 데모로 동작합니다. 토큰이 있으면 서버 API가 Supabase에 저장을 시도합니다.
+            토큰이 입력되면 등록 내용이 서버 API를 통해 운영 DB에 저장됩니다. 토큰이 없을 때는 현재 화면에서 먼저 확인하고 검수할 수 있습니다.
           </p>
           <Link className="secondary-action" href={customerPreviewUrl}>
-            고객 홈 반영 확인
+            고객 예약 화면 확인
           </Link>
         </div>
         {message && <p className="status-note">{message}</p>}
+      </section>
+
+      <section className="host-form-layout">
+        <article className="host-form-card">
+          <h2>숙소 기본정보 등록·수정</h2>
+          <div className="form-grid">
+            <label>
+              <span>숙소 ID</span>
+              <input
+                value={accommodationForm.id}
+                onChange={(event) => updateAccommodationField("id", event.target.value)}
+                placeholder="baebang-alps"
+              />
+            </label>
+            <label>
+              <span>노출 상태</span>
+              <select
+                value={accommodationForm.status}
+                onChange={(event) => updateAccommodationField("status", event.target.value as AccommodationForm["status"])}
+              >
+                <option value="active">고객 화면 노출</option>
+                <option value="hidden">비공개</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            <span>숙소명</span>
+            <input
+              value={accommodationForm.name}
+              onChange={(event) => updateAccommodationField("name", event.target.value)}
+              placeholder="아산 배방알프스"
+            />
+          </label>
+          <div className="form-grid">
+            <label>
+              <span>지역</span>
+              <input
+                value={accommodationForm.area}
+                onChange={(event) => updateAccommodationField("area", event.target.value)}
+                placeholder="충남 아산 배방"
+              />
+            </label>
+            <label>
+              <span>주소</span>
+              <input
+                value={accommodationForm.address}
+                onChange={(event) => updateAccommodationField("address", event.target.value)}
+                placeholder="충남 아산시 ..."
+              />
+            </label>
+          </div>
+          <label>
+            <span>숙소 컨셉</span>
+            <input
+              value={accommodationForm.concept}
+              onChange={(event) => updateAccommodationField("concept", event.target.value)}
+              placeholder="저수지 전망 독채와 바베큐 특화 펜션"
+            />
+          </label>
+          <button className="primary-action" type="button" disabled={isSaving} onClick={saveAccommodation}>
+            숙소 기본정보 저장
+          </button>
+        </article>
+      </section>
+
+      <section className="host-section owner-console">
+        <div className="section-head">
+          <h2>콘텐츠 운영 콘솔</h2>
+          <span>노출 자료 확인·수정·비공개</span>
+        </div>
+        <div className="owner-console-summary">
+          {managementTabs.map((tab) => (
+            <button
+              className={managementView === tab.id ? "active" : ""}
+              key={tab.id}
+              type="button"
+              onClick={() => setManagementView(tab.id)}
+            >
+              <span>{tab.label}</span>
+              <b>{tab.count}</b>
+            </button>
+          ))}
+        </div>
+
+        {managementView === "rooms" && (
+          <div className="owner-console-list">
+            {rooms.length === 0 ? (
+              <p className="owner-console-empty">노출 중인 객실이 없습니다. 객실/사이트 등록폼에서 새 객실을 추가해주세요.</p>
+            ) : (
+              rooms.map((room) => (
+                <article className="owner-console-card" key={room.id}>
+                  <div className="owner-console-thumb" style={{ backgroundImage: `url(${cover(room)})` }} />
+                  <div>
+                    <span>{room.id} · {roomTypeLabel(room.type)}</span>
+                    <h3>{room.name}</h3>
+                    <p>{room.description}</p>
+                    <div className="host-meta">
+                      <span>기본 {formatWon(room.basePrice)}</span>
+                      <span>주말 +{formatWon(room.weekendExtra)}</span>
+                      <span>{room.standardCapacity}~{room.maxCapacity}인</span>
+                      <span>사진 {room.images.length}장</span>
+                      <span>영상 {videos.filter((video) => video.roomId === room.id).length}개</span>
+                    </div>
+                  </div>
+                  <div className="owner-console-actions">
+                    <button type="button" onClick={() => loadRoomDraft(room)}>수정폼 불러오기</button>
+                    <Link href={`/stays/${previewAccommodationId}?room=${room.id}&utm_source=penbatv&utm_medium=host_room_manage&utm_campaign=${previewAccommodationId}`}>
+                      고객 화면 보기
+                    </Link>
+                    <button type="button" onClick={() => hideRoom(room.id)}>비공개</button>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        )}
+
+        {managementView === "videos" && (
+          <div className="owner-console-list">
+            {videos.length === 0 ? (
+              <p className="owner-console-empty">등록된 유튜브 영상이 없습니다.</p>
+            ) : (
+              videos.map((video) => (
+                <article className="owner-console-card" key={video.code}>
+                  <div
+                    className="owner-console-thumb video"
+                    style={{ backgroundImage: `url(${video.thumbnailUrl ?? youtubeThumb(video.url ?? "") ?? (selectedRoom ? cover(selectedRoom) : "/penba/sign.jpg")})` }}
+                  />
+                  <div>
+                    <span>{video.category === "all" ? "전체" : video.category === "exterior" ? "외부" : "내부"} · {roomNameById.get(video.roomId) ?? video.roomId}</span>
+                    <h3>{video.title}</h3>
+                    <p>{video.description}</p>
+                    <div className="host-meta">
+                      <span>{video.code}</span>
+                      <span>{video.tag}</span>
+                    </div>
+                  </div>
+                  <div className="owner-console-actions">
+                    <button type="button" onClick={() => loadVideoDraft(video)}>수정폼 불러오기</button>
+                    {video.url && <a href={video.url} rel="noreferrer" target="_blank">유튜브 열기</a>}
+                    <button type="button" onClick={() => removeVideo(video.code)}>비공개</button>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        )}
+
+        {managementView === "naver" && (
+          <div className="owner-console-list">
+            {naverLinks.length === 0 ? (
+              <p className="owner-console-empty">등록된 네이버 블로그·리뷰 링크가 없습니다.</p>
+            ) : (
+              naverLinks.map((link) => (
+                <article className="owner-console-card compact" key={link.id}>
+                  <div>
+                    <span>{naverTypeLabel(link.type)} · {link.roomId ? roomNameById.get(link.roomId) ?? link.roomId : "숙소 전체"}</span>
+                    <h3>{link.title}</h3>
+                    <p>{link.excerpt}</p>
+                    <div className="host-meta">
+                      <span>{link.author}</span>
+                      {link.rating && <span>평점 {link.rating}</span>}
+                      {link.publishedAt && <span>{link.publishedAt}</span>}
+                    </div>
+                  </div>
+                  <div className="owner-console-actions">
+                    <button type="button" onClick={() => loadNaverLinkDraft(link)}>수정폼 불러오기</button>
+                    <a href={link.url} rel="noreferrer" target="_blank">링크 열기</a>
+                    <button type="button" onClick={() => removeNaverLink(link.id)}>비공개</button>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        )}
+
+        {managementView === "nearby" && (
+          <div className="owner-console-list">
+            {nearbyPlaces.length === 0 ? (
+              <p className="owner-console-empty">등록된 주변 가볼만한곳·맛집이 없습니다.</p>
+            ) : (
+              nearbyPlaces.map((place) => (
+                <article className="owner-console-card" key={place.id}>
+                  <div className="owner-console-thumb" style={{ backgroundImage: `url(${place.imageUrl ?? "/penba/reservoir.jpg"})` }} />
+                  <div>
+                    <span>{nearbyTypeLabel(place.type)} · {place.category}</span>
+                    <h3>{place.name}</h3>
+                    <p>{place.description}</p>
+                    <div className="host-meta">
+                      <span>{place.distanceLabel}</span>
+                      <span>{place.travelTime}</span>
+                      {place.address && <span>{place.address}</span>}
+                    </div>
+                  </div>
+                  <div className="owner-console-actions">
+                    <button type="button" onClick={() => loadNearbyPlaceDraft(place)}>수정폼 불러오기</button>
+                    {(place.mapUrl || place.url) && <a href={place.mapUrl ?? place.url ?? "#"} rel="noreferrer" target="_blank">지도·상세 열기</a>}
+                    <button type="button" onClick={() => removeNearbyPlace(place.id)}>비공개</button>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        )}
+
+        {managementView === "options" && (
+          <div className="owner-console-list">
+            {options.length === 0 ? (
+              <p className="owner-console-empty">등록된 부대옵션이 없습니다.</p>
+            ) : (
+              options.map((option) => (
+                <article className="owner-console-card compact" key={option.id}>
+                  <div>
+                    <span>{option.id}</span>
+                    <h3>{option.name}</h3>
+                    <p>{option.description}</p>
+                    <div className="host-meta">
+                      <span>{formatWon(option.price)}</span>
+                    </div>
+                  </div>
+                  <div className="owner-console-actions">
+                    <button type="button" onClick={() => loadOptionDraft(option)}>수정폼 불러오기</button>
+                    <button type="button" onClick={() => removeOption(option.id)}>비공개</button>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        )}
       </section>
 
       <section className="host-form-studio">
@@ -712,6 +1553,159 @@ export function HostRoomsClient() {
             옵션 등록
           </button>
         </article>
+
+        <article className="host-form-card">
+          <h2>네이버 블로그·리뷰 등록</h2>
+          <div className="form-grid">
+            <label>
+              <span>숙소 ID</span>
+              <input value={naverLinkForm.accommodationId} onChange={(event) => updateNaverLinkField("accommodationId", event.target.value)} />
+            </label>
+            <label>
+              <span>연결 객실</span>
+              <select value={naverLinkForm.roomId} onChange={(event) => updateNaverLinkField("roomId", event.target.value)}>
+                <option value="">숙소 전체</option>
+                {rooms.map((room) => (
+                  <option key={room.id} value={room.id}>{room.name}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="form-grid">
+            <label>
+              <span>구분</span>
+              <select
+                value={naverLinkForm.type}
+                onChange={(event) => {
+                  const nextType = event.target.value as NaverLinkType;
+                  updateNaverLinkField("type", nextType);
+                  updateNaverLinkField("author", naverTypeLabel(nextType));
+                }}
+              >
+                <option value="blog">네이버 블로그</option>
+                <option value="review">네이버 리뷰</option>
+              </select>
+            </label>
+            <label>
+              <span>링크 ID</span>
+              <input value={naverLinkForm.id} onChange={(event) => updateNaverLinkField("id", event.target.value)} placeholder="비워두면 자동 생성" />
+            </label>
+          </div>
+          <label>
+            <span>네이버 URL</span>
+            <input value={naverLinkForm.url} onChange={(event) => updateNaverLinkField("url", event.target.value)} placeholder="https://blog.naver.com/... 또는 https://map.naver.com/..." />
+          </label>
+          <label>
+            <span>제목</span>
+            <input value={naverLinkForm.title} onChange={(event) => updateNaverLinkField("title", event.target.value)} />
+          </label>
+          <div className="form-grid">
+            <label>
+              <span>작성자/출처</span>
+              <input value={naverLinkForm.author} onChange={(event) => updateNaverLinkField("author", event.target.value)} />
+            </label>
+            <label>
+              <span>평점</span>
+              <input type="number" min={0} max={5} step={0.1} value={naverLinkForm.rating} onChange={(event) => updateNaverLinkField("rating", Number(event.target.value))} />
+            </label>
+          </div>
+          <div className="form-grid">
+            <label>
+              <span>작성일</span>
+              <input type="date" value={naverLinkForm.publishedAt} onChange={(event) => updateNaverLinkField("publishedAt", event.target.value)} />
+            </label>
+            <label>
+              <span>정렬</span>
+              <input type="number" min={0} value={naverLinkForm.sortOrder} onChange={(event) => updateNaverLinkField("sortOrder", Number(event.target.value))} />
+            </label>
+          </div>
+          <label>
+            <span>요약 문구</span>
+            <input value={naverLinkForm.excerpt} onChange={(event) => updateNaverLinkField("excerpt", event.target.value)} />
+          </label>
+          <button className="primary-action" type="button" disabled={isSaving} onClick={saveNaverLink}>
+            네이버 링크 등록
+          </button>
+        </article>
+
+        <article className="host-form-card">
+          <h2>주변 가볼만한곳·맛집 등록</h2>
+          <div className="form-grid">
+            <label>
+              <span>숙소 ID</span>
+              <input value={nearbyPlaceForm.accommodationId} onChange={(event) => updateNearbyPlaceField("accommodationId", event.target.value)} />
+            </label>
+            <label>
+              <span>구분</span>
+              <select
+                value={nearbyPlaceForm.type}
+                onChange={(event) => {
+                  const nextType = event.target.value as NearbyPlaceType;
+                  updateNearbyPlaceField("type", nextType);
+                  updateNearbyPlaceField("category", nextType === "attraction" ? "산책·사진" : "한식·맛집");
+                }}
+              >
+                <option value="attraction">주변 가볼만한곳</option>
+                <option value="restaurant">주변맛집</option>
+              </select>
+            </label>
+          </div>
+          <div className="form-grid">
+            <label>
+              <span>장소 ID</span>
+              <input value={nearbyPlaceForm.id} onChange={(event) => updateNearbyPlaceField("id", event.target.value)} placeholder="비워두면 자동 생성" />
+            </label>
+            <label>
+              <span>카테고리</span>
+              <input value={nearbyPlaceForm.category} onChange={(event) => updateNearbyPlaceField("category", event.target.value)} />
+            </label>
+          </div>
+          <label>
+            <span>장소명</span>
+            <input value={nearbyPlaceForm.name} onChange={(event) => updateNearbyPlaceField("name", event.target.value)} placeholder="곡교천 은행나무길" />
+          </label>
+          <label>
+            <span>주소</span>
+            <input value={nearbyPlaceForm.address} onChange={(event) => updateNearbyPlaceField("address", event.target.value)} />
+          </label>
+          <div className="form-grid">
+            <label>
+              <span>거리 표시</span>
+              <input value={nearbyPlaceForm.distanceLabel} onChange={(event) => updateNearbyPlaceField("distanceLabel", event.target.value)} placeholder="차량 약 15분" />
+            </label>
+            <label>
+              <span>소요시간</span>
+              <input value={nearbyPlaceForm.travelTime} onChange={(event) => updateNearbyPlaceField("travelTime", event.target.value)} placeholder="15분" />
+            </label>
+          </div>
+          <label>
+            <span>소개 문구</span>
+            <input value={nearbyPlaceForm.description} onChange={(event) => updateNearbyPlaceField("description", event.target.value)} />
+          </label>
+          <div className="form-grid">
+            <label>
+              <span>상세 URL</span>
+              <input value={nearbyPlaceForm.url} onChange={(event) => updateNearbyPlaceField("url", event.target.value)} placeholder="블로그/홈페이지 링크 선택" />
+            </label>
+            <label>
+              <span>지도 URL</span>
+              <input value={nearbyPlaceForm.mapUrl} onChange={(event) => updateNearbyPlaceField("mapUrl", event.target.value)} placeholder="https://map.naver.com/..." />
+            </label>
+          </div>
+          <div className="form-grid">
+            <label>
+              <span>이미지 URL</span>
+              <input value={nearbyPlaceForm.imageUrl} onChange={(event) => updateNearbyPlaceField("imageUrl", event.target.value)} placeholder="/penba/reservoir.jpg 또는 https://..." />
+            </label>
+            <label>
+              <span>정렬</span>
+              <input type="number" min={0} value={nearbyPlaceForm.sortOrder} onChange={(event) => updateNearbyPlaceField("sortOrder", Number(event.target.value))} />
+            </label>
+          </div>
+          <button className="primary-action" type="button" disabled={isSaving} onClick={saveNearbyPlace}>
+            주변정보 등록
+          </button>
+        </article>
       </section>
 
       <section className="host-section">
@@ -733,13 +1727,17 @@ export function HostRoomsClient() {
                 <span>최대 {room.maxCapacity}인</span>
                 <span>이미지 {room.images.length}장</span>
                 <span>영상 {videos.filter((video) => video.roomId === room.id).length}개</span>
+                <span>네이버 {naverLinks.filter((link) => link.roomId === room.id).length}개</span>
+                <span>주변 {nearbyPlaces.length}개</span>
               </div>
               <div className="host-actions">
                 <button type="button" onClick={() => setSelectedRoomId(room.id)}>선택</button>
-                <button type="button">요금 수정</button>
-                <button type="button">차단일 추가</button>
+                <button type="button" onClick={() => loadRoomDraft(room)}>요금 수정</button>
+                <button type="button" onClick={() => setMessage("차단일 관리는 달력에서 날짜를 선택해 예약 불가 상태로 저장하는 방식으로 운영됩니다.")}>
+                  차단일 추가
+                </button>
                 <button type="button" onClick={() => hideRoom(room.id)}>
-                  화면에서 숨기기
+                  비공개
                 </button>
               </div>
             </article>
@@ -785,6 +1783,30 @@ export function HostRoomsClient() {
                     <b>{option.name}</b>
                     <strong>{formatWon(option.price)}</strong>
                   </div>
+                ))}
+              </div>
+            </article>
+            <article>
+              <h3>네이버 블로그·리뷰</h3>
+              <div className="preview-naver-list">
+                {selectedRoomNaverLinks.map((link) => (
+                  <a href={link.url} key={link.id} rel="noreferrer" target="_blank">
+                    <span>{naverTypeLabel(link.type)}</span>
+                    <b>{link.title}</b>
+                    <small>{link.author}</small>
+                  </a>
+                ))}
+              </div>
+            </article>
+            <article>
+              <h3>주변 가볼만한곳·맛집</h3>
+              <div className="preview-place-list">
+                {[...attractionPlaces.slice(0, 2), ...restaurantPlaces.slice(0, 2)].map((place) => (
+                  <a href={place.mapUrl ?? place.url ?? "#"} key={place.id} rel="noreferrer" target="_blank">
+                    <span>{nearbyTypeLabel(place.type)} · {place.category}</span>
+                    <b>{place.name}</b>
+                    <small>{place.distanceLabel || place.travelTime}</small>
+                  </a>
                 ))}
               </div>
             </article>

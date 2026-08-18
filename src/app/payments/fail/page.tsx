@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { markPaymentOrderCancelled, markPaymentOrderFailed } from "@/lib/payments/orders";
 
 type PaymentFailPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -13,6 +14,15 @@ export default async function PaymentFailPage({ searchParams }: PaymentFailPageP
   const orderId = first(query.orderId);
   const code = first(query.code);
   const message = first(query.message);
+  const isCancelled =
+    code === "PAY_PROCESS_CANCELED" ||
+    code === "PAYMENT_REQUEST_ABORTED" ||
+    (message ?? "").includes("취소");
+  const savedResult = orderId
+    ? isCancelled
+      ? await markPaymentOrderCancelled({ orderId })
+      : await markPaymentOrderFailed({ orderId })
+    : null;
 
   return (
     <main className="payment-result">
@@ -30,6 +40,8 @@ export default async function PaymentFailPage({ searchParams }: PaymentFailPageP
           <dd>{code ?? "-"}</dd>
           <dt>message</dt>
           <dd>{message ?? "-"}</dd>
+          <dt>saved</dt>
+          <dd>{savedResult?.persisted ? (isCancelled ? "cancelled" : "failed") : "not saved"}</dd>
         </dl>
         <div className="result-actions">
           <Link href="/stays/baebang-alps?utm_source=youtube&utm_medium=video&utm_campaign=campheaven_room_01&room=A">

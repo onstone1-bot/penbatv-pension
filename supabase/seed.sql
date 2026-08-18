@@ -192,3 +192,124 @@ on conflict (code) do update set
   description = excluded.description,
   thumbnail_url = excluded.thumbnail_url,
   coupon_amount = excluded.coupon_amount;
+
+insert into public.naver_links (
+  id, accommodation_id, room_id, link_type, title, url, author, excerpt, rating, published_at, sort_order
+)
+values
+  (
+    'naver-blog-baebang-alps-tour',
+    'baebang-alps',
+    'A',
+    'blog',
+    '배방알프스 독채펜션 가족여행 후기',
+    'https://blog.naver.com/',
+    '네이버 블로그',
+    '저수지 전망, 독채 거실, 바베큐 동선을 사진과 글로 확인할 수 있는 블로그 후기입니다.',
+    null,
+    '2026-08-01',
+    1
+  ),
+  (
+    'naver-review-baebang-alps-bbq',
+    'baebang-alps',
+    'B',
+    'review',
+    '바베큐장과 글램핑 분위기가 좋았어요',
+    'https://map.naver.com/',
+    '네이버 리뷰',
+    '바베큐장 이용 편의성과 야외 분위기에 대한 고객 리뷰를 연결합니다.',
+    4.8,
+    '2026-08-05',
+    2
+  )
+on conflict (id) do update set
+  accommodation_id = excluded.accommodation_id,
+  room_id = excluded.room_id,
+  link_type = excluded.link_type,
+  title = excluded.title,
+  url = excluded.url,
+  author = excluded.author,
+  excerpt = excluded.excerpt,
+  rating = excluded.rating,
+  published_at = excluded.published_at,
+  sort_order = excluded.sort_order;
+
+insert into public.nearby_places (
+  id, accommodation_id, place_type, name, category, address, distance_label, travel_time,
+  description, url, map_url, image_url, sort_order
+)
+values
+  (
+    'nearby-attraction-ginkgo-road',
+    'baebang-alps',
+    'attraction',
+    '곡교천 은행나무길',
+    '산책·사진',
+    '충남 아산시 염치읍 송곡리',
+    '차량 약 18분',
+    '18분',
+    '가을 은행나무길과 강변 산책이 좋아 가족 여행 코스로 묶기 좋습니다.',
+    null,
+    'https://map.naver.com/',
+    '/penba/reservoir.jpg',
+    1
+  ),
+  (
+    'nearby-attraction-hyeonchungsa',
+    'baebang-alps',
+    'attraction',
+    '현충사',
+    '역사·가족',
+    '충남 아산시 염치읍 현충사길 126',
+    '차량 약 22분',
+    '22분',
+    '아이들과 함께 들르기 좋은 역사 산책 코스입니다.',
+    null,
+    'https://map.naver.com/',
+    '/penba/entrance-road.jpg',
+    2
+  ),
+  (
+    'nearby-restaurant-market-noodle',
+    'baebang-alps',
+    'restaurant',
+    '온양온천시장 칼국수 거리',
+    '시장·한식',
+    '충남 아산시 시장길 일대',
+    '차량 약 25분',
+    '25분',
+    '체크인 전후로 들르기 좋은 시장 먹거리 코스입니다.',
+    null,
+    'https://map.naver.com/',
+    '/penba/bbq-yard.jpg',
+    3
+  ),
+  (
+    'nearby-restaurant-baebang-bbq',
+    'baebang-alps',
+    'restaurant',
+    '배방 고기·한식 맛집권',
+    '한식·고기',
+    '충남 아산시 배방읍 일대',
+    '차량 약 12분',
+    '12분',
+    '바베큐를 하지 않는 날 저녁 식사 후보로 안내하기 좋은 주변 맛집권입니다.',
+    null,
+    'https://map.naver.com/',
+    '/penba/bbq-deck.jpg',
+    4
+  )
+on conflict (id) do update set
+  accommodation_id = excluded.accommodation_id,
+  place_type = excluded.place_type,
+  name = excluded.name,
+  category = excluded.category,
+  address = excluded.address,
+  distance_label = excluded.distance_label,
+  travel_time = excluded.travel_time,
+  description = excluded.description,
+  url = excluded.url,
+  map_url = excluded.map_url,
+  image_url = excluded.image_url,
+  sort_order = excluded.sort_order;

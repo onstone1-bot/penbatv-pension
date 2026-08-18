@@ -1,14 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { BookingDraft } from "@/lib/booking-draft";
-import type { BookingOption, DatePreset, Room, Stay, YoutubeVideo } from "@/lib/mock-data";
+import type { BookingOption, DatePreset, NaverLink, NearbyPlace, Room, Stay, YoutubeVideo } from "@/lib/mock-data";
 import { formatWon, quoteLocalRoom, quoteOptions, youtubeCoupon } from "@/lib/local-quote";
 import type { ISODateString } from "@/lib/types";
 
-type Screen = "home" | "detail" | "booking" | "mine";
+type Screen = "home" | "detail" | "booking" | "mine" | "my";
+type HomeTab = "booking" | "story";
 type BookingStep = 1 | 2 | 3 | 4 | 5;
 type RangeAvailability = "idle" | "checking" | "available" | "unavailable" | "unknown";
+type DayAvailabilityStatus = "checking" | "available" | "unavailable" | "unknown";
 type BookingMode = "request" | "instant";
 type VideoCategory = YoutubeVideo["category"];
 type BarbecueSlot = "17:00" | "18:00" | "19:00" | "none";
@@ -56,6 +59,7 @@ type PaymentPrepareResponse = {
       url: string | null;
       clientKey: string | null;
       method: "CARD" | "VIRTUAL_ACCOUNT" | "TRANSFER" | null;
+      easyPay: "NAVERPAY" | "TOSSPAY" | null;
       successUrl: string;
       failUrl: string;
       bankTransfer: {
@@ -81,6 +85,16 @@ type AvailabilityResponse = {
     available: boolean;
     blockedReason: string | null;
   };
+  error?: unknown;
+};
+
+type CalendarAvailabilityResponse = {
+  days?: Array<{
+    date: string;
+    roomId: string;
+    available: boolean;
+    blockedReason: string | null;
+  }>;
   error?: unknown;
 };
 
@@ -128,7 +142,8 @@ type TossPaymentRequest = {
   customerName?: string;
   customerMobilePhone?: string;
   card?: {
-    flowMode: "DEFAULT";
+    flowMode: "DEFAULT" | "DIRECT";
+    easyPay?: "NAVERPAY" | "TOSSPAY";
   };
   sandbox?: {
     paymentResult: "SUCCESS" | "FAIL";
@@ -180,11 +195,18 @@ const emptyDate: DatePreset = {
   label: "일정 준비 중"
 };
 
+const fallbackUnavailableDaysByRoom: Record<string, string[]> = {
+  A: ["2026-08-24", "2026-08-25", "2026-09-05", "2026-09-06"],
+  B: ["2026-08-28", "2026-08-30"]
+};
+
 type Props = {
   stay: Stay;
   rooms: Room[];
   options: BookingOption[];
   videos: YoutubeVideo[];
+  naverLinks: NaverLink[];
+  nearbyPlaces: NearbyPlace[];
   datePresets: DatePreset[];
   initialDraft: BookingDraft;
 };
@@ -202,8 +224,8 @@ const customerJourney = [
   },
   {
     step: "03",
-    title: "객실 선택 후 예약·결제",
-    body: "객실을 고르면 관련 영상과 방 사진을 함께 보고 날짜, 옵션, 결제 방식을 선택합니다."
+    title: "사진·영상 확인 후 예약 진행",
+    body: "일정과 인원을 먼저 고른 뒤 객실 사진과 영상을 확인하고 결제 방식으로 이어집니다."
   }
 ];
 
@@ -267,8 +289,8 @@ const bookingStepLabels: Array<{
   label: string;
 }> = [
   { step: 1, label: "일정" },
-  { step: 2, label: "객실" },
-  { step: 3, label: "인원/옵션" },
+  { step: 2, label: "인원/옵션" },
+  { step: 3, label: "객실/영상" },
   { step: 4, label: "결제" },
   { step: 5, label: "완료" }
 ];
@@ -378,7 +400,14 @@ async function requestTossPayment(input: {
     failUrl: checkout.failUrl,
     customerName: input.guestName || "예약 고객",
     ...(phone ? { customerMobilePhone: phone } : {}),
-    ...(method === "CARD" ? { card: { flowMode: "DEFAULT" as const } } : {}),
+    ...(method === "CARD"
+      ? {
+          card: {
+            flowMode: checkout.easyPay ? "DIRECT" as const : "DEFAULT" as const,
+            ...(checkout.easyPay ? { easyPay: checkout.easyPay } : {})
+          }
+        }
+      : {}),
     ...(clientKey.startsWith("test_") ? { sandbox: { paymentResult: "SUCCESS" as const } } : {})
   });
 }
@@ -454,6 +483,13 @@ function nightsBetween(checkIn: string, checkOut: string) {
   return Math.max(1, Math.round(ms / 86_400_000));
 }
 
+function enumerateStayNights(checkIn: string, checkOut: string) {
+  const start = dateFromISO(checkIn);
+  const nights = nightsBetween(checkIn, checkOut);
+
+  return Array.from({ length: nights }, (_, index) => toISODate(addDays(start, index)));
+}
+
 function formatRangeLabel(checkIn: string, checkOut: string) {
   const checkInDate = dateFromISO(checkIn);
   const checkOutDate = dateFromISO(checkOut);
@@ -487,6 +523,10 @@ function buildCalendarDays(monthDate: Date) {
   });
 }
 
+function fallbackDayAvailability(roomId: string, isoDate: string): DayAvailabilityStatus {
+  return fallbackUnavailableDaysByRoom[roomId]?.includes(isoDate) ? "unavailable" : "available";
+}
+
 function youtubeEmbedUrl(url?: string) {
   if (!url) return null;
 
@@ -499,15 +539,46 @@ function isBarbecueOption(option: Pick<BookingOption, "id" | "name" | "descripti
   return text.includes("bbq") || text.includes("barbecue") || text.includes("바비큐") || text.includes("바베큐");
 }
 
-export function StayAppClient({ stay, rooms, options, videos, datePresets, initialDraft }: Props) {
+function naverTypeLabel(type: NaverLink["type"]) {
+  return type === "blog" ? "네이버 블로그" : "네이버 리뷰";
+}
+
+function nearbyTypeLabel(type: NearbyPlace["type"]) {
+  return type === "attraction" ? "주변 가볼만한곳" : "주변맛집";
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function displayWithoutStayName(title: string, stayName: string) {
+  const spacedStayName = stayName.replace("배방", "배방 ");
+  const pattern = new RegExp(`^(${escapeRegExp(stayName)}|${escapeRegExp(spacedStayName)})\\s*`, "i");
+  const cleaned = title.replace(pattern, "").trim();
+
+  return cleaned || title;
+}
+
+export function StayAppClient({
+  stay,
+  rooms,
+  options,
+  videos,
+  naverLinks,
+  nearbyPlaces,
+  datePresets,
+  initialDraft
+}: Props) {
   const initialRoomId = initialDraft.roomId ?? rooms[0]?.id ?? "";
   const initialBarbecueOptionId = options.find(isBarbecueOption)?.id;
   const [screen, setScreen] = useState<Screen>("home");
+  const [homeTab, setHomeTab] = useState<HomeTab>("booking");
   const [selectedRoomId, setSelectedRoomId] = useState(initialRoomId);
   const [selectedDateId, setSelectedDateId] = useState(datePresets[0]?.id ?? "");
   const [selectedCheckIn, setSelectedCheckIn] = useState(datePresets[0]?.checkIn ?? emptyDate.checkIn);
   const [selectedCheckOut, setSelectedCheckOut] = useState(datePresets[0]?.checkOut ?? emptyDate.checkOut);
   const [calendarMonth, setCalendarMonth] = useState(() => dateFromISO(datePresets[0]?.checkIn ?? emptyDate.checkIn));
+  const [dayAvailabilityMap, setDayAvailabilityMap] = useState<Record<string, DayAvailabilityStatus>>({});
   const [rangeAvailability, setRangeAvailability] = useState<RangeAvailability>("idle");
   const [selectedOptions, setSelectedOptions] = useState<string[]>(() =>
     initialBarbecueOptionId ? [initialBarbecueOptionId] : []
@@ -539,6 +610,10 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
     label: formatRangeLabel(selectedCheckIn, selectedCheckOut)
   };
   const calendarDays = useMemo(() => buildCalendarDays(calendarMonth), [calendarMonth]);
+  const selectedRangeHasUnavailable = useMemo(
+    () => enumerateStayNights(selectedCheckIn, selectedCheckOut).some((iso) => dayAvailabilityMap[iso] === "unavailable"),
+    [dayAvailabilityMap, selectedCheckIn, selectedCheckOut]
+  );
 
   const roomQuote = useMemo(
     () =>
@@ -583,6 +658,19 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
     [selectedRoom.id, videos]
   );
   const bookingRoomVideos = selectedRoomVideos.length > 0 ? selectedRoomVideos : videos.slice(0, 2);
+  const selectedRoomNaverLinks = useMemo(
+    () => naverLinks.filter((link) => !link.roomId || link.roomId === selectedRoom.id),
+    [naverLinks, selectedRoom.id]
+  );
+  const displayTitle = (title: string) => displayWithoutStayName(title, stay.name);
+  const attractionPlaces = useMemo(
+    () => nearbyPlaces.filter((place) => place.type === "attraction"),
+    [nearbyPlaces]
+  );
+  const restaurantPlaces = useMemo(
+    () => nearbyPlaces.filter((place) => place.type === "restaurant"),
+    [nearbyPlaces]
+  );
 
   useEffect(() => {
     if (!activeHold) {
@@ -668,6 +756,70 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
   }, [selectedRoom.id, selectedCheckIn, selectedCheckOut]);
 
   useEffect(() => {
+    if (!selectedRoom.id) return;
+
+    let cancelled = false;
+    const daysToCheck = calendarDays.map((day) => day.iso);
+    const startDate = daysToCheck[0];
+    const endDate = toISODate(addDays(dateFromISO(daysToCheck[daysToCheck.length - 1]), 1));
+
+    setDayAvailabilityMap((current) => {
+      const next = { ...current };
+      for (const iso of daysToCheck) {
+        next[iso] = "checking";
+      }
+      return next;
+    });
+
+    async function loadDayAvailability() {
+      let entries: Array<readonly [string, DayAvailabilityStatus]>;
+
+      try {
+        const params = new URLSearchParams({
+          roomId: selectedRoom.id,
+          startDate,
+          endDate
+        });
+        const payload = await getJson<CalendarAvailabilityResponse>(
+          `/api/availability/calendar?${params.toString()}`
+        );
+        const statusByDate = new Map(
+          (payload.days ?? []).map((day) => [
+            day.date,
+            day.available ? "available" : "unavailable"
+          ] as const)
+        );
+
+        entries = daysToCheck.map((iso) => [
+          iso,
+          statusByDate.get(iso) ?? "unknown"
+        ] as const);
+      } catch {
+        entries = daysToCheck.map((iso) => [
+          iso,
+          fallbackDayAvailability(selectedRoom.id, iso)
+        ] as const);
+      }
+
+      if (cancelled) return;
+
+      setDayAvailabilityMap((current) => {
+        const next = { ...current };
+        for (const [iso, status] of entries) {
+          next[iso] = status;
+        }
+        return next;
+      });
+    }
+
+    loadDayAvailability();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [calendarDays, selectedRoom.id]);
+
+  useEffect(() => {
     if (!selectedRoom.id || !selectedCheckIn || !selectedCheckOut) return;
 
     let cancelled = false;
@@ -750,6 +902,18 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
   }
 
   function chooseCalendarDate(isoDate: string) {
+    const dayStatus = dayAvailabilityMap[isoDate];
+
+    if (dayStatus === "unavailable") {
+      setAvailabilityMessage("이미 예약된 날짜입니다. 다른 날짜를 선택해주세요.");
+      return;
+    }
+
+    if (dayStatus === "checking") {
+      setAvailabilityMessage("해당 날짜의 예약 가능 여부를 확인 중입니다.");
+      return;
+    }
+
     const clicked = dateFromISO(isoDate);
     const currentCheckIn = dateFromISO(selectedCheckIn);
     const currentCheckOut = dateFromISO(selectedCheckOut);
@@ -762,6 +926,15 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
     if (!hasRange || clicked.getTime() <= currentCheckIn.getTime()) {
       setSelectedCheckIn(isoDate);
       setSelectedCheckOut(toISODate(addDays(clicked, 1)));
+      return;
+    }
+
+    const hasUnavailableNight = enumerateStayNights(selectedCheckIn, isoDate).some(
+      (nightIso) => dayAvailabilityMap[nightIso] === "unavailable"
+    );
+
+    if (hasUnavailableNight) {
+      setAvailabilityMessage("선택한 기간 중 이미 예약된 날짜가 있습니다. 더 짧은 기간이나 다른 날짜를 선택해주세요.");
       return;
     }
 
@@ -802,9 +975,11 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
     const date = dateFromISO(dayIso).getTime();
     const checkIn = dateFromISO(selectedCheckIn).getTime();
     const checkOut = dateFromISO(selectedCheckOut).getTime();
+    const dayStatus = dayAvailabilityMap[dayIso] ?? "checking";
     const classes = ["calendar-day"];
 
     if (!inMonth) classes.push("muted-day");
+    classes.push(dayStatus);
     if (date === checkIn) classes.push("range-start");
     if (date === checkOut) classes.push("range-end");
     if (date > checkIn && date < checkOut) classes.push("in-range");
@@ -812,7 +987,26 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
     return classes.join(" ");
   }
 
+  function calendarDayStatusLabel(dayIso: string) {
+    const status = dayAvailabilityMap[dayIso] ?? "checking";
+
+    if (status === "unavailable") return "예약마감";
+    if (status === "available") return "가능";
+    if (status === "unknown") return "확인필요";
+    return "확인중";
+  }
+
+  function isCalendarDayDisabled(dayIso: string, inMonth: boolean) {
+    const status = dayAvailabilityMap[dayIso] ?? "checking";
+    return !inMonth || status === "checking" || status === "unavailable";
+  }
+
   async function checkSelectedAvailability() {
+    if (selectedRangeHasUnavailable) {
+      setAvailabilityMessage("선택한 기간 중 이미 예약된 날짜가 있습니다. 다른 날짜를 선택해주세요.");
+      return false;
+    }
+
     setAvailabilityMessage("실시간 예약 가능 여부를 확인하고 있습니다.");
 
     try {
@@ -853,6 +1047,11 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
 
   async function completeBooking() {
     if (isSubmittingBooking) return;
+
+    if (selectedRangeHasUnavailable || rangeAvailability === "unavailable") {
+      setAvailabilityMessage("선택한 기간은 예약할 수 없습니다. 달력에서 예약 가능한 날짜를 다시 선택해주세요.");
+      return;
+    }
 
     setIsSubmittingBooking(true);
     setHoldMessage(
@@ -1021,6 +1220,13 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
 
   return (
     <main className="app-shell">
+      <header className="customer-home-topbar" aria-label="펜바TV 메인 이동">
+        <Link href="/" className="customer-main-home-link">
+          펜바TV 메인홈
+        </Link>
+        <span>{stay.name} 고객홈</span>
+      </header>
+
       {screen === "home" && (
         <>
           <section className="stay-hero" style={{ backgroundImage: `url(${stay.heroUrl})` }}>
@@ -1031,22 +1237,85 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
             </div>
           </section>
 
-          <section className="quick-search">
-            <div>
-              <b>{stay.area}</b>
-              <span>{selectedDate.label} · 성인 {adultCount + childCount}명</span>
-            </div>
-            <button onClick={() => goBooking(selectedRoomId, 1)}>검색</button>
+          <section className="home-content-tabs" aria-label="예약과 숙소 정보 탭">
+            <button
+              className={homeTab === "booking" ? "active" : ""}
+              type="button"
+              onClick={() => setHomeTab("booking")}
+            >
+              예약하기
+            </button>
+            <button
+              className={homeTab === "story" ? "active" : ""}
+              type="button"
+              onClick={() => setHomeTab("story")}
+            >
+              숙소 둘러보기
+            </button>
           </section>
 
+          {homeTab === "booking" && (
           <section className="booking-start-panel" aria-label="예약 일정, 객실, 인원, 부대옵션 선택">
             <div className="section-head">
               <h2>예약 시작</h2>
-              <span>일정 · 객실 · 인원 · 부대옵션</span>
+              <span>일정 · 인원 · 객실 사진/영상 · 부대옵션</span>
             </div>
 
             <div className="booking-start-block">
               <b>예약일정 선택</b>
+              <div className="booking-start-calendar">
+                <div className="calendar-toolbar compact">
+                  <button type="button" onClick={() => moveCalendarMonth(-1)} aria-label="이전 달">
+                    ‹
+                  </button>
+                  <b>{monthLabel(calendarMonth)}</b>
+                  <button type="button" onClick={() => moveCalendarMonth(1)} aria-label="다음 달">
+                    ›
+                  </button>
+                </div>
+                <div className="calendar-weekdays compact">
+                  {["일", "월", "화", "수", "목", "금", "토"].map((weekday) => (
+                    <span key={weekday}>{weekday}</span>
+                  ))}
+                </div>
+                <div className="calendar-grid compact">
+                  {calendarDays.map((day) => (
+                    <button
+                      type="button"
+                      className={calendarClassName(day.iso, day.inMonth)}
+                      disabled={isCalendarDayDisabled(day.iso, day.inMonth)}
+                      key={day.iso}
+                      onClick={() => chooseCalendarDate(day.iso)}
+                      aria-label={`${day.iso} ${calendarDayStatusLabel(day.iso)}`}
+                    >
+                      <span>{day.day}</span>
+                      <small>{calendarDayStatusLabel(day.iso)}</small>
+                    </button>
+                  ))}
+                </div>
+                <div className="calendar-legend" aria-label="달력 예약 상태 안내">
+                  <span className="legend-available">예약가능</span>
+                  <span className="legend-selected">선택일정</span>
+                  <span className="legend-unavailable">예약마감</span>
+                </div>
+              </div>
+              <div className={`availability-summary compact ${selectedRangeHasUnavailable ? "unavailable" : rangeAvailability}`}>
+                <span>선택 기간</span>
+                <b>{selectedDate.label}</b>
+                <small>
+                  {selectedRangeHasUnavailable
+                    ? "선택한 기간 중 예약마감 날짜가 있습니다."
+                    : rangeAvailability === "checking"
+                      ? "예약 여부 확인 중"
+                      : rangeAvailability === "available"
+                        ? "예약 가능"
+                        : rangeAvailability === "unavailable"
+                          ? "예약 불가"
+                          : rangeAvailability === "unknown"
+                            ? "실시간 확인 필요"
+                            : "날짜를 선택하세요"}
+                </small>
+              </div>
               <div className="booking-start-dates">
                 {datePresets.map((date) => (
                   <button
@@ -1056,26 +1325,6 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                     onClick={() => chooseDate(date.id)}
                   >
                     {date.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="booking-start-block">
-              <b>객실 선택</b>
-              <div className="booking-start-rooms">
-                {rooms.map((room) => (
-                  <button
-                    className={selectedRoomId === room.id ? "active" : ""}
-                    key={room.id}
-                    type="button"
-                    onClick={() => chooseRoomForBooking(room.id)}
-                  >
-                    <span style={{ backgroundImage: `url(${cover(room)})` }} />
-                    <strong>{room.name}</strong>
-                    <small>
-                      기준 {room.standardCapacity}인 · {formatWon(room.basePrice)}~
-                    </small>
                   </button>
                 ))}
               </div>
@@ -1108,6 +1357,44 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
             </div>
 
             <div className="booking-start-block">
+              <b>객실 사진·영상 확인</b>
+              <div className="booking-start-rooms">
+                {rooms.map((room) => (
+                  <button
+                    className={selectedRoomId === room.id ? "active" : ""}
+                    key={room.id}
+                    type="button"
+                    onClick={() => chooseRoomForBooking(room.id)}
+                  >
+                    <span style={{ backgroundImage: `url(${cover(room)})` }} />
+                    <strong>{room.name}</strong>
+                    <small>
+                      기준 {room.standardCapacity}인 · 최대 {room.maxCapacity}인 · {formatWon(room.basePrice)}~
+                    </small>
+                  </button>
+                ))}
+              </div>
+              <div className="booking-start-room-preview" aria-label={`${selectedRoom.name} 객실 사진과 영상`}>
+                <div className="booking-start-photo-strip">
+                  {selectedRoomPreviewImages.map((image) => (
+                    <span key={image.url} style={{ backgroundImage: `url(${image.url})` }}>
+                      <b>{image.caption}</b>
+                    </span>
+                  ))}
+                </div>
+                <div className="booking-start-video-strip">
+                  {bookingRoomVideos.slice(0, 2).map((video) => (
+                    <a href={video.url} key={video.code} target="_blank" rel="noreferrer">
+                      <span style={{ backgroundImage: `url(${video.thumbnailUrl ?? cover(selectedRoom)})` }} />
+                      <b>{video.tag}</b>
+                      <small>{displayTitle(video.title)}</small>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="booking-start-block">
               <b>부대옵션 선택</b>
               <div className="booking-start-options">
                 {options.map((option) => (
@@ -1135,11 +1422,19 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
               <b>{formatWon(totalAmount)}</b>
               {quoteMessage && <small>{quoteMessage}</small>}
             </div>
-            <button className="primary-action" type="button" onClick={() => goBooking(selectedRoom.id, 4)}>
-              선택 완료, 결제 진행
+            <button
+              className="primary-action"
+              type="button"
+              disabled={rangeAvailability === "checking" || rangeAvailability === "unavailable" || selectedRangeHasUnavailable}
+              onClick={() => goBooking(selectedRoom.id, 3)}
+            >
+              객실 사진·영상 확인 후 진행
             </button>
           </section>
+          )}
 
+          {homeTab === "story" && (
+          <>
           <section className="chip-row">
             {["전체", "독채", "글램핑", "바비큐", "불멍", "오늘가능"].map((chip, index) => (
               <span className={index === 0 ? "chip active" : "chip"} key={chip}>
@@ -1165,14 +1460,14 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
             </div>
             <p>
               유튜브 영상 설명란에는 이 숙소의 펜바TV 링크가 들어가고, 고객은 여기서 객실 사진과
-              관련 영상을 다시 확인한 뒤 예약·결제를 선택합니다.
+              관련 영상을 다시 확인한 뒤 일정 선택으로 이동합니다.
             </p>
             <div className="youtube-entry-actions">
               <button type="button" onClick={() => setScreen("detail")}>
                 객실 먼저 보기
               </button>
               <button type="button" onClick={() => goBooking(selectedRoom.id, 1)}>
-                예약·결제 선택
+                일정 선택하기
               </button>
             </div>
           </section>
@@ -1193,7 +1488,11 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
               ) : (
                 <div className="featured-video-fallback" style={{ backgroundImage: `url(${stay.heroUrl})` }}>
                   <span>펜바TV 단독 촬영 영상</span>
-                  <b>{stay.featuredVideoTitle ?? "사장님이 유튜브 링크를 등록하면 영상이 자동으로 표시됩니다."}</b>
+                  <b>
+                    {stay.featuredVideoTitle
+                      ? displayTitle(stay.featuredVideoTitle)
+                      : "사장님이 유튜브 링크를 등록하면 영상이 자동으로 표시됩니다."}
+                  </b>
                 </div>
               )}
             </div>
@@ -1225,7 +1524,7 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                     </button>
                     <span className="video-copy">
                       <em>{video.tag}</em>
-                      <b>{video.title}</b>
+                      <b>{displayTitle(video.title)}</b>
                       <small>{video.description}</small>
                       {video.url ? (
                         <a className="video-open-link" href={video.url} target="_blank" rel="noreferrer">
@@ -1241,8 +1540,29 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
 
           <section className="section">
             <div className="section-head">
-              <h2>객실 선택</h2>
-              <span>사진과 영상 확인 후 예약</span>
+              <h2>네이버 블로그·리뷰로 확인</h2>
+              <span>외부 후기 신뢰 자료</span>
+            </div>
+            <div className="naver-link-list">
+              {naverLinks.map((link) => (
+                <a className="naver-link-card" href={link.url} key={link.id} target="_blank" rel="noreferrer">
+                  <span>{naverTypeLabel(link.type)}</span>
+                  <b>{displayTitle(link.title)}</b>
+                  <small>{link.excerpt}</small>
+                  <em>
+                    {link.author}
+                    {link.rating ? ` · 평점 ${link.rating.toFixed(1)}` : ""}
+                    {link.publishedAt ? ` · ${link.publishedAt}` : ""}
+                  </em>
+                </a>
+              ))}
+            </div>
+          </section>
+
+          <section className="section">
+            <div className="section-head">
+              <h2>객실 사진 모아보기</h2>
+              <span>예약 진행 전 공간 확인</span>
             </div>
             <div className="room-list">
               {rooms.map((room) => (
@@ -1282,13 +1602,64 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                     </div>
                     <div className="card-actions">
                       <b>{formatWon(room.basePrice)}~</b>
-                      <button onClick={() => goBooking(room.id, 1)}>예약·결제</button>
+                      <button
+                        onClick={() => {
+                          setSelectedRoomId(room.id);
+                          setScreen("detail");
+                        }}
+                      >
+                        사진·영상 보기
+                      </button>
                     </div>
                   </div>
                 </article>
               ))}
             </div>
           </section>
+
+          <section className="section">
+            <div className="section-head">
+              <h2>주변 가볼만한곳</h2>
+              <span>펜션 소개 아래 여행 코스</span>
+            </div>
+            <div className="nearby-place-list">
+              {attractionPlaces.map((place) => (
+                <article className="nearby-place-card" key={place.id}>
+                  <div style={{ backgroundImage: `url(${place.imageUrl ?? stay.heroUrl})` }} />
+                  <span>{nearbyTypeLabel(place.type)} · {place.category}</span>
+                  <b>{place.name}</b>
+                  <small>{place.distanceLabel || place.travelTime}</small>
+                  <p>{place.description}</p>
+                  <a href={place.mapUrl ?? place.url ?? "#"} target="_blank" rel="noreferrer">
+                    지도/상세 보기
+                  </a>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="section">
+            <div className="section-head">
+              <h2>주변맛집</h2>
+              <span>펜션 소개 아래 맛집 후보</span>
+            </div>
+            <div className="nearby-place-list">
+              {restaurantPlaces.map((place) => (
+                <article className="nearby-place-card" key={place.id}>
+                  <div style={{ backgroundImage: `url(${place.imageUrl ?? stay.heroUrl})` }} />
+                  <span>{nearbyTypeLabel(place.type)} · {place.category}</span>
+                  <b>{place.name}</b>
+                  <small>{place.distanceLabel || place.travelTime}</small>
+                  <p>{place.description}</p>
+                  <a href={place.mapUrl ?? place.url ?? "#"} target="_blank" rel="noreferrer">
+                    지도/상세 보기
+                  </a>
+                </article>
+              ))}
+            </div>
+          </section>
+          </>
+          )}
         </>
       )}
 
@@ -1329,7 +1700,7 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                   </button>
                   <span className="video-copy">
                     <em>{video.tag}</em>
-                    <b>{video.title}</b>
+                    <b>{displayTitle(video.title)}</b>
                     <small>{video.description}</small>
                     {video.url ? (
                       <a className="video-open-link" href={video.url} target="_blank" rel="noreferrer">
@@ -1345,6 +1716,23 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
             <b>영상 체크포인트</b>
             <p>입구·주차 → 방/사이트 간격 → 바비큐 → 샤워실 → 밤 불멍 순서로 확인하고 같은 공간을 예약합니다.</p>
           </div>
+          {selectedRoomNaverLinks.length > 0 && (
+            <div className="room-naver-section">
+              <div className="section-head">
+                <h2>네이버 후기</h2>
+                <span>{selectedRoom.name} 관련 링크</span>
+              </div>
+              <div className="naver-link-list compact">
+                {selectedRoomNaverLinks.map((link) => (
+                  <a className="naver-link-card" href={link.url} key={link.id} target="_blank" rel="noreferrer">
+                    <span>{naverTypeLabel(link.type)}</span>
+                    <b>{displayTitle(link.title)}</b>
+                    <small>{link.excerpt}</small>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="decision-grid">
             <div>
               <span>예약 확정 기준</span>
@@ -1436,22 +1824,36 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                   <button
                     type="button"
                     className={calendarClassName(day.iso, day.inMonth)}
+                    disabled={isCalendarDayDisabled(day.iso, day.inMonth)}
                     key={day.iso}
                     onClick={() => chooseCalendarDate(day.iso)}
+                    aria-label={`${day.iso} ${calendarDayStatusLabel(day.iso)}`}
                   >
                     <span>{day.day}</span>
+                    <small>{calendarDayStatusLabel(day.iso)}</small>
                   </button>
                 ))}
               </div>
-              <div className={`availability-summary ${rangeAvailability}`}>
+              <div className="calendar-legend" aria-label="달력 예약 상태 안내">
+                <span className="legend-available">예약가능</span>
+                <span className="legend-selected">선택일정</span>
+                <span className="legend-unavailable">예약마감</span>
+              </div>
+              <div className={`availability-summary ${selectedRangeHasUnavailable ? "unavailable" : rangeAvailability}`}>
                 <span>선택 기간</span>
                 <b>{selectedDate.label}</b>
                 <small>
-                  {rangeAvailability === "checking" && "예약 여부 확인 중"}
-                  {rangeAvailability === "available" && "예약 가능"}
-                  {rangeAvailability === "unavailable" && "예약 불가"}
-                  {rangeAvailability === "unknown" && "실시간 확인 필요"}
-                  {rangeAvailability === "idle" && "날짜를 선택하세요"}
+                  {selectedRangeHasUnavailable
+                    ? "선택한 기간 중 예약마감 날짜가 있습니다."
+                    : rangeAvailability === "checking"
+                      ? "예약 여부 확인 중"
+                      : rangeAvailability === "available"
+                        ? "예약 가능"
+                        : rangeAvailability === "unavailable"
+                          ? "예약 불가"
+                          : rangeAvailability === "unknown"
+                            ? "실시간 확인 필요"
+                            : "날짜를 선택하세요"}
                 </small>
               </div>
               <div className="preset-row">
@@ -1468,7 +1870,7 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
               </div>
               <button
                 className="primary-action"
-                disabled={rangeAvailability === "checking" || rangeAvailability === "unavailable"}
+                disabled={rangeAvailability === "checking" || rangeAvailability === "unavailable" || selectedRangeHasUnavailable}
                 onClick={() => setBookingStep(2)}
               >
                 다음
@@ -1476,9 +1878,12 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
             </div>
           )}
 
-          {bookingStep === 2 && (
+          {bookingStep === 3 && (
             <div className="flow-card">
               <h2>객실과 영상 확인</h2>
+              <p className="capacity-note">
+                {selectedDate.label} · 성인 {adultCount}명 · 아동 {childCount}명 기준으로 객실을 고르고 사진과 영상을 확인하세요.
+              </p>
               <div className="room-choice-list">
                 {rooms.map((room) => (
                   <button
@@ -1510,17 +1915,17 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                   <a href={video.url} key={video.code} rel="noreferrer" target="_blank">
                     <span style={{ backgroundImage: `url(${video.thumbnailUrl ?? cover(selectedRoom)})` }} />
                     <b>{video.tag}</b>
-                    <small>{video.title}</small>
+                    <small>{displayTitle(video.title)}</small>
                   </a>
                 ))}
               </div>
-              <button className="primary-action" onClick={() => setBookingStep(3)}>
-                다음
+              <button className="primary-action" onClick={goPaymentStep} disabled={isSubmittingBooking}>
+                객실 확인 완료, 결제 정보 입력
               </button>
             </div>
           )}
 
-          {bookingStep === 3 && (
+          {bookingStep === 2 && (
             <div className="flow-card">
               <h2>인원과 옵션</h2>
               <div className="counter-row">
@@ -1580,8 +1985,8 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
                 </div>
               )}
               {availabilityMessage && <p className="status-note">{availabilityMessage}</p>}
-              <button className="primary-action" onClick={goPaymentStep} disabled={isSubmittingBooking}>
-                다음
+              <button className="primary-action" onClick={() => setBookingStep(3)}>
+                인원 선택 완료, 객실 사진·영상 보기
               </button>
             </div>
           )}
@@ -1722,16 +2127,59 @@ export function StayAppClient({ stay, rooms, options, videos, datePresets, initi
         </section>
       )}
 
+      {screen === "my" && (
+        <section className="flow-card app-tab-design-card">
+          <span className="eyebrow">MY 화면 설계</span>
+          <h2>내 정보와 예약 이용 관리</h2>
+          <p className="description">
+            로그인 이후 고객이 예약자 정보, 결제수단, 알림 수신, 최근 본 숙소를 관리하는 개인 메뉴로 확장합니다.
+          </p>
+          <div className="my-design-summary">
+            <article>
+              <span>01</span>
+              <b>예약자 프로필</b>
+              <small>이름, 연락처, 기본 인원, 차량 정보를 저장합니다.</small>
+            </article>
+            <article>
+              <span>02</span>
+              <b>결제·환불 관리</b>
+              <small>카드, 네이버페이, 계좌이체 내역과 환불 상태를 확인합니다.</small>
+            </article>
+            <article>
+              <span>03</span>
+              <b>알림 설정</b>
+              <small>예약 완료, 입실 안내, 바베큐 시간 알림 수신 여부를 관리합니다.</small>
+            </article>
+            <article>
+              <span>04</span>
+              <b>최근 본 숙소</b>
+              <small>유튜브에서 들어와 확인한 펜션과 객실을 다시 볼 수 있게 합니다.</small>
+            </article>
+          </div>
+        </section>
+      )}
+
       <nav className="bottom-tabs">
         <button className={screen === "home" ? "on" : ""} onClick={() => setScreen("home")}>
-          홈
+          <span className="bottom-tab-mark">홈</span>
+          <span className="bottom-tab-label">홈</span>
         </button>
-        <button onClick={() => setScreen("detail")}>객실</button>
-        <button onClick={() => goBooking(selectedRoomId, 1)}>예약</button>
+        <button className={screen === "detail" ? "on" : ""} onClick={() => setScreen("detail")}>
+          <span className="bottom-tab-mark">방</span>
+          <span className="bottom-tab-label">객실</span>
+        </button>
+        <button className={screen === "booking" ? "on" : ""} onClick={() => goBooking(selectedRoomId, 1)}>
+          <span className="bottom-tab-mark">일</span>
+          <span className="bottom-tab-label">예약</span>
+        </button>
         <button className={screen === "mine" ? "on" : ""} onClick={() => setScreen("mine")}>
-          내예약
+          <span className="bottom-tab-mark">예</span>
+          <span className="bottom-tab-label">내예약</span>
         </button>
-        <button>MY</button>
+        <button className={screen === "my" ? "on" : ""} onClick={() => setScreen("my")}>
+          <span className="bottom-tab-mark">MY</span>
+          <span className="bottom-tab-label">MY</span>
+        </button>
       </nav>
     </main>
   );

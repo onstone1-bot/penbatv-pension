@@ -6,6 +6,7 @@ export type PaymentProviderId =
   | "realtime_transfer"
   | "manual_bank_transfer";
 export type PaymentMode = "mock" | "toss" | "manual";
+export type EasyPayProvider = "NAVERPAY" | "TOSSPAY";
 
 export type PreparePaymentInput = {
   holdId: string | null;
@@ -48,6 +49,7 @@ export type PreparedPayment = {
     url: string | null;
     clientKey: string | null;
     method: "CARD" | "VIRTUAL_ACCOUNT" | "TRANSFER" | null;
+    easyPay: EasyPayProvider | null;
     successUrl: string;
     failUrl: string;
     bankTransfer: {
@@ -137,11 +139,18 @@ export function preparePayment(input: PreparePaymentInput): PreparedPayment {
       url: null,
       clientKey: mode === "toss" ? process.env.TOSS_PAYMENTS_CLIENT_KEY ?? null : null,
       method: mode === "toss" ? tossMethod(input.provider) : null,
+      easyPay: mode === "toss" ? easyPayProvider(input.provider) : null,
       successUrl: successUrl.toString(),
       failUrl: failUrl.toString(),
       bankTransfer: mode === "manual" ? manualBankTransfer() : null
     }
   };
+}
+
+function easyPayProvider(provider: PaymentProviderId): EasyPayProvider | null {
+  if (provider === "naverpay") return "NAVERPAY";
+  if (provider === "tosspay") return "TOSSPAY";
+  return null;
 }
 
 export async function confirmTossPayment(input: ConfirmTossPaymentInput) {

@@ -94,6 +94,29 @@ export async function markPaymentOrderPaid(input: {
   }
 }
 
+export async function markPaymentOrderCancelled(input: {
+  orderId: string;
+  paymentKey?: string | null;
+}) {
+  try {
+    const supabase = createAdminClient();
+    const { error } = await supabase
+      .from("payment_orders")
+      .update({
+        status: "cancelled",
+        payment_key: input.paymentKey ?? null
+      })
+      .eq("order_id", input.orderId)
+      .eq("status", "ready");
+
+    if (error) throw error;
+
+    return { persisted: true as const };
+  } catch (error) {
+    return { persisted: false as const, reason: errorMessage(error) };
+  }
+}
+
 export async function markPaymentOrderWaitingDeposit(input: {
   orderId: string;
   paymentKey: string;
@@ -130,11 +153,36 @@ export async function markPaymentOrderFailed(input: {
         status: "failed",
         payment_key: input.paymentKey ?? null
       })
-      .eq("order_id", input.orderId);
+      .eq("order_id", input.orderId)
+      .eq("status", "ready");
 
     if (error) throw error;
 
     return { persisted: true as const };
+  } catch (error) {
+    return { persisted: false as const, reason: errorMessage(error) };
+  }
+}
+
+export async function expireReadyPaymentOrders(now = new Date().toISOString()) {
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from("payment_orders")
+      .update({
+        status: "expired"
+      })
+      .eq("status", "ready")
+      .lt("expires_at", now)
+      .select("order_id");
+
+    if (error) throw error;
+
+    return {
+      persisted: true as const,
+      expiredCount: data?.length ?? 0,
+      orderIds: (data ?? []).map((order) => order.order_id)
+    };
   } catch (error) {
     return { persisted: false as const, reason: errorMessage(error) };
   }

@@ -22,6 +22,13 @@ export const createAccommodationSchema = z.object({
   status: z.enum(["draft", "review", "active", "paused"]).default("review")
 });
 
+export const updateAccommodationSchema = createAccommodationSchema
+  .omit({ id: true, ownerName: true, ownerPhone: true })
+  .partial()
+  .extend({
+    status: z.enum(["active", "hidden", "draft", "review", "paused"]).optional()
+  });
+
 export const createRoomSchema = z.object({
   id: z.string().min(1),
   accommodationId: z.string().min(1),
@@ -82,4 +89,36 @@ export const createYoutubeCampaignSchema = z.object({
   thumbnailUrl: z.string().url().or(z.literal("")).default(""),
   couponAmount: z.number().int().min(0).default(0),
   status: z.enum(["active", "ended"]).default("active")
+});
+
+export const createNaverLinkSchema = z.object({
+  id: z.string().min(1).regex(/^[a-z0-9-]+$/),
+  accommodationId: z.string().min(1),
+  roomId: z.string().nullable().optional(),
+  type: z.enum(["blog", "review"]),
+  title: z.string().min(1),
+  url: z.string().url(),
+  author: z.string().min(1).default("네이버"),
+  excerpt: z.string().nullable().optional(),
+  rating: z.number().min(0).max(5).nullable().optional(),
+  publishedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  sortOrder: z.number().int().min(0).default(0),
+  status: z.enum(["active", "hidden"]).default("active")
+});
+
+export const createNearbyPlaceSchema = z.object({
+  id: z.string().min(1).regex(/^[a-z0-9-]+$/),
+  accommodationId: z.string().min(1),
+  type: z.enum(["attraction", "restaurant"]),
+  name: z.string().min(1),
+  category: z.string().min(1),
+  address: z.string().nullable().optional(),
+  distanceLabel: z.string().nullable().optional(),
+  travelTime: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+  url: z.string().url().or(z.literal("")).default(""),
+  mapUrl: z.string().url().or(z.literal("")).default(""),
+  imageUrl: z.string().url().or(z.string().startsWith("/")).or(z.literal("")).default(""),
+  sortOrder: z.number().int().min(0).default(0),
+  status: z.enum(["active", "hidden"]).default("active")
 });

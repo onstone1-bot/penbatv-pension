@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AvailabilityReason, AvailabilityResult, ISODateString } from "@/lib/types";
 import type { Database } from "@/lib/supabase/database.types";
-import { assertValidDateRange, rangesOverlap } from "@/lib/date";
+import { assertValidDateRange, enumerateNights, rangesOverlap } from "@/lib/date";
 
 type Client = SupabaseClient<Database>;
 
@@ -88,6 +88,81 @@ export async function getAvailableRooms(
   return Promise.all(
     (rooms ?? []).map((room) => getRoomAvailability(supabase, room.id, checkIn, checkOut))
   );
+}
+
+export async function getRoomCalendarAvailability(
+  supabase: Client,
+  roomId: string,
+  startDate: ISODateString,
+  endDate: ISODateString
+) {
+  assertValidDateRange(startDate, endDate);
+  await expireBookingHolds(supabase);
+
+  const [bookingsResult, holdsResult, blocksResult] = await Promise.all([
+    supabase
+      .from("bookings")
+      .select("id, check_in, check_out")
+      .eq("room_id", roomId)
+      .in("status", ["hold", "confirmed"])
+      .lt("check_in", endDate)
+      .gt("check_out", startDate),
+    supabase
+      .from("booking_holds")
+      .select("id, check_in, check_out")
+      .eq("room_id", roomId)
+      .gt("expires_at", new Date().toISOString())
+      .lt("check_in", endDate)
+      .gt("check_out", startDate),
+    supabase
+      .from("room_blocks")
+      .select("id, check_in, check_out")
+      .eq("room_id", roomId)
+      .lt("check_in", endDate)
+      .gt("check_out", startDate)
+  ]);
+
+  if (bookingsResult.error) throw bookingsResult.error;
+  if (holdsResult.error) throw holdsResult.error;
+  if (blocksResult.error) throw blocksResult.error;
+
+  const blockedRanges: Array<{
+    checkIn: string;
+    checkOut: string;
+    reason: AvailabilityReason;
+  }> = [
+    ...(bookingsResult.data ?? []).map((row) => ({
+      checkIn: row.check_in,
+      checkOut: row.check_out,
+      reason: "confirmed_booking" as const
+    })),
+    ...(holdsResult.data ?? []).map((row) => ({
+      checkIn: row.check_in,
+      checkOut: row.check_out,
+      reason: "active_hold" as const
+    })),
+    ...(blocksResult.data ?? []).map((row) => ({
+      checkIn: row.check_in,
+      checkOut: row.check_out,
+      reason: "room_block" as const
+    }))
+  ];
+
+  return enumerateNights(startDate, endDate).map((date) => {
+    const nextDate = new Date(`${date}T00:00:00.000Z`);
+    nextDate.setUTCDate(nextDate.getUTCDate() + 1);
+    const checkOut = nextDate.toISOString().slice(0, 10);
+    const conflict = blockedRanges.find((range) =>
+      rangesOverlap(date, checkOut, range.checkIn, range.checkOut)
+    );
+
+    return {
+      date,
+      roomId,
+      available: !conflict,
+      blockedReason: conflict?.reason ?? null
+    };
+  });
 }
 
 export async function createBookingHold(

@@ -59,6 +59,34 @@ export type YoutubeVideo = {
   roomId: string;
 };
 
+export type NaverLink = {
+  id: string;
+  accommodationId: string;
+  roomId?: string | null;
+  type: "blog" | "review";
+  title: string;
+  url: string;
+  author: string;
+  excerpt: string;
+  rating?: number | null;
+  publishedAt?: string | null;
+};
+
+export type NearbyPlace = {
+  id: string;
+  accommodationId: string;
+  type: "attraction" | "restaurant";
+  name: string;
+  category: string;
+  address: string;
+  distanceLabel: string;
+  travelTime: string;
+  description: string;
+  url?: string | null;
+  mapUrl?: string | null;
+  imageUrl?: string | null;
+};
+
 export type DatePreset = {
   id: string;
   checkIn: string;
@@ -285,6 +313,87 @@ export const mockVideos: YoutubeVideo[] = [
     category: "interior",
     description: "객실 이용 안내와 바비큐장 예약 전 확인해야 할 이용 기준",
     roomId: "B"
+  }
+];
+
+export const mockNaverLinks: NaverLink[] = [
+  {
+    id: "naver-blog-baebang-alps-tour",
+    accommodationId: "baebang-alps",
+    roomId: "A",
+    type: "blog",
+    title: "배방알프스 독채펜션 가족여행 후기",
+    url: "https://blog.naver.com/",
+    author: "네이버 블로그",
+    excerpt: "저수지 전망, 독채 거실, 바베큐 동선을 사진과 글로 확인할 수 있는 블로그 후기입니다.",
+    publishedAt: "2026-08-01"
+  },
+  {
+    id: "naver-review-baebang-alps-bbq",
+    accommodationId: "baebang-alps",
+    roomId: "B",
+    type: "review",
+    title: "바베큐장과 글램핑 분위기가 좋았어요",
+    url: "https://map.naver.com/",
+    author: "네이버 리뷰",
+    excerpt: "바베큐장 이용 편의성과 야외 분위기에 대한 고객 리뷰를 연결합니다.",
+    rating: 4.8,
+    publishedAt: "2026-08-05"
+  }
+];
+
+export const mockNearbyPlaces: NearbyPlace[] = [
+  {
+    id: "nearby-attraction-ginkgo-road",
+    accommodationId: "baebang-alps",
+    type: "attraction",
+    name: "곡교천 은행나무길",
+    category: "산책·사진",
+    address: "충남 아산시 염치읍 송곡리",
+    distanceLabel: "차량 약 18분",
+    travelTime: "18분",
+    description: "가을 은행나무길과 강변 산책이 좋아 가족 여행 코스로 묶기 좋습니다.",
+    mapUrl: "https://map.naver.com/",
+    imageUrl: "/penba/reservoir.jpg"
+  },
+  {
+    id: "nearby-attraction-hyeonchungsa",
+    accommodationId: "baebang-alps",
+    type: "attraction",
+    name: "현충사",
+    category: "역사·가족",
+    address: "충남 아산시 염치읍 현충사길 126",
+    distanceLabel: "차량 약 22분",
+    travelTime: "22분",
+    description: "아이들과 함께 들르기 좋은 역사 산책 코스입니다.",
+    mapUrl: "https://map.naver.com/",
+    imageUrl: "/penba/entrance-road.jpg"
+  },
+  {
+    id: "nearby-restaurant-market-noodle",
+    accommodationId: "baebang-alps",
+    type: "restaurant",
+    name: "온양온천시장 칼국수 거리",
+    category: "시장·한식",
+    address: "충남 아산시 시장길 일대",
+    distanceLabel: "차량 약 25분",
+    travelTime: "25분",
+    description: "체크인 전후로 들르기 좋은 시장 먹거리 코스입니다.",
+    mapUrl: "https://map.naver.com/",
+    imageUrl: "/penba/bbq-yard.jpg"
+  },
+  {
+    id: "nearby-restaurant-baebang-bbq",
+    accommodationId: "baebang-alps",
+    type: "restaurant",
+    name: "배방 고기·한식 맛집권",
+    category: "한식·고기",
+    address: "충남 아산시 배방읍 일대",
+    distanceLabel: "차량 약 12분",
+    travelTime: "12분",
+    description: "바베큐를 하지 않는 날 저녁 식사 후보로 안내하기 좋은 주변 맛집권입니다.",
+    mapUrl: "https://map.naver.com/",
+    imageUrl: "/penba/bbq-deck.jpg"
   }
 ];
 

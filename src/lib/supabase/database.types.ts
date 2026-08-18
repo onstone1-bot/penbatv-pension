@@ -180,6 +180,9 @@ export type Database = {
           check_in: string;
           check_out: string;
           reason: string | null;
+          external_source_id: string | null;
+          external_uid: string | null;
+          source_channel: string | null;
           created_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["room_blocks"]["Row"]> & {
@@ -210,6 +213,60 @@ export type Database = {
           title: string;
         };
         Update: Partial<Database["public"]["Tables"]["youtube_campaigns"]["Row"]>;
+        Relationships: [];
+      };
+      naver_links: {
+        Row: {
+          id: string;
+          accommodation_id: string;
+          room_id: string | null;
+          link_type: "blog" | "review";
+          title: string;
+          url: string;
+          author: string | null;
+          excerpt: string | null;
+          rating: number | null;
+          published_at: string | null;
+          sort_order: number;
+          status: "active" | "hidden";
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["naver_links"]["Row"]> & {
+          id: string;
+          accommodation_id: string;
+          link_type: "blog" | "review";
+          title: string;
+          url: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["naver_links"]["Row"]>;
+        Relationships: [];
+      };
+      nearby_places: {
+        Row: {
+          id: string;
+          accommodation_id: string;
+          place_type: "attraction" | "restaurant";
+          name: string;
+          category: string;
+          address: string | null;
+          distance_label: string | null;
+          travel_time: string | null;
+          description: string | null;
+          url: string | null;
+          map_url: string | null;
+          image_url: string | null;
+          sort_order: number;
+          status: "active" | "hidden";
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["nearby_places"]["Row"]> & {
+          id: string;
+          accommodation_id: string;
+          place_type: "attraction" | "restaurant";
+          name: string;
+          category: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["nearby_places"]["Row"]>;
         Relationships: [];
       };
       utm_events: {
@@ -303,6 +360,88 @@ export type Database = {
           payout_amount: number;
         };
         Update: Partial<Database["public"]["Tables"]["settlements"]["Row"]>;
+        Relationships: [];
+      };
+      notification_queue: {
+        Row: {
+          id: string;
+          booking_id: string | null;
+          channel: "alimtalk" | "sms";
+          template_type: "booking_confirmed" | "checkin_guide" | "barbecue_reminder";
+          recipient_name: string;
+          recipient_phone: string;
+          message: string;
+          scheduled_at: string;
+          sent_at: string | null;
+          status: "queued" | "sent" | "failed" | "cancelled";
+          failure_reason: string | null;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["notification_queue"]["Row"]> & {
+          template_type: "booking_confirmed" | "checkin_guide" | "barbecue_reminder";
+          recipient_name: string;
+          recipient_phone: string;
+          message: string;
+          scheduled_at: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["notification_queue"]["Row"]>;
+        Relationships: [];
+      };
+      calendar_sync_sources: {
+        Row: {
+          id: string;
+          room_id: string;
+          provider: string;
+          ical_url: string | null;
+          sync_policy: "import_only" | "two_way_later";
+          status: "active" | "paused" | "failed";
+          last_synced_at: string | null;
+          last_error: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["calendar_sync_sources"]["Row"]> & {
+          room_id: string;
+          provider: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["calendar_sync_sources"]["Row"]>;
+        Relationships: [];
+      };
+      calendar_sync_events: {
+        Row: {
+          id: string;
+          source_id: string;
+          room_id: string;
+          external_uid: string;
+          summary: string | null;
+          check_in: string;
+          check_out: string;
+          status: "blocked" | "cancelled";
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["calendar_sync_events"]["Row"]> & {
+          source_id: string;
+          room_id: string;
+          external_uid: string;
+          check_in: string;
+          check_out: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["calendar_sync_events"]["Row"]>;
+        Relationships: [];
+      };
+      pilot_runs: {
+        Row: {
+          id: string;
+          accommodation_id: string;
+          status: "draft" | "rehearsal" | "ready" | "open";
+          checklist: Json;
+          opened_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["pilot_runs"]["Row"]> & {
+          accommodation_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["pilot_runs"]["Row"]>;
         Relationships: [];
       };
     };

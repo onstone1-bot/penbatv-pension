@@ -13,6 +13,9 @@ erDiagram
   booking_options ||--o{ booking_option_items : selected
   rooms ||--o{ room_blocks : blocks
   rooms ||--o{ youtube_campaigns : promotes
+  accommodations ||--o{ naver_links : has
+  rooms ||--o{ naver_links : references
+  accommodations ||--o{ nearby_places : has
   youtube_campaigns ||--o{ utm_events : tracks
   booking_holds ||--o{ payment_orders : secures
   rooms ||--o{ payment_orders : priced_for
@@ -89,6 +92,31 @@ erDiagram
     text description
     text thumbnail_url
     integer coupon_amount
+  }
+
+  naver_links {
+    text id PK
+    text accommodation_id FK
+    text room_id FK
+    text link_type
+    text title
+    text url
+    text author
+    numeric rating
+    text status
+  }
+
+  nearby_places {
+    text id PK
+    text accommodation_id FK
+    text place_type
+    text name
+    text category
+    text address
+    text distance_label
+    text map_url
+    text image_url
+    text status
   }
 
   utm_events {

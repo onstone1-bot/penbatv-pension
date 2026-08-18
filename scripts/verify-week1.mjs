@@ -75,6 +75,7 @@ for (const route of [
   "src/app/api/accommodations/[id]/rooms/route.ts",
   "src/app/api/accommodations/[id]/options/route.ts",
   "src/app/api/availability/route.ts",
+  "src/app/api/availability/calendar/route.ts",
   "src/app/api/booking-holds/route.ts",
   "src/app/api/payments/prepare/route.ts",
   "src/app/api/payments/confirm/route.ts",
@@ -88,7 +89,9 @@ for (const route of [
   "src/app/stays/[id]/page.tsx",
   "src/app/stays/[id]/StayAppClient.tsx",
   "src/app/host/rooms/page.tsx",
-  "src/app/host/rooms/HostRoomsClient.tsx"
+  "src/app/host/rooms/HostRoomsClient.tsx",
+  "scripts/verify-week1-live.mjs",
+  "scripts/verify-week1-flow.mjs"
 ]) {
   assert(exists(route), `Missing route/page file: ${route}`);
 }

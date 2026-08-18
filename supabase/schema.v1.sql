@@ -164,6 +164,40 @@ alter table public.youtube_campaigns
   add column if not exists description text,
   add column if not exists thumbnail_url text;
 
+create table if not exists public.naver_links (
+  id text primary key,
+  accommodation_id text not null references public.accommodations(id) on delete cascade,
+  room_id text references public.rooms(id) on delete set null,
+  link_type text not null check (link_type in ('blog', 'review')),
+  title text not null,
+  url text not null,
+  author text,
+  excerpt text,
+  rating numeric(2, 1) check (rating is null or (rating >= 0 and rating <= 5)),
+  published_at date,
+  sort_order integer not null default 0,
+  status text not null default 'active' check (status in ('active', 'hidden')),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.nearby_places (
+  id text primary key,
+  accommodation_id text not null references public.accommodations(id) on delete cascade,
+  place_type text not null check (place_type in ('attraction', 'restaurant')),
+  name text not null,
+  category text not null,
+  address text,
+  distance_label text,
+  travel_time text,
+  description text,
+  url text,
+  map_url text,
+  image_url text,
+  sort_order integer not null default 0,
+  status text not null default 'active' check (status in ('active', 'hidden')),
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.utm_events (
   id uuid primary key default gen_random_uuid(),
   event_name text not null,
@@ -224,6 +258,63 @@ create table if not exists public.settlements (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.notification_queue (
+  id uuid primary key default gen_random_uuid(),
+  booking_id uuid references public.bookings(id) on delete cascade,
+  channel text not null default 'alimtalk' check (channel in ('alimtalk', 'sms')),
+  template_type text not null check (template_type in ('booking_confirmed', 'checkin_guide', 'barbecue_reminder')),
+  recipient_name text not null,
+  recipient_phone text not null,
+  message text not null,
+  scheduled_at timestamptz not null,
+  sent_at timestamptz,
+  status text not null default 'queued' check (status in ('queued', 'sent', 'failed', 'cancelled')),
+  failure_reason text,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.calendar_sync_sources (
+  id uuid primary key default gen_random_uuid(),
+  room_id text not null references public.rooms(id) on delete cascade,
+  provider text not null,
+  ical_url text,
+  sync_policy text not null default 'import_only' check (sync_policy in ('import_only', 'two_way_later')),
+  status text not null default 'active' check (status in ('active', 'paused', 'failed')),
+  last_synced_at timestamptz,
+  last_error text,
+  created_at timestamptz not null default now(),
+  constraint calendar_sync_sources_room_provider_unique unique (room_id, provider)
+);
+
+create table if not exists public.calendar_sync_events (
+  id uuid primary key default gen_random_uuid(),
+  source_id uuid not null references public.calendar_sync_sources(id) on delete cascade,
+  room_id text not null references public.rooms(id) on delete cascade,
+  external_uid text not null,
+  summary text,
+  check_in date not null,
+  check_out date not null,
+  status text not null default 'blocked' check (status in ('blocked', 'cancelled')),
+  created_at timestamptz not null default now(),
+  constraint calendar_sync_events_valid_date_range check (check_in < check_out),
+  constraint calendar_sync_events_source_uid_unique unique (source_id, external_uid)
+);
+
+alter table public.room_blocks
+  add column if not exists external_source_id uuid references public.calendar_sync_sources(id) on delete cascade,
+  add column if not exists external_uid text,
+  add column if not exists source_channel text;
+
+create table if not exists public.pilot_runs (
+  id uuid primary key default gen_random_uuid(),
+  accommodation_id text not null references public.accommodations(id) on delete cascade,
+  status text not null default 'rehearsal' check (status in ('draft', 'rehearsal', 'ready', 'open')),
+  checklist jsonb not null default '{}'::jsonb,
+  opened_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
 create index if not exists rooms_accommodation_id_idx on public.rooms(accommodation_id);
 create index if not exists room_images_room_id_sort_idx on public.room_images(room_id, sort_order);
 create index if not exists room_rates_room_date_idx on public.room_rates(room_id, start_date, end_date, priority desc);
@@ -235,6 +326,9 @@ create index if not exists booking_option_items_booking_idx on public.booking_op
 create index if not exists room_blocks_room_date_idx on public.room_blocks(room_id, check_in, check_out);
 create index if not exists youtube_campaigns_code_idx on public.youtube_campaigns(code);
 create index if not exists youtube_campaigns_room_id_idx on public.youtube_campaigns(room_id);
+create index if not exists naver_links_accommodation_sort_idx on public.naver_links(accommodation_id, sort_order);
+create index if not exists naver_links_room_id_idx on public.naver_links(room_id);
+create index if not exists nearby_places_accommodation_sort_idx on public.nearby_places(accommodation_id, place_type, sort_order);
 create index if not exists utm_events_utm_created_idx on public.utm_events(utm_code, created_at);
 create index if not exists payment_orders_order_idx on public.payment_orders(order_id);
 create index if not exists payment_orders_hold_idx on public.payment_orders(hold_id);
@@ -242,6 +336,14 @@ create index if not exists payment_orders_booking_idx on public.payment_orders(b
 create index if not exists payment_orders_status_idx on public.payment_orders(status, expires_at);
 create index if not exists payments_booking_idx on public.payments(booking_id);
 create index if not exists settlements_payment_idx on public.settlements(payment_id);
+create unique index if not exists notification_queue_booking_template_unique_idx
+on public.notification_queue(booking_id, template_type)
+where booking_id is not null;
+create index if not exists notification_queue_status_schedule_idx on public.notification_queue(status, scheduled_at);
+create unique index if not exists room_blocks_external_source_uid_unique_idx
+on public.room_blocks(external_source_id, external_uid)
+where external_source_id is not null and external_uid is not null;
+create index if not exists pilot_runs_accommodation_status_idx on public.pilot_runs(accommodation_id, status, created_at desc);
 
 do $$
 begin
@@ -282,10 +384,16 @@ alter table public.booking_holds enable row level security;
 alter table public.booking_option_items enable row level security;
 alter table public.room_blocks enable row level security;
 alter table public.youtube_campaigns enable row level security;
+alter table public.naver_links enable row level security;
+alter table public.nearby_places enable row level security;
 alter table public.utm_events enable row level security;
 alter table public.payment_orders enable row level security;
 alter table public.payments enable row level security;
 alter table public.settlements enable row level security;
+alter table public.notification_queue enable row level security;
+alter table public.calendar_sync_sources enable row level security;
+alter table public.calendar_sync_events enable row level security;
+alter table public.pilot_runs enable row level security;
 
 create policy "anon can read active accommodations"
 on public.accommodations for select to anon
@@ -330,6 +438,28 @@ create policy "anon can read active youtube campaigns"
 on public.youtube_campaigns for select to anon
 using (status = 'active');
 
+create policy "anon can read active naver links"
+on public.naver_links for select to anon
+using (
+  status = 'active'
+  and exists (
+    select 1 from public.accommodations a
+    where a.id = naver_links.accommodation_id
+    and a.status = 'active'
+  )
+);
+
+create policy "anon can read active nearby places"
+on public.nearby_places for select to anon
+using (
+  status = 'active'
+  and exists (
+    select 1 from public.accommodations a
+    where a.id = nearby_places.accommodation_id
+    and a.status = 'active'
+  )
+);
+
 create policy "anon can insert utm events"
 on public.utm_events for insert to anon
 with check (true);
@@ -340,6 +470,12 @@ grant select on public.room_images to anon;
 grant select on public.room_rates to anon;
 grant select on public.booking_options to anon;
 grant select on public.youtube_campaigns to anon;
+grant select on public.naver_links to anon;
+grant select on public.nearby_places to anon;
 grant insert on public.utm_events to anon;
 
 grant select, insert, update, delete on all tables in schema public to service_role;
+grant select, insert, update, delete on public.notification_queue to service_role;
+grant select, insert, update, delete on public.calendar_sync_sources to service_role;
+grant select, insert, update, delete on public.calendar_sync_events to service_role;
+grant select, insert, update, delete on public.pilot_runs to service_role;
