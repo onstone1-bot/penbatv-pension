@@ -39,7 +39,7 @@ const css = `
 @media(max-width:720px){.shell{padding-inline:14px}.hero,.metrics,.cards,.templates,.features,.packages,.photos,.flow-grid,.video-category-grid,.room-media-grid,.booking-panel,.booking-grid,.pay-actions,.checkout-demo,.checkout-grid,.checkout-media,.booking-form-grid,.booking-room-pick,.guest-option-grid,.booking-demo-top,.date-button-grid,.date-inputs,.demo-room-grid,.booking-demo-actions,.route-focus,.route-task-grid,.live-checkout,.live-form-grid,.payment-methods{grid-template-columns:1fr}.hero h1{font-size:32px}.video-stack a{grid-template-columns:72px 1fr auto}.section-head{display:block}.bottom{grid-template-columns:repeat(5,1fr)}.room-choice-card .media{grid-template-columns:1fr}.room-choice-card .side-photo{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.room-choice-card .main-photo,.room-choice-card .side-photo{min-height:170px}.live-receipt{position:static}}
 `;
 
-const siteVersionLabel = "업데이트 화면 v19 · 예약결제 실제동작 시연 적용";
+const siteVersionLabel = "업데이트 화면 v20 · 실제 예약 기능 우선 적용";
 
 const routes = {
   "/": {
@@ -503,7 +503,7 @@ const checkoutScript = `
   if (listRoot) {
     const list = JSON.parse(localStorage.getItem("penbaReservations") || "[]");
     if (!list.length) {
-      listRoot.innerHTML = '<article><h3>아직 저장된 예약이 없습니다.</h3><p>고객 예약 화면에서 날짜와 객실을 선택한 뒤 결제까지 진행하면 이곳에 표시됩니다.</p><a class="btn" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=my_empty&utm_campaign=baebang-alps">예약하러 가기</a></article>';
+      listRoot.innerHTML = '<article><h3>아직 저장된 예약이 없습니다.</h3><p>고객 예약 화면에서 날짜와 객실을 선택한 뒤 결제까지 진행하면 이곳에 표시됩니다.</p><a class="btn" href="/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=my_empty&utm_campaign=baebang-alps">예약하러 가기</a></article>';
     } else {
       listRoot.innerHTML = list.map((item) => '<article><span class="chip">' + item.status + '</span><h3>' + item.property + ' · ' + item.room + '</h3><p>' + item.checkIn + ' - ' + item.checkOut + '<br>' + item.guests + '<br>' + item.options + '</p><div class="price">' + won(item.amount) + '</div><p>예약자: ' + item.guestName + ' · ' + item.phone + '</p></article>').join("");
     }
@@ -540,14 +540,14 @@ const roomMedia = [
 ];
 
 const mainProperties = [
-  ["배방 알프스", "충남 아산 배방", "숲과 계곡을 함께 즐기는 독채 펜션과 글램핑", "180,000원~", "요청+바로결제", images.sign, "/stays/baebang-alps?utm_source=penbatv&utm_medium=main_property&utm_campaign=baebang-alps"],
-  ["리버 포레스트 스테이", "강원 홍천", "강변 데크와 가족형 객실을 묶은 주말 캠핑 펜션", "150,000원~", "바로결제", images.glamping, "/stays/river-forest-stay?utm_source=penbatv&utm_medium=main_property&utm_campaign=river-forest-stay"],
-  ["오션 캐빈 하우스", "경남 남해", "바다 전망 객실과 숯불 바비큐를 강조한 감성 펜션", "130,000원~", "예약요청", images.reservoir, "/stays/ocean-cabin-house?utm_source=penbatv&utm_medium=main_property&utm_campaign=ocean-cabin-house"]
+  ["배방 알프스", "충남 아산 배방", "숲과 계곡을 함께 즐기는 독채 펜션과 글램핑", "180,000원~", "요청+바로결제", images.sign, "/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=main_property&utm_campaign=baebang-alps"],
+  ["리버 포레스트 스테이", "강원 홍천", "강변 데크와 가족형 객실을 묶은 주말 캠핑 펜션", "150,000원~", "바로결제", images.glamping, "/stays/river-forest-stay?start=booking&utm_source=penbatv&utm_medium=main_property&utm_campaign=river-forest-stay"],
+  ["오션 캐빈 하우스", "경남 남해", "바다 전망 객실과 숯불 바비큐를 강조한 감성 펜션", "130,000원~", "예약요청", images.reservoir, "/stays/ocean-cabin-house?start=booking&utm_source=penbatv&utm_medium=main_property&utm_campaign=ocean-cabin-house"]
 ];
 
 function sectionMainShortcuts() {
   const shortcuts = [
-    ["고객 화면", "유튜브 설명란 링크를 누른 고객이 사진, 영상, 일정, 객실, 결제까지 진행합니다.", "/stays/baebang-alps?utm_source=penbatv&utm_medium=main_customer&utm_campaign=baebang-alps", "예약 시연"],
+    ["고객 화면", "유튜브 설명란 링크를 누른 고객이 사진, 영상, 일정, 객실, 결제까지 진행합니다.", "/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=main_customer&utm_campaign=baebang-alps", "예약 시연"],
     ["사장님 관리", "객실, 요금, 사진, 영상, 후기, 주변정보와 예약 현황을 관리합니다.", "/host/rooms", "관리화면"],
     ["운영자 관리", "입점 승인, 전체 예약, 결제, 정산, 유튜브 성과를 확인합니다.", "/admin/operations", "운영화면"]
   ];
@@ -655,7 +655,7 @@ function sectionHome() {
   </section>
   <section class="section"><div class="section-head"><h2>유튜브 영상 모아보기</h2><span class="muted">숙소별 여러 영상 링크</span></div>
     <div class="video-tabs"><span class="on">전체</span><span>외부</span><span>내부</span></div>
-    <div class="cards">${videos.map(([title, label, , image, url]) => `<article class="card image-card"><a class="image" href="${url}" target="_blank" rel="noreferrer" style="background-image:url('${image}')"></a><div class="body"><span class="chip">${label}</span><h3>${title}</h3><p>실제 유튜브 영상 설명란에서 펜바TV 고객 홈으로 들어오고, 같은 화면에서 객실 선택과 예약·결제를 이어갑니다.</p><div class="actions"><a class="btn" href="${url}" target="_blank" rel="noreferrer">유튜브 보기</a><a class="btn alt" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=youtube_description&utm_campaign=baebang-alps">예약 홈 이동</a></div></div></article>`).join("")}</div>
+    <div class="cards">${videos.map(([title, label, , image, url]) => `<article class="card image-card"><a class="image" href="${url}" target="_blank" rel="noreferrer" style="background-image:url('${image}')"></a><div class="body"><span class="chip">${label}</span><h3>${title}</h3><p>실제 유튜브 영상 설명란에서 펜바TV 고객 홈으로 들어오고, 같은 화면에서 객실 선택과 예약·결제를 이어갑니다.</p><div class="actions"><a class="btn" href="${url}" target="_blank" rel="noreferrer">유튜브 보기</a><a class="btn alt" href="/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=youtube_description&utm_campaign=baebang-alps">예약 홈 이동</a></div></div></article>`).join("")}</div>
   </section>`;
 }
 
@@ -675,7 +675,7 @@ function sectionVideoCategories() {
 function sectionRoomMediaSelection() {
   return `<section class="section"><div class="section-head"><h2>객실 선택 화면</h2><span class="muted">방 사진 + 유튜브 영상 + 예약·결제</span></div><div class="room-media-grid">${roomMedia.map((room, index) => {
     const matchedVideos = videos.filter(([title]) => room.videos.includes(title));
-    return `<article class="card room-choice-card"><div class="media"><div class="main-photo" style="background-image:url('${room.cover}')"></div><div class="side-photo">${room.photos.map((photo) => `<span style="background-image:url('${photo}')"></span>`).join("")}</div></div><div class="body"><span class="chip">${room.type}</span><h3>${room.name}</h3><p>${room.body}</p><div class="price">${room.price}</div><div class="mini-video-list">${matchedVideos.map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${label} · ${title}</b></a>`).join("")}</div><div class="actions"><a class="btn" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=room_media&utm_campaign=baebang-alps&room=${index === 0 ? "A" : "B"}">객실 상세 보기</a><a class="btn alt" href="/booking-calendar-status">예약 현황 보기</a></div></div></article>`;
+    return `<article class="card room-choice-card"><div class="media"><div class="main-photo" style="background-image:url('${room.cover}')"></div><div class="side-photo">${room.photos.map((photo) => `<span style="background-image:url('${photo}')"></span>`).join("")}</div></div><div class="body"><span class="chip">${room.type}</span><h3>${room.name}</h3><p>${room.body}</p><div class="price">${room.price}</div><div class="mini-video-list">${matchedVideos.map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${label} · ${title}</b></a>`).join("")}</div><div class="actions"><a class="btn" href="/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=room_media&utm_campaign=baebang-alps&room=${index === 0 ? "A" : "B"}">객실 상세 보기</a><a class="btn alt" href="/booking-calendar-status">예약 현황 보기</a></div></div></article>`;
   }).join("")}</div></section>`;
 }
 
@@ -711,7 +711,7 @@ function sectionCalendar() {
 }
 
 function sectionDirectBooking() {
-  return `<section class="section booking-panel"><div><span class="eyebrow">빠른 예약결제</span><h2>예약 가능한 날짜를 확인하고 바로 결제 단계로 이동합니다.</h2><p>유튜브에서 들어온 고객이 이 화면에서 날짜, 객실, 바베큐 시간, 결제수단, 총액을 한 번에 확인하도록 구성했습니다.</p></div><div class="pay-card"><div class="booking-grid"><label><span>체크인</span><strong>2026-08-22</strong></label><label><span>객실</span><strong>독채펜션 A</strong></label><label><span>바베큐장</span><strong>18:00 - 21:00</strong></label><label><span>인원</span><strong>성인 4명</strong></label></div><div><span>객실 요금</span><b>250,000원</b></div><div><span>바베큐 숯불세트</span><b>30,000원</b></div><div><span>유튜브 유입 할인</span><b>-10,000원</b></div><div class="total"><span>총 결제 예정금액</span><strong>270,000원</strong></div><div class="methods"><span>신용카드</span><span>간편결제</span><span>현금영수증</span></div><div class="pay-actions"><a href="/stays/baebang-alps?utm_source=penbatv&utm_medium=calendar_direct_booking&utm_campaign=baebang-alps&room=A&checkIn=2026-08-22">예약/결제 진행</a><a href="/stays/baebang-alps?utm_source=penbatv&utm_medium=calendar_payment_preview&utm_campaign=baebang-alps">상세 예약 화면</a></div></div></section>`;
+  return `<section class="section booking-panel"><div><span class="eyebrow">빠른 예약결제</span><h2>예약 가능한 날짜를 확인하고 바로 결제 단계로 이동합니다.</h2><p>유튜브에서 들어온 고객이 이 화면에서 날짜, 객실, 바베큐 시간, 결제수단, 총액을 한 번에 확인하도록 구성했습니다.</p></div><div class="pay-card"><div class="booking-grid"><label><span>체크인</span><strong>2026-08-22</strong></label><label><span>객실</span><strong>독채펜션 A</strong></label><label><span>바베큐장</span><strong>18:00 - 21:00</strong></label><label><span>인원</span><strong>성인 4명</strong></label></div><div><span>객실 요금</span><b>250,000원</b></div><div><span>바베큐 숯불세트</span><b>30,000원</b></div><div><span>유튜브 유입 할인</span><b>-10,000원</b></div><div class="total"><span>총 결제 예정금액</span><strong>270,000원</strong></div><div class="methods"><span>신용카드</span><span>간편결제</span><span>현금영수증</span></div><div class="pay-actions"><a href="/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=calendar_direct_booking&utm_campaign=baebang-alps&room=A&checkIn=2026-08-22">예약/결제 진행</a><a href="/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=calendar_payment_preview&utm_campaign=baebang-alps">상세 예약 화면</a></div></div></section>`;
 }
 
 function sectionOperations() {
@@ -764,7 +764,7 @@ function sectionMemberDemo() {
 }
 
 function sectionCheckoutLive() {
-  return `<section class="section live-checkout"><form class="live-form" data-checkout-form><span class="eyebrow">예약 결제</span><h2>예약자 정보와 결제수단을 입력하세요</h2><div class="live-form-grid"><label>예약자명<input name="guestName" placeholder="홍길동" autocomplete="name"></label><label>연락처<input name="phone" placeholder="010-0000-0000" autocomplete="tel"></label><label>이메일<input name="email" placeholder="guest@example.com" autocomplete="email"></label><label>현금영수증<select name="cashReceipt"><option>미발행</option><option>개인 소득공제</option><option>사업자 지출증빙</option></select></label></div><h3>결제수단</h3><div class="payment-methods"><label><input type="radio" name="paymentMethod" value="card" checked>신용카드</label><label><input type="radio" name="paymentMethod" value="naverpay">네이버페이</label><label><input type="radio" name="paymentMethod" value="bank">수동 계좌이체</label></div><input type="hidden" data-booking-json><button class="btn" type="submit">결제하고 예약 확정</button><div class="form-message" data-form-message>현재 공개 시연용은 실제 카드 승인 대신 브라우저에 예약을 저장합니다.</div></form><aside class="live-receipt"><span class="eyebrow">선택한 예약</span><h2>결제 예정 내역</h2><div class="receipt-lines"><div><span>일정</span><b data-pay-dates></b></div><div><span>객실</span><b data-pay-room></b></div><div><span>인원</span><b data-pay-guests></b></div><div><span>옵션</span><b data-pay-options></b></div><strong><span>총 결제금액</span><b data-pay-amount></b></strong></div><div class="actions" style="margin-top:14px"><a class="btn alt" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=checkout_back&utm_campaign=baebang-alps">예약 조건 다시 선택</a></div></aside></section>`;
+  return `<section class="section live-checkout"><form class="live-form" data-checkout-form><span class="eyebrow">예약 결제</span><h2>예약자 정보와 결제수단을 입력하세요</h2><div class="live-form-grid"><label>예약자명<input name="guestName" placeholder="홍길동" autocomplete="name"></label><label>연락처<input name="phone" placeholder="010-0000-0000" autocomplete="tel"></label><label>이메일<input name="email" placeholder="guest@example.com" autocomplete="email"></label><label>현금영수증<select name="cashReceipt"><option>미발행</option><option>개인 소득공제</option><option>사업자 지출증빙</option></select></label></div><h3>결제수단</h3><div class="payment-methods"><label><input type="radio" name="paymentMethod" value="card" checked>신용카드</label><label><input type="radio" name="paymentMethod" value="naverpay">네이버페이</label><label><input type="radio" name="paymentMethod" value="bank">수동 계좌이체</label></div><input type="hidden" data-booking-json><button class="btn" type="submit">결제하고 예약 확정</button><div class="form-message" data-form-message>현재 공개 시연용은 실제 카드 승인 대신 브라우저에 예약을 저장합니다.</div></form><aside class="live-receipt"><span class="eyebrow">선택한 예약</span><h2>결제 예정 내역</h2><div class="receipt-lines"><div><span>일정</span><b data-pay-dates></b></div><div><span>객실</span><b data-pay-room></b></div><div><span>인원</span><b data-pay-guests></b></div><div><span>옵션</span><b data-pay-options></b></div><strong><span>총 결제금액</span><b data-pay-amount></b></strong></div><div class="actions" style="margin-top:14px"><a class="btn alt" href="/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=checkout_back&utm_campaign=baebang-alps">예약 조건 다시 선택</a></div></aside></section>`;
 }
 
 function sectionBookingComplete() {
@@ -816,17 +816,17 @@ function render(pathname) {
   if (pathname === "/") {
     return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
       <div class="version-banner"><span>${siteVersionLabel}</span><small>메인·고객·사장님·운영자 이동 확인용</small></div>
-      <section class="hero"><div><span class="eyebrow">PenBa TV Main Demo</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=hero_demo&utm_campaign=baebang-alps">고객 예약 시연하기</a><a class="btn alt" href="/host/rooms">사장님 관리 보기</a><a class="btn alt" href="/admin/operations">운영자 관리 보기</a><a class="btn alt" href="/platform-guide">기존 메인 설명 보기</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
+      <section class="hero"><div><span class="eyebrow">PenBa TV Main Demo</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=hero_demo&utm_campaign=baebang-alps">고객 예약 시연하기</a><a class="btn alt" href="/host/rooms">사장님 관리 보기</a><a class="btn alt" href="/admin/operations">운영자 관리 보기</a><a class="btn alt" href="/platform-guide">기존 메인 설명 보기</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
       ${sectionMainShortcuts()}${sectionMainProperties()}${sectionMainScenario()}${sectionHome()}${sectionCustomerBookingForm()}${sectionPhotos()}
       <section class="band section"><h2>오늘 시연 포인트</h2><p>이제 메인 화면은 개발 일정 설명보다 고객 예약 흐름을 먼저 보여줍니다. 고객 화면, 사장님 관리화면, 운영자 관리화면으로 바로 이동하고, 입점 숙소 3개 대표 화면과 유튜브 영상 링크를 한눈에 확인할 수 있습니다.</p></section>
     </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/platform-guide">설명</a><a href="/booking-calendar-status">예약</a><a href="/host/rooms">사장님</a><a href="/admin/operations">운영자</a></nav><script>${bookingDemoScript}</script><script>${checkoutScript}</script></body></html>`;
   }
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
     <div class="version-banner"><span>${siteVersionLabel}</span><small>현재 주소: ${pathname}</small></div>
-    <section class="hero"><div><span class="eyebrow">PenBa TV</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/">고객 홈</a><a class="btn alt" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=youtube_description&utm_campaign=baebang-alps">객실 선택</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a><a class="btn alt" href="/host/make24-benchmark">입점 제안</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
+    <section class="hero"><div><span class="eyebrow">PenBa TV</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/">고객 홈</a><a class="btn alt" href="/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=youtube_description&utm_campaign=baebang-alps">객실 선택</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a><a class="btn alt" href="/host/make24-benchmark">입점 제안</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
     ${pageSections(pathname)}
     <section class="band section"><h2>외부 공유용 펜바TV 고객 데모</h2><p>이 페이지는 유튜브 설명란 링크를 누른 고객이 보게 될 흐름을 기준으로 구성했습니다. 영상으로 신뢰를 만들고, 객실 사진과 예약 현황을 본 뒤 예약·결제 선택으로 이어지는 구조입니다.</p></section>
-  </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/stays/baebang-alps?utm_source=penbatv&utm_medium=bottom_room&utm_campaign=baebang-alps">객실</a><a href="/booking-calendar-status">예약</a><a href="/my">내예약</a><a href="/host/rooms">사장님</a></nav><script>${bookingDemoScript}</script><script>${checkoutScript}</script></body></html>`;
+  </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=bottom_room&utm_campaign=baebang-alps">객실</a><a href="/booking-calendar-status">예약</a><a href="/my">내예약</a><a href="/host/rooms">사장님</a></nav><script>${bookingDemoScript}</script><script>${checkoutScript}</script></body></html>`;
 }
 
 const worker = `

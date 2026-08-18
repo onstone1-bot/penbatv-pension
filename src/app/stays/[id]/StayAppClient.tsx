@@ -209,6 +209,10 @@ type Props = {
   nearbyPlaces: NearbyPlace[];
   datePresets: DatePreset[];
   initialDraft: BookingDraft;
+  initialScreen?: Extract<Screen, "home" | "booking">;
+  initialCheckIn?: string | null;
+  initialCheckOut?: string | null;
+  initialBookingMode?: BookingMode;
 };
 
 const customerJourney = [
@@ -567,17 +571,24 @@ export function StayAppClient({
   naverLinks,
   nearbyPlaces,
   datePresets,
-  initialDraft
+  initialDraft,
+  initialScreen = "home",
+  initialCheckIn,
+  initialCheckOut,
+  initialBookingMode = "request"
 }: Props) {
   const initialRoomId = initialDraft.roomId ?? rooms[0]?.id ?? "";
   const initialBarbecueOptionId = options.find(isBarbecueOption)?.id;
-  const [screen, setScreen] = useState<Screen>("home");
+  const firstPreset = datePresets.find((date) => date.id === "d2") ?? datePresets[0] ?? emptyDate;
+  const firstCheckIn = initialCheckIn ?? firstPreset.checkIn;
+  const firstCheckOut = initialCheckOut ?? (initialCheckIn ? toISODate(addDays(dateFromISO(firstCheckIn), 1)) : firstPreset.checkOut);
+  const [screen, setScreen] = useState<Screen>(initialScreen);
   const [homeTab, setHomeTab] = useState<HomeTab>("booking");
   const [selectedRoomId, setSelectedRoomId] = useState(initialRoomId);
-  const [selectedDateId, setSelectedDateId] = useState(datePresets[0]?.id ?? "");
-  const [selectedCheckIn, setSelectedCheckIn] = useState(datePresets[0]?.checkIn ?? emptyDate.checkIn);
-  const [selectedCheckOut, setSelectedCheckOut] = useState(datePresets[0]?.checkOut ?? emptyDate.checkOut);
-  const [calendarMonth, setCalendarMonth] = useState(() => dateFromISO(datePresets[0]?.checkIn ?? emptyDate.checkIn));
+  const [selectedDateId, setSelectedDateId] = useState(initialCheckIn ? "custom" : firstPreset.id);
+  const [selectedCheckIn, setSelectedCheckIn] = useState(firstCheckIn);
+  const [selectedCheckOut, setSelectedCheckOut] = useState(firstCheckOut);
+  const [calendarMonth, setCalendarMonth] = useState(() => dateFromISO(firstCheckIn));
   const [dayAvailabilityMap, setDayAvailabilityMap] = useState<Record<string, DayAvailabilityStatus>>({});
   const [rangeAvailability, setRangeAvailability] = useState<RangeAvailability>("idle");
   const [selectedOptions, setSelectedOptions] = useState<string[]>(() =>
@@ -588,7 +599,7 @@ export function StayAppClient({
   const [guestName, setGuestName] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentProvider>("card");
-  const [bookingMode, setBookingMode] = useState<BookingMode>("request");
+  const [bookingMode, setBookingMode] = useState<BookingMode>(initialBookingMode);
   const [bookingStep, setBookingStep] = useState<BookingStep>(1);
   const [booking, setBooking] = useState<LocalBooking | null>(null);
   const [barbecueSlot, setBarbecueSlot] = useState<BarbecueSlot>("18:00");

@@ -11,7 +11,7 @@ const quickLinks = [
   {
     title: "고객 화면",
     body: "유튜브 설명란 링크를 누른 고객이 사진, 영상, 일정, 객실, 결제까지 진행합니다.",
-    href: "/stays/baebang-alps?utm_source=penbatv&utm_medium=main_customer&utm_campaign=baebang-alps",
+    href: "/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=main_customer&utm_campaign=baebang-alps",
     action: "예약 시연"
   },
   {
@@ -75,8 +75,8 @@ export default function HomePage() {
       </header>
 
       <section className="main-update-banner" aria-label="업데이트 버전 안내">
-        <b>업데이트 화면 v17 · 메인/고객/사장님/운영자 이동 구분 적용</b>
-        <span>이 문구가 보이면 새 화면입니다. 고객 예약 시연, 사장님 관리, 운영자 관리가 각각 다른 화면으로 이동합니다.</span>
+        <b>업데이트 화면 v20 · 실제 예약 기능 우선 적용</b>
+        <span>고객 예약 시연을 누르면 설명이 아니라 날짜·객실·인원·옵션·결제 단계가 바로 실행됩니다.</span>
       </section>
 
       <section className="main-home-hero" aria-label="펜바TV 메인 소개">
@@ -88,7 +88,7 @@ export default function HomePage() {
             달력에서 가능한 날짜를 고른 뒤 객실·인원·바베큐 옵션을 선택해 결제까지 진행합니다.
           </p>
           <div className="main-hero-actions">
-            <Link href={`/stays/${heroProperty.id}?utm_source=penbatv&utm_medium=hero_demo&utm_campaign=${heroProperty.id}`}>
+            <Link href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=hero_demo&utm_campaign=${heroProperty.id}`}>
               고객 예약 시연하기
             </Link>
             <Link href="/host/rooms">사장님 관리 보기</Link>
@@ -133,7 +133,7 @@ export default function HomePage() {
             <article key={property.id}>
               <Link
                 className="main-property-image"
-                href={`/stays/${property.id}?utm_source=penbatv&utm_medium=main_property&utm_campaign=${property.id}`}
+                href={`/stays/${property.id}?start=booking&utm_source=penbatv&utm_medium=main_property&utm_campaign=${property.id}`}
               >
                 <Image
                   src={property.heroUrl}
@@ -156,7 +156,7 @@ export default function HomePage() {
                   <small>{reservationModeLabels[property.reservationMode]}</small>
                 </div>
                 <div className="main-card-actions">
-                  <Link href={`/stays/${property.id}?utm_source=penbatv&utm_medium=main_card_reserve&utm_campaign=${property.id}`}>
+                  <Link href={`/stays/${property.id}?start=booking&utm_source=penbatv&utm_medium=main_card_reserve&utm_campaign=${property.id}`}>
                     예약 화면
                   </Link>
                   <Link href={`/booking-calendar-status?accommodationId=${property.id}`}>
@@ -198,7 +198,7 @@ export default function HomePage() {
             <span>YouTube Contents</span>
             <h2>전체·외부·내부 영상 링크</h2>
           </div>
-          <Link href={`/stays/${heroProperty.id}?utm_source=penbatv&utm_medium=video_more&utm_campaign=${heroProperty.id}`}>
+          <Link href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=video_more&utm_campaign=${heroProperty.id}`}>
             영상 보고 예약
           </Link>
         </div>
@@ -242,7 +242,7 @@ export default function HomePage() {
       <nav className="home-bottom-tabs" aria-label="모바일 하단 메뉴">
         <Link className="on" href="/">홈</Link>
         <Link href="/platform-guide">설명</Link>
-        <Link href={`/stays/${heroProperty.id}?utm_source=penbatv&utm_medium=bottom_booking&utm_campaign=${heroProperty.id}`}>
+        <Link href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=bottom_booking&utm_campaign=${heroProperty.id}`}>
           예약
         </Link>
         <Link href="/my">내예약</Link>
