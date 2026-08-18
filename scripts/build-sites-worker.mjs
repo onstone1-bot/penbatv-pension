@@ -27,6 +27,7 @@ const css = `
 :root{color-scheme:light;--bg:#f5f4f1;--ink:#17211d;--muted:#65726c;--green:#0f5a47;--line:rgba(19,28,24,.12);--red:#c51f1f}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:inherit}
 .shell{max-width:1080px;margin:0 auto;padding:34px 18px 96px}.hero,.section,.band{border:1px solid var(--line);border-radius:16px;background:#fff;padding:24px}.hero{display:grid;grid-template-columns:minmax(0,1fr)280px;gap:18px;align-items:end;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(237,247,242,.84)),url("${images.sign}");background-size:cover;background-position:center}.eyebrow,.muted{color:var(--muted);font-size:13px;font-weight:900}.hero h1{margin:8px 0 10px;font-size:42px;line-height:1.08}.hero p,.section p,.card p{color:var(--muted);line-height:1.65}.actions,.chips,.nav{display:flex;flex-wrap:wrap;gap:8px}.btn{border-radius:10px;background:var(--green);color:#fff;padding:12px 14px;text-decoration:none;font-weight:900}.btn.alt{border:1px solid var(--line);background:#fff;color:var(--ink)}.video-stack{display:grid;gap:10px}.video-stack a{display:grid;grid-template-columns:74px 1fr auto;gap:10px;align-items:center;border:1px solid rgba(255,255,255,.58);border-radius:12px;background:rgba(255,255,255,.84);padding:10px;text-decoration:none}.video-stack span{aspect-ratio:16/10;border-radius:8px;background-size:cover;background-position:center}.video-stack small{color:var(--red);font-weight:900}
+.version-banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;border:2px solid rgba(197,31,31,.22);border-radius:14px;background:#fff7f2;padding:13px 15px;color:#8f3f20;font-weight:950}.version-banner small{color:var(--muted);font-weight:800}.route-focus{display:grid;grid-template-columns:minmax(0,.9fr)minmax(0,1.1fr);gap:14px;margin-top:18px;border:1px solid rgba(15,90,71,.14);border-radius:16px;background:#fff;padding:18px}.route-focus h2,.route-focus p{margin:0}.route-focus h2{font-size:28px}.route-focus p{margin-top:8px}.route-task-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.route-task-grid a,.route-task-grid span{display:grid;gap:6px;border:1px solid var(--line);border-radius:12px;background:#f8faf9;padding:13px;text-decoration:none}.route-task-grid b{color:var(--green)}.route-focus.customer{background:linear-gradient(135deg,#fff,#edf7f2)}.route-focus.host{background:linear-gradient(135deg,#fff,#fff8e8)}.route-focus.admin{background:linear-gradient(135deg,#fff,#eef3f7)}.route-focus.auth{background:linear-gradient(135deg,#fff,#f9f1d2)}
 .metrics,.cards,.templates,.features,.packages,.photos,.flow-grid,.video-category-grid,.room-media-grid{display:grid;gap:12px;margin-top:14px}.metrics{grid-template-columns:repeat(3,1fr)}.cards,.templates,.photos,.flow-grid,.video-category-grid{grid-template-columns:repeat(3,1fr)}.features{grid-template-columns:repeat(2,1fr)}.packages{grid-template-columns:repeat(3,1fr)}.room-media-grid{grid-template-columns:repeat(2,1fr)}.metric,.card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:16px}.metric b{display:block;margin-top:6px;font-size:24px}.section{margin-top:22px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px}.section h2{margin:0}.chip{border-radius:999px;background:#edf7f2;color:var(--green);padding:7px 9px;font-size:12px;font-weight:900}.image-card{overflow:hidden;padding:0}.image-card .image{display:block;min-height:210px;background-size:cover;background-position:center;text-decoration:none}.image-card .body{padding:14px}.photo{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#fff}.photo .image{min-height:220px;background-size:cover;background-position:center}.photo span,.photo h3{margin-left:12px;margin-right:12px}.photo h3{font-size:17px}.price{font-size:20px;font-weight:900}
 .flow-card strong{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--green);color:#fff}.flow-card h3{margin:12px 0 8px}.video-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.video-tabs span{border:1px solid var(--line);border-radius:999px;background:#fff;padding:9px 12px;font-weight:900}.video-tabs .on{background:var(--green);color:#fff}.category-card{overflow:hidden;padding:0}.category-card .image{min-height:190px;background-size:cover;background-position:center}.category-card .body{padding:16px}.room-choice-card{overflow:hidden;padding:0}.room-choice-card .media{display:grid;grid-template-columns:1.1fr .9fr;gap:0}.room-choice-card .main-photo,.room-choice-card .side-photo{min-height:210px}.room-choice-card .main-photo,.room-choice-card .side-photo span{background-size:cover;background-position:center}.room-choice-card .side-photo{display:grid;grid-template-rows:1fr 1fr}.room-choice-card .side-photo span{display:block}.room-choice-card .body{padding:16px}.room-choice-card .actions{margin-top:12px}.mini-video-list{display:grid;gap:8px;margin-top:12px}.mini-video-list a{display:grid;grid-template-columns:86px 1fr;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px;text-decoration:none}.mini-video-list span{min-height:58px;border-radius:8px;background-size:cover;background-position:center}
 .checkout-demo{display:grid;grid-template-columns:300px 1fr;gap:14px}.checkout-side,.checkout-main{border:1px solid var(--line);border-radius:14px;background:#fff;padding:18px}.checkout-steps{display:grid;gap:8px}.checkout-steps div{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px}.checkout-steps b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--green);color:#fff}.checkout-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.checkout-grid div{border:1px solid var(--line);border-radius:10px;background:#f8faf9;padding:12px}.checkout-grid span{display:block;color:var(--muted);font-size:12px;font-weight:900}.checkout-grid strong{display:block;margin-top:5px}.checkout-media{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}.checkout-media article{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#fff}.checkout-media .image{min-height:180px;background-size:cover;background-position:center}.checkout-media .body{padding:12px}.checkout-total{display:grid;gap:8px;border:1px solid rgba(15,90,71,.18);border-radius:12px;background:#f7fbf9;padding:14px}.checkout-total div,.checkout-total strong{display:flex;justify-content:space-between;gap:10px}.checkout-total strong{border-top:1px solid var(--line);padding-top:10px;color:var(--green);font-size:22px}
@@ -34,8 +35,10 @@ const css = `
 .booking-demo-top{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.booking-demo-calendar,.booking-demo-summary{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px}.date-button-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.demo-date,.demo-room,.demo-option,.demo-step{border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);font:inherit;font-weight:900;cursor:pointer}.demo-date{min-height:66px;padding:9px;text-align:left}.demo-date small,.demo-room small{display:block;margin-top:4px;color:var(--muted);font-size:12px}.demo-date.active,.demo-room.active,.demo-option.active{border-color:var(--green);background:#edf7f2;color:var(--green)}.demo-date[data-status="reserved"],.demo-date[data-status="blocked"]{background:#f6f6f6;color:#8a8a8a}.date-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.date-inputs label{display:grid;gap:5px;color:var(--muted);font-size:12px;font-weight:900}.date-inputs input{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}.demo-room-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}.demo-room{overflow:hidden;padding:0;text-align:left}.demo-room .image{min-height:126px;background-size:cover;background-position:center}.demo-room .room-body{display:grid;gap:4px;padding:12px}.demo-room .room-status{font-size:12px;color:var(--green)}.demo-room.unavailable .room-status{color:#a33a1f}.demo-room.unavailable{opacity:.72}.summary-lines{display:grid;gap:8px}.summary-lines div{display:flex;justify-content:space-between;gap:10px}.demo-guest-panel,.demo-option-panel{display:grid;gap:8px}.demo-guest-row{display:grid;grid-template-columns:1fr 34px 38px 34px;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px}.demo-step{width:34px;height:34px;border-radius:50%;padding:0}.option-button-grid{display:grid;gap:8px}.demo-option{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 12px;text-align:left}.booking-demo-message{border-radius:12px;background:#fff8e8;color:#875a00;padding:12px;font-weight:900}.booking-demo-message.ok{background:#edf7f2;color:var(--green)}.booking-demo-message.no{background:#fff0ec;color:#a33a1f}.booking-demo-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.booking-demo-actions .disabled{pointer-events:none;opacity:.45}
 .booking-panel{display:grid;grid-template-columns:minmax(0,.9fr)minmax(360px,1.1fr);gap:16px;border:1px solid rgba(15,90,71,.16);border-radius:16px;background:#fff;padding:18px}.booking-panel h2{margin:7px 0 10px;font-size:25px}.booking-panel p{margin:0;color:var(--muted);line-height:1.6}.booking-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.booking-grid label{border:1px solid var(--line);border-radius:10px;background:#f8faf9;padding:12px}.booking-grid span,.pay-card span{display:block;color:var(--muted);font-size:12px;font-weight:900}.booking-grid strong{display:block;margin-top:5px}.pay-card{display:grid;gap:10px}.pay-card>div{display:flex;align-items:center;justify-content:space-between;gap:12px}.pay-card .total{border-top:1px solid var(--line);padding-top:12px}.pay-card .total strong{color:var(--green);font-size:24px}.methods{display:flex!important;flex-wrap:wrap;justify-content:flex-start!important;gap:8px}.methods span{border-radius:999px;background:#edf7f2;color:var(--green);padding:7px 9px}.pay-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:8px}.pay-actions a{border-radius:10px;padding:13px;text-align:center;text-decoration:none;font-weight:900}.pay-actions a:first-child{background:var(--green);color:#fff}.pay-actions a:last-child{border:1px solid var(--line);color:var(--ink)}
 .calendar{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:14px}.calendar-grid{display:grid;grid-template-columns:190px repeat(7,110px);min-width:960px}.cal-head,.date,.room,.cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px;min-height:72px}.cal-head,.date{background:#f8faf9;font-weight:900}.cell{text-align:center;text-decoration:none}.available{background:#edf7f2;color:var(--green)}.few{background:#fff8e8;color:#875a00}.reserved{background:#fff0ec;color:#a33a1f}.blocked{background:#eef2f6;color:#405161}.wait{background:#f5efff;color:#67409b}.bottom{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(1080px,100%);display:grid;grid-template-columns:repeat(5,1fr);gap:6px;border-top:1px solid var(--line);background:rgba(255,255,255,.96);padding:8px 12px}.bottom a{border-radius:10px;padding:10px 6px;text-align:center;text-decoration:none;color:var(--muted);font-size:12px;font-weight:900}.bottom a.on{background:#edf7f2;color:var(--green)}
-@media(max-width:720px){.shell{padding-inline:14px}.hero,.metrics,.cards,.templates,.features,.packages,.photos,.flow-grid,.video-category-grid,.room-media-grid,.booking-panel,.booking-grid,.pay-actions,.checkout-demo,.checkout-grid,.checkout-media,.booking-form-grid,.booking-room-pick,.guest-option-grid,.booking-demo-top,.date-button-grid,.date-inputs,.demo-room-grid,.booking-demo-actions{grid-template-columns:1fr}.hero h1{font-size:32px}.video-stack a{grid-template-columns:72px 1fr auto}.section-head{display:block}.bottom{grid-template-columns:repeat(5,1fr)}.room-choice-card .media{grid-template-columns:1fr}.room-choice-card .side-photo{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.room-choice-card .main-photo,.room-choice-card .side-photo{min-height:170px}}
+@media(max-width:720px){.shell{padding-inline:14px}.hero,.metrics,.cards,.templates,.features,.packages,.photos,.flow-grid,.video-category-grid,.room-media-grid,.booking-panel,.booking-grid,.pay-actions,.checkout-demo,.checkout-grid,.checkout-media,.booking-form-grid,.booking-room-pick,.guest-option-grid,.booking-demo-top,.date-button-grid,.date-inputs,.demo-room-grid,.booking-demo-actions,.route-focus,.route-task-grid{grid-template-columns:1fr}.hero h1{font-size:32px}.video-stack a{grid-template-columns:72px 1fr auto}.section-head{display:block}.bottom{grid-template-columns:repeat(5,1fr)}.room-choice-card .media{grid-template-columns:1fr}.room-choice-card .side-photo{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.room-choice-card .main-photo,.room-choice-card .side-photo{min-height:170px}}
 `;
+
+const siteVersionLabel = "업데이트 화면 v17 · 화면 이동 구분 적용";
 
 const routes = {
   "/": {
@@ -459,6 +462,82 @@ function sectionMainScenario() {
   return `<section class="section"><div class="section-head"><h2>유튜브에서 예약결제까지</h2><span class="muted">오늘 설명할 실제 시나리오</span></div><div class="flow-grid">${steps.map(([step, title, body]) => `<article class="card flow-card"><strong>${step}</strong><h3>${title}</h3><p>${body}</p></article>`).join("")}</div></section>`;
 }
 
+function routeFocus(pathname) {
+  if (pathname.startsWith("/stays") || pathname === "/customer-home") {
+    return {
+      type: "customer",
+      eyebrow: "고객 예약 화면",
+      title: "날짜 선택, 객실 선택, 사진·영상 확인, 결제가 한 흐름으로 이어집니다.",
+      body: "유튜브 설명란에서 들어온 고객이 가장 먼저 보는 화면입니다. 화면 이동 확인을 위해 고객 예약에 필요한 항목을 첫 섹션에 모았습니다.",
+      tasks: [
+        ["예약일정", "예약완료 날짜는 선택 불가, 가능일만 선택"],
+        ["객실", "독채펜션 A와 돔 글램핑 B 사진·영상 확인"],
+        ["인원/옵션", "성인·아동·바베큐·불멍 선택"],
+        ["결제", "선택값을 결제 진행 화면으로 전달"]
+      ]
+    };
+  }
+  if (pathname.startsWith("/host")) {
+    return {
+      type: "host",
+      eyebrow: "사장님 관리 화면",
+      title: "객실, 요금, 사진, 유튜브, 예약 현황을 사장님이 직접 관리합니다.",
+      body: "입점한 펜션 사장님이 보는 화면입니다. 고객 화면과 다르게 등록·수정·운영 현황 중심으로 보여줍니다.",
+      tasks: [
+        ["객실 등록", "객실명, 기준인원, 최대인원, 요금 입력"],
+        ["사진/영상", "내부·외부 사진과 유튜브 링크 분류"],
+        ["예약 현황", "날짜별 예약 가능 여부와 결제 상태 확인"],
+        ["주변정보", "네이버 블로그, 리뷰, 맛집, 관광지 등록"]
+      ]
+    };
+  }
+  if (pathname.startsWith("/admin")) {
+    return {
+      type: "admin",
+      eyebrow: "운영자 관리 화면",
+      title: "전체 입점, 예약, 결제, 정산, 유튜브 전환 성과를 통합 관리합니다.",
+      body: "펜바TV 운영자가 보는 화면입니다. 여러 펜션을 유치했을 때 전체 현황과 승인 흐름을 확인합니다.",
+      tasks: [
+        ["입점 승인", "신청 숙소 검토와 오픈 상태 관리"],
+        ["전체 예약", "숙소별 예약·취소·결제 상태 집계"],
+        ["정산", "사장님별 정산 예정금액 확인"],
+        ["유튜브 성과", "UTM 유입과 예약 전환 분석"]
+      ]
+    };
+  }
+  if (pathname === "/auth" || pathname === "/my") {
+    return {
+      type: "auth",
+      eyebrow: "회원·MY 화면",
+      title: "네이버·카카오 간편가입 후 예약 확인과 찜, 회원정보를 관리합니다.",
+      body: "고객이 편하게 가입하고 예약 내역을 다시 찾을 수 있게 만드는 회원 관리 화면입니다.",
+      tasks: [
+        ["간편가입", "네이버·카카오 본인인증 진입"],
+        ["내예약", "예약번호, 결제상태, 입실정보 확인"],
+        ["찜", "관심 숙소 저장"],
+        ["회원정보", "예약자 정보와 알림 설정 관리"]
+      ]
+    };
+  }
+  return {
+    type: "customer",
+    eyebrow: "펜바TV 설명 화면",
+    title: "이 화면은 펜바TV의 전체 구조와 MVP 개발 범위를 설명합니다.",
+    body: "고객, 사장님, 운영자의 화면이 어떻게 연결되는지 시연용으로 정리했습니다.",
+    tasks: [
+      ["고객", "유튜브에서 예약결제까지"],
+      ["사장님", "입점 등록과 예약 관리"],
+      ["운영자", "전체 관리와 정산"],
+      ["개발", "MVP 우선순위와 일정"]
+    ]
+  };
+}
+
+function sectionRouteFocus(pathname) {
+  const focus = routeFocus(pathname);
+  return `<section class="route-focus ${focus.type}"><div><span class="eyebrow">${focus.eyebrow}</span><h2>${focus.title}</h2><p>${focus.body}</p></div><div class="route-task-grid">${focus.tasks.map(([title, body]) => `<span><b>${title}</b><small>${body}</small></span>`).join("")}</div></section>`;
+}
+
 function sectionHome() {
   return `
   <section class="metrics" aria-label="펜바TV 운영 지표">
@@ -570,14 +649,16 @@ function render(pathname) {
   const route = routes[pathname] ?? routes["/"];
   if (pathname === "/") {
     return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
+      <div class="version-banner"><span>${siteVersionLabel}</span><small>메인·고객·사장님·운영자 이동 확인용</small></div>
       <section class="hero"><div><span class="eyebrow">PenBa TV Main Demo</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=hero_demo&utm_campaign=baebang-alps">고객 예약 시연하기</a><a class="btn alt" href="/host/rooms">사장님 관리 보기</a><a class="btn alt" href="/admin/operations">운영자 관리 보기</a><a class="btn alt" href="/platform-guide">기존 메인 설명 보기</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
       ${sectionMainShortcuts()}${sectionMainProperties()}${sectionMainScenario()}${sectionHome()}${sectionCustomerBookingForm()}${sectionPhotos()}
       <section class="band section"><h2>오늘 시연 포인트</h2><p>이제 메인 화면은 개발 일정 설명보다 고객 예약 흐름을 먼저 보여줍니다. 고객 화면, 사장님 관리화면, 운영자 관리화면으로 바로 이동하고, 입점 숙소 3개 대표 화면과 유튜브 영상 링크를 한눈에 확인할 수 있습니다.</p></section>
     </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/platform-guide">설명</a><a href="/booking-calendar-status">예약</a><a href="/host/rooms">사장님</a><a href="/admin/operations">운영자</a></nav><script>${bookingDemoScript}</script></body></html>`;
   }
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="shell">
+    <div class="version-banner"><span>${siteVersionLabel}</span><small>현재 주소: ${pathname}</small></div>
     <section class="hero"><div><span class="eyebrow">PenBa TV</span><h1>${route.subtitle}</h1><p>${route.body}</p><div class="actions"><a class="btn" href="/">고객 홈</a><a class="btn alt" href="/stays/baebang-alps?utm_source=penbatv&utm_medium=youtube_description&utm_campaign=baebang-alps">객실 선택</a><a class="btn alt" href="/booking-calendar-status">예약 현황</a><a class="btn alt" href="/host/make24-benchmark">입점 제안</a></div></div><div class="video-stack">${videos.slice(0, 3).map(([title, label, , image, url]) => `<a href="${url}" target="_blank" rel="noreferrer"><span style="background-image:url('${image}')"></span><b>${title}</b><small>${label}</small></a>`).join("")}</div></section>
-    ${sectionCustomerBookingForm()}${sectionPriorityCheckout()}${sectionCustomerYoutubeFlow()}${sectionVideoCategories()}${sectionRoomMediaSelection()}${sectionHome()}${sectionPhotos()}${sectionCalendar()}${sectionDirectBooking()}${sectionOperations()}${sectionPackages()}${sectionTemplates()}${sectionFeatures()}
+    ${sectionRouteFocus(pathname)}${sectionCustomerBookingForm()}${sectionPriorityCheckout()}${sectionCustomerYoutubeFlow()}${sectionVideoCategories()}${sectionRoomMediaSelection()}${sectionHome()}${sectionPhotos()}${sectionCalendar()}${sectionDirectBooking()}${sectionOperations()}${sectionPackages()}${sectionTemplates()}${sectionFeatures()}
     <section class="band section"><h2>외부 공유용 펜바TV 고객 데모</h2><p>이 페이지는 유튜브 설명란 링크를 누른 고객이 보게 될 흐름을 기준으로 구성했습니다. 영상으로 신뢰를 만들고, 객실 사진과 예약 현황을 본 뒤 예약·결제 선택으로 이어지는 구조입니다.</p></section>
   </main><nav class="bottom"><a class="on" href="/">홈</a><a href="/stays/baebang-alps?utm_source=penbatv&utm_medium=bottom_room&utm_campaign=baebang-alps">객실</a><a href="/booking-calendar-status">예약</a><a href="/host/make24-benchmark">입점</a><a href="/host/core-features">기능</a></nav><script>${bookingDemoScript}</script></body></html>`;
 }
@@ -599,6 +680,7 @@ export default {
 
 const workerBody = `
 const css = ${JSON.stringify(css)};
+const siteVersionLabel = ${JSON.stringify(siteVersionLabel)};
 const routes = ${JSON.stringify(routes)};
 const videos = ${JSON.stringify(videos)};
 const templates = ${JSON.stringify(templates)};
@@ -613,6 +695,8 @@ ${label.toString()}
 ${sectionMainShortcuts.toString()}
 ${sectionMainProperties.toString()}
 ${sectionMainScenario.toString()}
+${routeFocus.toString()}
+${sectionRouteFocus.toString()}
 ${sectionHome.toString()}
 ${sectionCustomerYoutubeFlow.toString()}
 ${sectionVideoCategories.toString()}

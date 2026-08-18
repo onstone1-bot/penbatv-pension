@@ -74,6 +74,11 @@ export default function HomePage() {
         </nav>
       </header>
 
+      <section className="main-update-banner" aria-label="업데이트 버전 안내">
+        <b>업데이트 화면 v17 · 메인/고객/사장님/운영자 이동 구분 적용</b>
+        <span>이 문구가 보이면 새 화면입니다. 고객 예약 시연, 사장님 관리, 운영자 관리가 각각 다른 화면으로 이동합니다.</span>
+      </section>
+
       <section className="main-home-hero" aria-label="펜바TV 메인 소개">
         <div className="main-hero-copy">
           <span>유튜브에서 보고 바로 예약</span>

@@ -2149,6 +2149,37 @@ dd {
   color: #191600;
 }
 
+.main-update-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+  border: 2px solid rgba(180, 83, 32, 0.24);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff7ef, #f2fbf4);
+  padding: 14px 16px;
+  color: #8c421e;
+  box-shadow: 0 14px 34px rgba(31, 56, 45, 0.08);
+}
+
+.main-update-banner b,
+.main-update-banner span {
+  display: block;
+}
+
+.main-update-banner b {
+  font-size: 15px;
+}
+
+.main-update-banner span {
+  color: #5f6d64;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
 .main-home-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(330px, 420px);
