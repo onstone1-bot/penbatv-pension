@@ -49,7 +49,7 @@ export default async function StayLandingPage({ params, searchParams }: PageProp
       initialScreen={shouldOpenBooking(query) ? "booking" : "home"}
       initialCheckIn={first(query.checkIn)}
       initialCheckOut={first(query.checkOut)}
-      initialBookingMode={shouldOpenBooking(query) ? "instant" : "request"}
+      initialBookingMode="instant"
     />
   );
 }

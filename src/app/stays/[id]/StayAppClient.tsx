@@ -17,10 +17,12 @@ type VideoCategory = YoutubeVideo["category"];
 type BarbecueSlot = "17:00" | "18:00" | "19:00" | "none";
 
 type LocalBooking = {
+  bookingId: string | null;
   bookingNo: string;
   holdId: string | null;
   holdExpiresAt: string | null;
   paymentSessionId: string | null;
+  status: "paid" | "waiting_deposit" | "request";
   roomName: string;
   checkIn: string;
   checkOut: string;
@@ -76,6 +78,7 @@ type PaymentPrepareResponse = {
 type PaymentConfirmResponse = {
   status?: "paid" | "failed" | "waiting_deposit";
   bookingId?: string;
+  bookingNo?: string | null;
   idempotent?: boolean;
   error?: unknown;
 };
@@ -561,6 +564,10 @@ function displayWithoutStayName(title: string, stayName: string) {
   const cleaned = title.replace(pattern, "").trim();
 
   return cleaned || title;
+}
+
+function localBookingNo() {
+  return `PBTV-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-LOCAL`;
 }
 
 export function StayAppClient({
@@ -1073,6 +1080,9 @@ export function StayAppClient({
     let holdId = activeHold?.id ?? null;
     let holdExpiresAt = activeHold?.expiresAt ?? null;
     let paymentSessionId: string | null = null;
+    let confirmedBookingId: string | null = null;
+    let confirmedBookingNo: string | null = null;
+    let createdBookingStatus: LocalBooking["status"] = bookingMode === "instant" ? "paid" : "request";
 
     if (bookingMode === "instant") {
       if (activeHold && !isActiveHoldExpired) {
@@ -1160,6 +1170,9 @@ export function StayAppClient({
             return;
           }
 
+          confirmedBookingId = confirmPayload.bookingId ?? null;
+          confirmedBookingNo = confirmPayload.bookingNo ?? null;
+          createdBookingStatus = "waiting_deposit";
           const bank = payment.checkout?.bankTransfer;
           setHoldMessage(
             bank
@@ -1180,6 +1193,9 @@ export function StayAppClient({
             return;
           }
 
+          confirmedBookingId = confirmPayload.bookingId ?? null;
+          confirmedBookingNo = confirmPayload.bookingNo ?? null;
+          createdBookingStatus = "paid";
           setHoldMessage("Mock payment confirmed. Booking was saved to the database.");
         } else if (payment?.mode === "toss") {
           setHoldMessage(
@@ -1211,10 +1227,12 @@ export function StayAppClient({
     }
 
     const createdBooking = {
-      bookingNo: `STAY-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-0001`,
+      bookingId: confirmedBookingId,
+      bookingNo: confirmedBookingNo ?? localBookingNo(),
       holdId,
       holdExpiresAt,
       paymentSessionId,
+      status: createdBookingStatus,
       roomName: selectedRoom.name,
       checkIn: selectedDate.checkIn,
       checkOut: selectedDate.checkOut,
@@ -2112,9 +2130,9 @@ export function StayAppClient({
               </span>
               {booking?.barbecueSlot !== "none" && <span>바베큐장 {booking?.barbecueSlot}</span>}
               <strong>{formatWon(booking?.totalAmount ?? totalAmount)}</strong>
-              <button className="primary-action" onClick={() => setScreen("mine")}>
+              <Link className="primary-action" href={guestPhone ? `/my?phone=${encodeURIComponent(guestPhone)}` : "/my"}>
                 내 예약 보기
-              </button>
+              </Link>
             </div>
           )}
         </section>
@@ -2131,6 +2149,14 @@ export function StayAppClient({
                 {booking.checkIn} - {booking.checkOut}
               </span>
               <strong>{formatWon(booking.totalAmount)}</strong>
+              <span>
+                {booking.status === "paid"
+                  ? "결제완료"
+                  : booking.status === "waiting_deposit"
+                    ? "입금대기"
+                    : "예약요청"}
+              </span>
+              {booking.bookingId && <small>DB 예약 ID {booking.bookingId}</small>}
             </div>
           ) : (
             <p className="description">아직 예약 내역이 없습니다.</p>

@@ -79,7 +79,7 @@ async function finalizePaidPaymentOrder(input: {
       bookingId: input.order.booking_id
     });
 
-    return { bookingId: input.order.booking_id, idempotent: true };
+    return { bookingId: input.order.booking_id, bookingNo: null, idempotent: true };
   }
 
   const supabase = createAdminClient();
@@ -164,7 +164,7 @@ async function finalizePaidPaymentOrder(input: {
   });
   await enqueueBookingNotifications(booking.id);
 
-  return { bookingId: booking.id, idempotent: false };
+  return { bookingId: booking.id, bookingNo: booking.booking_no, idempotent: false };
 }
 
 async function recordManualTransferPaymentOrder(input: {
@@ -178,7 +178,7 @@ async function recordManualTransferPaymentOrder(input: {
       bookingId: input.order.booking_id
     });
 
-    return { bookingId: input.order.booking_id, idempotent: true };
+    return { bookingId: input.order.booking_id, bookingNo: null, idempotent: true };
   }
 
   const supabase = createAdminClient();
@@ -263,7 +263,7 @@ async function recordManualTransferPaymentOrder(input: {
   });
   await enqueueBookingNotifications(booking.id);
 
-  return { bookingId: booking.id, idempotent: false };
+  return { bookingId: booking.id, bookingNo: booking.booking_no, idempotent: false };
 }
 
 export async function confirmPreparedPayment(input: ConfirmPreparedPaymentInput) {
@@ -304,7 +304,8 @@ export async function confirmPreparedPayment(input: ConfirmPreparedPaymentInput)
         status: storedOrder.order.status === "paid" ? ("paid" as const) : ("waiting_deposit" as const),
         idempotent: true,
         orderId: input.orderId,
-        bookingId: storedOrder.order.booking_id
+        bookingId: storedOrder.order.booking_id,
+        bookingNo: null
       }
     };
   }
@@ -334,6 +335,7 @@ export async function confirmPreparedPayment(input: ConfirmPreparedPaymentInput)
         paymentKey: input.paymentKey,
         amount: input.amount,
         bookingId: finalized.bookingId,
+        bookingNo: finalized.bookingNo,
         idempotent: finalized.idempotent
       }
     };
@@ -357,6 +359,7 @@ export async function confirmPreparedPayment(input: ConfirmPreparedPaymentInput)
       result: {
         ...result,
         bookingId: finalized.bookingId,
+        bookingNo: finalized.bookingNo,
         idempotent: finalized.idempotent
       }
     };
