@@ -25,6 +25,7 @@ export async function getAdminOperationsData() {
     paymentsResult,
     settlementsResult,
     utmEventsResult,
+    profilesResult,
     notificationsResult,
     calendarSourcesResult,
     pilotRunsResult
@@ -56,6 +57,11 @@ export async function getAdminOperationsData() {
       .order("created_at", { ascending: false })
       .limit(500),
     supabase
+      .from("profiles")
+      .select("id, role, provider, status, created_at, last_sign_in_at")
+      .order("created_at", { ascending: false })
+      .limit(500),
+    supabase
       .from("notification_queue")
       .select("id, status, template_type, scheduled_at")
       .order("scheduled_at", { ascending: true })
@@ -80,6 +86,7 @@ export async function getAdminOperationsData() {
     paymentsResult,
     settlementsResult,
     utmEventsResult,
+    profilesResult,
     notificationsResult,
     calendarSourcesResult,
     pilotRunsResult
@@ -94,6 +101,7 @@ export async function getAdminOperationsData() {
   const payments = paymentsResult.data ?? [];
   const settlements = settlementsResult.data ?? [];
   const utmEvents = utmEventsResult.data ?? [];
+  const profiles = profilesResult.data ?? [];
   const notifications = notificationsResult.data ?? [];
   const calendarSources = calendarSourcesResult.data ?? [];
   const pilotRuns = pilotRunsResult.data ?? [];
@@ -144,6 +152,11 @@ export async function getAdminOperationsData() {
         label: "유튜브 전환율",
         value: `${percent(paymentCompleted || confirmedBookings.length, landingViews)}%`,
         detail: `방문 ${landingViews} · 결제시작 ${paymentStarts}`
+      },
+      {
+        label: "회원 계정",
+        value: `${profiles.length}명`,
+        detail: `고객 ${profiles.filter((profile) => profile.role === "customer").length} · 사장님 ${profiles.filter((profile) => profile.role === "host").length} · 운영자 ${profiles.filter((profile) => profile.role === "operator").length}`
       }
     ],
     operationQueues: [
@@ -163,6 +176,34 @@ export async function getAdminOperationsData() {
       roomCount: rooms.filter((room) => room.accommodation_id === stay.id).length,
       createdAt: stay.created_at
     })),
+    memberRows: profiles.slice(0, 12).map((profile) => ({
+      id: profile.id,
+      role: profile.role,
+      provider: profile.provider ?? "manual",
+      status: profile.status,
+      joinedAt: profile.created_at,
+      lastSignInAt: profile.last_sign_in_at
+    })),
+    roleRows: [
+      {
+        role: "customer",
+        screen: "고객홈 / MY",
+        apiScope: "내 예약 조회, 프로필 수정",
+        protection: "Supabase Auth + profiles.customer_id"
+      },
+      {
+        role: "host",
+        screen: "사장님 관리방",
+        apiScope: "본인 숙소 등록, 객실/사진/영상/옵션 관리",
+        protection: "x-admin-token + x-penbatv-role=host"
+      },
+      {
+        role: "operator",
+        screen: "운영자 관리방",
+        apiScope: "입점 승인, 전체 예약/결제/정산/UTM 집계",
+        protection: "x-admin-token + x-penbatv-role=operator"
+      }
+    ],
     reservationRows: bookings.slice(0, 10).map((booking) => {
       const room = roomById.get(booking.room_id);
       const stay = room ? accommodationById.get(room.accommodation_id) : null;
@@ -203,6 +244,7 @@ export async function getAdminOperationsData() {
       };
     }),
     statusCounts: {
+      profiles: countBy(profiles, (profile) => profile.role),
       accommodations: countBy(accommodations, (stay) => stay.status),
       bookings: countBy(bookings, (booking) => booking.status),
       paymentOrders: countBy(paymentOrders, (order) => order.status),
@@ -210,6 +252,15 @@ export async function getAdminOperationsData() {
       notifications: countBy(notifications, (notification) => notification.status),
       calendarSync: countBy(calendarSources, (source) => source.status),
       pilotRuns: countBy(pilotRuns, (run) => run.status)
-    }
+    },
+    week4QaRows: [
+      { day: "22일차", title: "고객 회원가입/로그인", status: "연결됨", evidence: "네이버/카카오 OAuth 후 profiles 자동 저장" },
+      { day: "23일차", title: "사장님/운영자 권한 분리", status: "강화됨", evidence: "관리 API role header 필수" },
+      { day: "24일차", title: "운영자 입점 승인", status: "연결됨", evidence: "/api/admin/accommodations/[id]/approval" },
+      { day: "25일차", title: "전체 예약 현황", status: "집계됨", evidence: "bookings 최근 예약 테이블" },
+      { day: "26일차", title: "결제/정산 예정금액", status: "집계됨", evidence: "payment_orders, payments, settlements" },
+      { day: "27일차", title: "유튜브 UTM 전환", status: "집계됨", evidence: "utm_events + bookings.utm_code" },
+      { day: "28일차", title: "관리자 QA", status: "점검중", evidence: "권한, 승인, 집계, 상태 카운트 검증" }
+    ]
   };
 }

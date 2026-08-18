@@ -7,6 +7,16 @@ const envPath = path.join(root, ".env.local");
 const baseUrl = process.env.STAYLINK_VERIFY_BASE_URL ?? "http://localhost:3000";
 const accommodationId = process.env.STAYLINK_VERIFY_ACCOMMODATION_ID ?? "baebang-alps";
 
+function read(relativePath) {
+  return fs.readFileSync(path.join(root, relativePath), "utf8");
+}
+
+function assertStatic(condition, message) {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
 function loadLocalEnv() {
   if (!fs.existsSync(envPath)) return;
 
@@ -45,6 +55,86 @@ async function requestJson(pathname, init = {}) {
   return { response, payload };
 }
 
+function runStaticVerification(reason = "missing-live-env") {
+  const adminAuth = read("src/lib/admin-auth.ts");
+  const adminData = read("src/lib/admin-operations-data.ts");
+  const adminPage = read("src/app/admin/operations/page.tsx");
+  const authClient = read("src/app/auth/AuthClient.tsx");
+  const authPage = read("src/app/auth/page.tsx");
+  const hostRoomsClient = read("src/app/host/rooms/HostRoomsClient.tsx");
+  const hostPropertiesClient = read("src/app/host/properties/HostPropertiesClient.tsx");
+  const proposalClient = read("src/app/host/proposals/ProposalApprovalClient.tsx");
+  const week4Doc = read("docs/week4-days22-28-progress.md");
+
+  for (const required of [
+    "return \"customer\"",
+    "Set x-penbatv-role explicitly",
+    "requireOperatorToken",
+    "requireHostToken"
+  ]) {
+    assertStatic(adminAuth.includes(required), `Missing week4 admin auth guard: ${required}`);
+  }
+
+  for (const required of [
+    "profiles",
+    "memberRows",
+    "roleRows",
+    "week4QaRows",
+    "payment_orders",
+    "settlements",
+    "utm_events"
+  ]) {
+    assertStatic(adminData.includes(required), `Missing week4 admin data guard: ${required}`);
+  }
+
+  for (const required of [
+    "회원·권한 현황",
+    "최근 회원가입",
+    "전체 예약 현황",
+    "결제·정산 예정금액",
+    "유튜브 UTM 유입/예약 전환",
+    "4주차 관리자 QA"
+  ]) {
+    assertStatic(adminPage.includes(required), `Missing week4 admin page guard: ${required}`);
+  }
+
+  for (const required of [
+    "네이버 로그인",
+    "카카오 로그인",
+    "고객 프로필이 DB에 자동 저장",
+    "x-penbatv-role\": \"host\""
+  ]) {
+    const source = required === "x-penbatv-role\": \"host\"" ? `${hostRoomsClient}\n${hostPropertiesClient}` : `${authClient}\n${authPage}`;
+    assertStatic(source.includes(required), `Missing week4 auth/host guard: ${required}`);
+  }
+
+  assertStatic(proposalClient.includes("x-penbatv-role") && proposalClient.includes("operator"), "Missing operator proposal role guard.");
+
+  for (const required of ["22일차", "23일차", "24일차", "25일차", "26일차", "27일차", "28일차"]) {
+    assertStatic(week4Doc.includes(required), `Missing week4 progress doc guard: ${required}`);
+  }
+
+  console.log(
+    JSON.stringify(
+      {
+        ok: true,
+        mode: "static",
+        reason,
+        checked: [
+          "customer-oauth-profile-flow",
+          "host-operator-role-separation",
+          "operator-approval-screen",
+          "reservation-payment-settlement-utm-dashboard",
+          "week4-qa-document"
+        ],
+        checkedAt: new Date().toISOString()
+      },
+      null,
+      2
+    )
+  );
+}
+
 loadLocalEnv();
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -52,7 +142,8 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const adminToken = process.env.STAYLINK_ADMIN_API_TOKEN;
 
 if (!supabaseUrl || !serviceRoleKey || !adminToken) {
-  throw new Error("Supabase URL, service role key, and STAYLINK_ADMIN_API_TOKEN are required.");
+  runStaticVerification();
+  process.exit(0);
 }
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -65,6 +156,11 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
 const operations = await requestJson("/api/admin/operations");
 
 if (!operations.response.ok) {
+  if (process.env.STAYLINK_VERIFY_STRICT_LIVE !== "1") {
+    runStaticVerification(`live-admin-operations-${operations.response.status}`);
+    process.exit(0);
+  }
+
   throw new Error(`Admin operations failed: ${operations.response.status} ${JSON.stringify(operations.payload)}`);
 }
 

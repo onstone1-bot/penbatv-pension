@@ -9,7 +9,7 @@ export function getRequestRole(request: Request): PenbaRole {
     return role;
   }
 
-  return "operator";
+  return "customer";
 }
 
 export function requireAdminToken(request: Request, allowedRoles: PenbaRole[] = ["host", "operator"]) {
@@ -28,7 +28,7 @@ export function requireAdminToken(request: Request, allowedRoles: PenbaRole[] = 
   const requestRole = getRequestRole(request);
 
   if (!allowedRoles.includes(requestRole)) {
-    throw new Error(`Role ${requestRole} is not allowed for this operation.`);
+    throw new Error(`Role ${requestRole} is not allowed for this operation. Set x-penbatv-role explicitly.`);
   }
 
   return { role: requestRole };

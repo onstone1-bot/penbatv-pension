@@ -287,7 +287,8 @@ async function postHostJson(url: string, adminToken: string, body: Record<string
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-admin-token": adminToken
+      "x-admin-token": adminToken,
+      "x-penbatv-role": "host"
     },
     body: JSON.stringify(body)
   });
@@ -310,7 +311,8 @@ async function sendHostJson(
     method,
     headers: {
       "Content-Type": "application/json",
-      "x-admin-token": adminToken
+      "x-admin-token": adminToken,
+      "x-penbatv-role": "host"
     },
     ...(body ? { body: JSON.stringify(body) } : {})
   });

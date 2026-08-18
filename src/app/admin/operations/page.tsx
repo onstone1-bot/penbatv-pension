@@ -69,6 +69,48 @@ export default async function AdminOperationsPage() {
 
       <section className="ops-section">
         <div className="section-head">
+          <h2>회원·권한 현황</h2>
+          <span>고객 · 사장님 · 운영자</span>
+        </div>
+        <div className="campaign-table">
+          {data.roleRows.map((row) => (
+            <div key={row.role}>
+              <b>{row.role}</b>
+              <span>{row.screen}</span>
+              <span>{row.apiScope}</span>
+              <strong>{row.protection}</strong>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="ops-section">
+        <div className="section-head">
+          <h2>최근 회원가입</h2>
+          <span>네이버·카카오 자동가입 확인</span>
+        </div>
+        <div className="campaign-table">
+          {data.memberRows.map((row) => (
+            <div key={row.id}>
+              <b>{row.role}</b>
+              <span>{row.provider} · {row.status}</span>
+              <span>가입 {row.joinedAt.slice(0, 10)}</span>
+              <strong>{row.lastSignInAt ? `최근 로그인 ${row.lastSignInAt.slice(0, 10)}` : "로그인 이력 확인 필요"}</strong>
+            </div>
+          ))}
+          {data.memberRows.length === 0 && (
+            <div>
+              <b>회원 데이터 없음</b>
+              <span>네이버/카카오 로그인 성공 후 profiles에 자동 저장됩니다.</span>
+              <span>Supabase Auth 연결 확인 필요</span>
+              <strong>0명</strong>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="ops-section">
+        <div className="section-head">
           <h2>전체 예약 현황</h2>
           <span>최근 예약 · 결제상태</span>
         </div>
@@ -123,6 +165,23 @@ export default async function AdminOperationsPage() {
               <strong>{formatWon(0)}</strong>
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="ops-section">
+        <div className="section-head">
+          <h2>4주차 관리자 QA</h2>
+          <span>22일차부터 28일차까지</span>
+        </div>
+        <div className="campaign-table">
+          {data.week4QaRows.map((row) => (
+            <div key={row.day}>
+              <b>{row.day}</b>
+              <span>{row.title}</span>
+              <span>{row.evidence}</span>
+              <strong>{row.status}</strong>
+            </div>
+          ))}
         </div>
       </section>
     </main>

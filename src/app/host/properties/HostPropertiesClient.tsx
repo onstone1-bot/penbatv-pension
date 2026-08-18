@@ -134,7 +134,8 @@ export function HostPropertiesClient() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-admin-token": form.adminToken.trim()
+            "x-admin-token": form.adminToken.trim(),
+            "x-penbatv-role": "host"
           },
           body: JSON.stringify({
             id: nextProperty.id,
