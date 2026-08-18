@@ -37,7 +37,8 @@ const css = `
 .live-checkout{display:grid;grid-template-columns:minmax(0,.95fr)minmax(320px,.75fr);gap:14px}.live-form,.live-receipt{border:1px solid var(--line);border-radius:14px;background:#fff;padding:18px}.live-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.live-form label{display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:900}.live-form input,.live-form select{width:100%;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit}.payment-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.payment-methods label{border:1px solid var(--line);border-radius:12px;background:#f8faf9;padding:12px;color:var(--ink);cursor:pointer}.payment-methods input{width:auto;margin-right:6px}.live-receipt{position:sticky;top:12px;height:max-content}.live-receipt h2,.live-form h2{margin-top:0}.receipt-lines{display:grid;gap:9px}.receipt-lines div,.receipt-lines strong{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-bottom:8px}.receipt-lines strong{border:0;color:var(--green);font-size:22px}.complete-box{border:1px solid rgba(15,90,71,.18);border-radius:14px;background:#edf7f2;padding:16px;color:var(--green);font-weight:900}.reservation-list{display:grid;gap:10px}.reservation-list article{border:1px solid var(--line);border-radius:12px;background:#fff;padding:14px}.reservation-list h3,.reservation-list p{margin:0}.reservation-list p{margin-top:6px}.form-message{margin-top:12px;border-radius:10px;background:#fff8e8;color:#7b4e00;padding:10px;font-weight:900}.form-message.ok{background:#edf7f2;color:var(--green)}.form-message.no{background:#fff0ec;color:#a33a1f}
 .calendar{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:14px}.calendar-grid{display:grid;grid-template-columns:190px repeat(7,110px);min-width:960px}.cal-head,.date,.room,.cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px;min-height:72px}.cal-head,.date{background:#f8faf9;font-weight:900}.cell{text-align:center;text-decoration:none}.available{background:#edf7f2;color:var(--green)}.few{background:#fff8e8;color:#875a00}.reserved{background:#fff0ec;color:#a33a1f}.blocked{background:#eef2f6;color:#405161}.wait{background:#f5efff;color:#67409b}.bottom{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(1080px,100%);display:grid;grid-template-columns:repeat(5,1fr);gap:6px;border-top:1px solid var(--line);background:rgba(255,255,255,.96);padding:8px 12px}.bottom a{border-radius:10px;padding:10px 6px;text-align:center;text-decoration:none;color:var(--muted);font-size:12px;font-weight:900}.bottom a.on{background:#edf7f2;color:var(--green)}
 .public-customer-app{max-width:960px;padding-bottom:96px}.customer-home-topbar{position:sticky;top:10px;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;border:1px solid rgba(15,90,71,.14);border-radius:14px;background:rgba(255,255,255,.94);padding:12px 14px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.customer-home-topbar a{border-radius:999px;background:var(--green);color:#fff;padding:9px 12px;text-decoration:none;font-size:12px;font-weight:900}.customer-home-topbar span{color:var(--muted);font-size:13px;font-weight:900}.stay-hero-public{position:relative;overflow:hidden;display:grid;align-items:end;min-height:330px;margin-bottom:14px;border-radius:20px;background-size:cover;background-position:center;box-shadow:var(--shadow)}.stay-hero-public:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.58))}.stay-hero-public .hero-copy{position:relative;padding:26px;color:#fff}.stay-hero-public span{display:inline-flex;border-radius:999px;background:rgba(255,255,255,.18);padding:8px 10px;font-size:12px;font-weight:900}.stay-hero-public h1{margin:10px 0 8px;font-size:42px;line-height:1.1}.stay-hero-public p{max-width:660px;margin:0;line-height:1.6}.home-content-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}.home-content-tabs a{border:1px solid var(--line);border-radius:12px;background:#fff;padding:13px;text-align:center;text-decoration:none;font-weight:900}.home-content-tabs .active{background:var(--green);color:#fff}.public-customer-app .booking-form-demo{margin-top:0}.public-proof{margin-top:16px;border:1px solid rgba(15,90,71,.14);border-radius:14px;background:#fff;padding:16px}.public-proof h2{margin:0 0 10px}.public-proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.public-proof-grid a,.public-proof-grid article{display:grid;gap:8px;border:1px solid var(--line);border-radius:12px;background:#f8faf9;padding:12px;text-decoration:none}.public-proof-grid span{height:130px;border-radius:10px;background-size:cover;background-position:center}.public-proof-grid b,.public-proof-grid small{display:block}.public-proof-grid small{color:var(--muted);line-height:1.45}.public-route-hero{margin-top:0;background-image:linear-gradient(135deg,rgba(255,255,255,.96),rgba(237,247,242,.88)),var(--route-image)}.public-route-hero h1{font-size:40px}.public-notice{border:1px solid rgba(15,90,71,.14);border-radius:14px;background:#edf7f2;padding:14px;color:var(--green);font-weight:900}.form-grid-demo{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.form-grid-demo label{display:grid;gap:6px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:12px;color:var(--muted);font-size:12px;font-weight:900}.form-grid-demo input,.form-grid-demo textarea,.form-grid-demo select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;color:var(--ink)}.form-grid-demo textarea{min-height:86px;resize:vertical}.wide-field{grid-column:1/-1}.status-table{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#fff}.status-row{display:grid;grid-template-columns:1.1fr .8fr .8fr 1fr;gap:8px;border-bottom:1px solid var(--line);padding:12px}.status-row:last-child{border-bottom:0}.status-row.header{background:#f8faf9;font-weight:900}.status-row b{color:var(--green)}
-@media(max-width:720px){.shell{padding-inline:14px}.hero,.metrics,.cards,.templates,.features,.packages,.photos,.flow-grid,.video-category-grid,.room-media-grid,.booking-panel,.booking-grid,.pay-actions,.checkout-demo,.checkout-grid,.checkout-media,.booking-form-grid,.booking-room-pick,.guest-option-grid,.booking-demo-top,.date-button-grid,.date-inputs,.demo-room-grid,.booking-demo-actions,.route-focus,.route-task-grid,.live-checkout,.live-form-grid,.payment-methods,.public-proof-grid,.form-grid-demo,.status-row{grid-template-columns:1fr}.hero h1{font-size:32px}.video-stack a{grid-template-columns:72px 1fr auto}.section-head{display:block}.bottom{grid-template-columns:repeat(5,1fr)}.room-choice-card .media{grid-template-columns:1fr}.room-choice-card .side-photo{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.room-choice-card .main-photo,.room-choice-card .side-photo{min-height:170px}.live-receipt{position:static}.public-customer-app{padding-inline:14px}.customer-home-topbar{top:6px}.stay-hero-public{min-height:286px;margin-inline:-2px}.stay-hero-public h1{font-size:30px}.home-content-tabs{grid-template-columns:1fr 1fr}.public-route-hero h1{font-size:30px}}
+.local-make24-page{max-width:960px;margin:0 auto;padding:40px 20px}.local-make24-page .guide-hero,.local-make24-page .guide-section{border:1px solid var(--line);border-radius:12px;background:#fff;padding:22px}.local-make24-page .guide-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:end}.local-make24-page .guide-hero h1{max-width:760px;margin:6px 0 10px;font-size:32px;line-height:1.14}.local-make24-page .guide-hero p:last-child{max-width:760px;margin:0;color:var(--muted);line-height:1.65}.local-make24-page .guide-section{margin-top:16px}.local-make24-page .make24-hero{border-color:rgba(197,31,31,.14);background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(255,240,236,.78)),url('${images.entrance}');background-size:cover;background-position:center}.local-make24-page .host-nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.local-make24-page .host-nav a,.local-make24-page .hero-action{border-radius:10px;background:var(--green);color:#fff;padding:12px 14px;text-decoration:none;font-weight:900}.local-make24-page .ghost-action{border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);padding:12px 14px;text-decoration:none;font-weight:900}.local-make24-page .section-head{display:flex;align-items:end;justify-content:space-between;gap:12px}.local-make24-page .section-head h2{margin:0}.local-make24-page .section-head span{color:var(--muted);font-size:13px;font-weight:900}.local-make24-page .benchmark-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.local-make24-page .benchmark-card,.local-make24-page .owner-package-card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:18px}.local-make24-page .benchmark-card h3{margin-top:0}.local-make24-page .benchmark-card dl{display:grid;grid-template-columns:1fr;gap:10px;margin:0;padding:0;border:0}.local-make24-page .benchmark-card dl div{border:1px solid var(--line);border-radius:10px;background:#f8faf9;padding:12px}.local-make24-page .benchmark-card dt,.local-make24-page .benchmark-card dd{display:block}.local-make24-page .benchmark-card dt{color:var(--green);font-size:12px;font-weight:900}.local-make24-page .benchmark-card dd{margin-top:6px;color:var(--muted);line-height:1.5}.local-make24-page .owner-package-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.local-make24-page .owner-package-card span{color:#c51f1f;font-size:12px;font-weight:900}.local-make24-page .owner-package-card h3{margin:8px 0}.local-make24-page .owner-package-card strong{display:block;font-size:22px}.local-make24-page .owner-package-card ul{margin:14px 0 0;padding-left:18px;color:var(--muted);line-height:1.7}.local-make24-page .service-module-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.local-make24-page .service-module-grid span{border:1px solid rgba(15,90,71,.16);border-radius:12px;background:#fff;padding:14px;color:var(--green);text-align:center;font-weight:900}.local-make24-page .build-step-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.local-make24-page .build-step-list div{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:14px}.local-make24-page .build-step-list span{display:grid;flex:0 0 34px;place-items:center;width:34px;height:34px;border-radius:50%;background:#edf7f2;color:var(--green);font-size:12px;font-weight:900}.local-make24-page .partner-center-band{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;margin-top:28px;border:1px solid rgba(15,90,71,.18);border-radius:14px;background:#fff;padding:22px}.local-make24-page .partner-center-band span{color:var(--green);font-size:12px;font-weight:900}.local-make24-page .partner-center-band h2{margin:7px 0 0}.local-make24-page .penba-actions{display:flex;flex-wrap:wrap;gap:8px}
+@media(max-width:720px){.shell{padding-inline:14px}.hero,.metrics,.cards,.templates,.features,.packages,.photos,.flow-grid,.video-category-grid,.room-media-grid,.booking-panel,.booking-grid,.pay-actions,.checkout-demo,.checkout-grid,.checkout-media,.booking-form-grid,.booking-room-pick,.guest-option-grid,.booking-demo-top,.date-button-grid,.date-inputs,.demo-room-grid,.booking-demo-actions,.route-focus,.route-task-grid,.live-checkout,.live-form-grid,.payment-methods,.public-proof-grid,.form-grid-demo,.status-row,.local-make24-page .guide-hero,.local-make24-page .benchmark-grid,.local-make24-page .owner-package-grid,.local-make24-page .service-module-grid,.local-make24-page .build-step-list,.local-make24-page .partner-center-band{grid-template-columns:1fr}.hero h1{font-size:32px}.video-stack a{grid-template-columns:72px 1fr auto}.section-head{display:block}.bottom{grid-template-columns:repeat(5,1fr)}.room-choice-card .media{grid-template-columns:1fr}.room-choice-card .side-photo{grid-template-columns:1fr 1fr;grid-template-rows:1fr}.room-choice-card .main-photo,.room-choice-card .side-photo{min-height:170px}.live-receipt{position:static}.public-customer-app{padding-inline:14px}.customer-home-topbar{top:6px}.stay-hero-public{min-height:286px;margin-inline:-2px}.stay-hero-public h1{font-size:30px}.home-content-tabs{grid-template-columns:1fr 1fr}.public-route-hero h1{font-size:30px}.local-make24-page{padding:28px 14px}.local-make24-page .guide-hero h1{font-size:28px}.local-make24-page .section-head{display:block}.local-make24-page .partner-center-band .penba-actions{margin-top:14px}}
 `;
 
 const siteVersionLabel = "공개 배포 정비 v22 · 로컬 시연 흐름 반영";
@@ -546,6 +547,70 @@ const mainProperties = [
   ["오션 캐빈 하우스", "경남 남해", "바다 전망 객실과 숯불 바비큐를 강조한 감성 펜션", "130,000원~", "예약요청", images.reservoir, "/stays/ocean-cabin-house?start=booking&utm_source=penbatv&utm_medium=main_property&utm_campaign=ocean-cabin-house"]
 ];
 
+const make24BenchmarkPoints = [
+  {
+    title: "펜션 홈페이지 제작 랜딩",
+    make24: "제작 방법, 제작 비용, 기능 소개, 유지보수 메뉴로 사장님 의사결정을 돕습니다.",
+    penba: "입점 신청, 유튜브 촬영, 예약결제, 운영 콘솔을 한 화면에서 비교할 수 있게 구성합니다."
+  },
+  {
+    title: "펜션 맞춤형 서비스",
+    make24: "사진 촬영, 실시간 예약, 비대면 카드 결제, 관리자 모드, 반응형, SEO를 묶어 제안합니다.",
+    penba: "사진 촬영 대신 유튜브 숏폼/롱폼 촬영을 핵심 상품으로 두고 예약 달력과 바로 연결합니다."
+  },
+  {
+    title: "실시간 예약 시스템",
+    make24: "객실 예약 현황을 한눈에 파악하고 체계적으로 관리하는 메시지가 강합니다.",
+    penba: "객실별 날짜 상태와 바베큐장 타임슬롯 상태를 동시에 보여주는 달력을 제공합니다."
+  },
+  {
+    title: "관리자 모드 체험",
+    make24: "관리자모드 체험 링크로 운영자가 직접 관리 가능하다는 신뢰를 줍니다.",
+    penba: "사장님 콘솔에서 객실, 이미지, 요금, 옵션, 예약현황, 알림까지 관리하도록 확장합니다."
+  }
+];
+
+const penbaOwnerPackages = [
+  {
+    name: "Starter",
+    price: "입점 무료",
+    target: "초기 제휴 펜션",
+    features: ["숙소 기본 페이지", "대표 유튜브 링크 1개", "예약요청 연결", "기본 예약 현황 달력"]
+  },
+  {
+    name: "YouTube Boost",
+    price: "촬영 패키지",
+    target: "홍보가 필요한 펜션",
+    features: ["펜바TV 숏폼 촬영", "영상 여러 개 노출", "UTM 유입 추적", "바베큐 옵션 예약 연결"]
+  },
+  {
+    name: "Booking Pro",
+    price: "예약결제형",
+    target: "바로결제 운영 펜션",
+    features: ["실시간 객실 달력", "바베큐 타임슬롯", "카드/간편결제", "관리자 매출 통계"]
+  }
+];
+
+const penbaBuildSteps = [
+  "상담 및 입점 조건 확인",
+  "숙소 자료와 유튜브 촬영 포인트 수집",
+  "숙소 상세 페이지와 예약 달력 구성",
+  "바베큐 옵션, 요금, 환불 기준 등록",
+  "유튜브 영상 업로드와 UTM 링크 연결",
+  "예약결제 테스트 후 펜바TV 노출"
+];
+
+const penbaServiceModules = [
+  "유튜브 촬영/편집",
+  "숙소 상세 페이지",
+  "실시간 예약 달력",
+  "바베큐장 예약",
+  "비대면 결제",
+  "관리자 콘솔",
+  "카카오 알림톡",
+  "SEO/지역 검색"
+];
+
 function sectionMainShortcuts() {
   const shortcuts = [
     ["고객 화면", "유튜브 설명란 링크를 누른 고객이 사진, 영상, 일정, 객실, 결제까지 진행합니다.", "/stays/baebang-alps?start=booking&utm_source=penbatv&utm_medium=main_customer&utm_campaign=baebang-alps", "예약 시연"],
@@ -849,13 +914,70 @@ function sectionDesignApplication() {
 
 function renderHostMake24Page(pathname) {
   const route = routes[pathname];
-  return renderDocument(route, pathname, `${sectionPublicRouteHero(pathname, {
-    eyebrow: "MAKE24 Pension Benchmark",
-    title: "펜션 사장님 입점 제안 페이지 구조",
-    body: "메이크24식 펜션 제작 제안 화면을 참고하되, 펜바TV는 유튜브 촬영과 예약결제, 사장님 관리화면까지 연결하는 입점 상품으로 보여줍니다.",
-    image: images.entrance,
-    actions: [["입점 등록", "/host/properties"], ["예약 결제 프로그램", "/host/reservation-payment"], ["디자인 선택", "/host/design-benchmark"], ["고객 홈", "/"]]
-  })}${sectionPackages()}${sectionMake24Process()}${sectionHostRegistrationDemo()}${sectionOperations()}`, "사장님");
+  return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${route.title}</title><meta name="description" content="${route.body}"><style>${css}</style></head><body><main class="local-make24-page">
+      <section class="guide-hero make24-hero">
+        <div>
+          <p class="muted">MAKE24 Pension Benchmark</p>
+          <h1>펜션 사장님 입점 제안 페이지 구조</h1>
+          <p>메이크24 펜션의 제작 랜딩 구조를 참고해, 펜바TV는 홈페이지 제작보다 유튜브 홍보와 예약결제 운영을 한 번에 제안하는 사장님용 화면으로 확장합니다.</p>
+        </div>
+        <div class="host-nav">
+          <a href="/host/properties">입점 등록</a>
+          <a href="/booking-calendar-status?accommodationId=87">예약 달력</a>
+          <a href="/host/reservation-payment">예약 결제 프로그램</a>
+          <a href="/host/core-features">핵심 기능</a>
+          <a href="/host/design-benchmark">디자인 선택</a>
+          <a href="/">고객 홈</a>
+        </div>
+      </section>
+
+      <section class="guide-section">
+        <div class="section-head">
+          <h2>벤치마킹 포인트</h2>
+          <span>메이크24 → 펜바TV 적용</span>
+        </div>
+        <div class="benchmark-grid">
+          ${make24BenchmarkPoints.map((point) => `<article class="benchmark-card"><h3>${point.title}</h3><dl><div><dt>Make24</dt><dd>${point.make24}</dd></div><div><dt>PenBa TV</dt><dd>${point.penba}</dd></div></dl></article>`).join("")}
+        </div>
+      </section>
+
+      <section class="guide-section">
+        <div class="section-head">
+          <h2>펜바TV 입점 패키지</h2>
+          <span>촬영 + 예약 + 운영</span>
+        </div>
+        <div class="owner-package-grid">
+          ${penbaOwnerPackages.map((item) => `<article class="owner-package-card"><span>${item.target}</span><h3>${item.name}</h3><strong>${item.price}</strong><ul>${item.features.map((feature) => `<li>${feature}</li>`).join("")}</ul></article>`).join("")}
+        </div>
+      </section>
+
+      <section class="guide-section">
+        <div class="section-head">
+          <h2>서비스 모듈</h2>
+          <span>사장님에게 보여줄 핵심 기능</span>
+        </div>
+        <div class="service-module-grid">${penbaServiceModules.map((module) => `<span>${module}</span>`).join("")}</div>
+      </section>
+
+      <section class="guide-section">
+        <div class="section-head">
+          <h2>입점 제작 과정</h2>
+          <span>상담부터 유튜브 링크 노출까지</span>
+        </div>
+        <div class="build-step-list">${penbaBuildSteps.map((step, index) => `<div><span>${String(index + 1).padStart(2, "0")}</span><b>${step}</b></div>`).join("")}</div>
+      </section>
+
+      <section class="partner-center-band">
+        <div>
+          <span>PenBa TV Owner Landing</span>
+          <h2>펜션 홈페이지 제작 경쟁이 아니라, 유튜브에서 예약까지 연결하는 입점 상품으로 차별화합니다.</h2>
+        </div>
+        <div class="penba-actions">
+          <a class="hero-action" href="/host/properties">입점 등록하기</a>
+          <a class="ghost-action" href="/host/launch-plan">런칭 가이드</a>
+        </div>
+      </section>
+    </main></body></html>`;
 }
 
 function renderDesignBenchmarkPage(pathname) {
@@ -1056,6 +1178,10 @@ const bookingDemoScript = ${JSON.stringify(bookingDemoScript)};
 const checkoutScript = ${JSON.stringify(checkoutScript)};
 const roomMedia = ${JSON.stringify(roomMedia)};
 const mainProperties = ${JSON.stringify(mainProperties)};
+const make24BenchmarkPoints = ${JSON.stringify(make24BenchmarkPoints)};
+const penbaOwnerPackages = ${JSON.stringify(penbaOwnerPackages)};
+const penbaBuildSteps = ${JSON.stringify(penbaBuildSteps)};
+const penbaServiceModules = ${JSON.stringify(penbaServiceModules)};
 ${label.toString()}
 ${sectionMainShortcuts.toString()}
 ${sectionMainProperties.toString()}
