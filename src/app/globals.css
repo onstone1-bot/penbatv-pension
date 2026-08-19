@@ -8451,3 +8451,151 @@ button {
     padding: 16px;
   }
 }
+/* Week 1 customer booking flow: make the MVP path obvious. */
+.week-one-booking-status {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0 14px;
+  border: 1px solid rgba(15, 90, 71, 0.14);
+  border-radius: 16px;
+  background: #f2faf6;
+  padding: 14px;
+}
+
+.week-one-booking-status > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.week-one-booking-status span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.week-one-booking-status b {
+  color: #173728;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.week-one-booking-status ol {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.week-one-booking-status li {
+  min-width: 0;
+  border: 1px solid rgba(15, 90, 71, 0.12);
+  border-radius: 999px;
+  background: #fff;
+  padding: 8px 7px;
+  color: #315244;
+  font-size: 11px;
+  font-weight: 900;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.booking-start-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.booking-start-summary div {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: #fff;
+  padding: 10px;
+}
+
+.booking-start-summary span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.booking-start-summary b {
+  display: block;
+  margin-top: 4px;
+  color: #173728;
+  font-size: 13px;
+  font-weight: 950;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.booking-start-total > div {
+  display: grid;
+  gap: 5px;
+}
+
+.quote-authority {
+  display: inline-flex;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: #eef3f0;
+  color: #587064;
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.quote-authority.ready {
+  background: #e7f8ef;
+  color: var(--green);
+}
+
+.quote-authority.loading {
+  background: #fff7da;
+  color: #8a6500;
+}
+
+.quote-authority.fallback,
+.quote-authority.idle {
+  background: #f4eee8;
+  color: #7a5838;
+}
+
+.booking-flow-summary small.quote-authority {
+  justify-self: end;
+  margin-top: 3px;
+}
+
+@media (max-width: 900px) {
+  .week-one-booking-status ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .week-one-booking-status li {
+    text-align: left;
+  }
+
+  .booking-start-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .week-one-booking-status > div {
+    display: grid;
+  }
+
+  .week-one-booking-status ol,
+  .booking-start-summary {
+    grid-template-columns: 1fr;
+  }
+}

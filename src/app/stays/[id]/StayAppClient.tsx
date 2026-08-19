@@ -302,6 +302,16 @@ const bookingStepLabels: Array<{
   { step: 5, label: "완료" }
 ];
 
+const weekOneBookingMilestones = [
+  "1일차 홈 단순화",
+  "2일차 상세 정리",
+  "3일차 달력 상태",
+  "4일차 날짜 차단",
+  "5일차 객실/옵션",
+  "6일차 서버 견적",
+  "7일차 모바일 QA"
+];
+
 const barbecueSlots: Array<{
   id: BarbecueSlot;
   label: string;
@@ -656,6 +666,9 @@ export function StayAppClient({
   const coupon = serverQuote?.discountAmount ?? fallbackCoupon;
   const guestAmount = serverQuote?.guestAmount ?? 0;
   const totalAmount = serverQuote?.totalAmount ?? Math.max(0, roomQuote.roomAmount + optionAmount - coupon);
+  const quoteAuthorityLabel = quoteStatus === "ready" ? "서버 기준 견적" : quoteStatus === "loading" ? "서버 계산 중" : "임시 예상가";
+  const quoteAuthorityClass = `quote-authority ${quoteStatus}`;
+  const selectedOptionsSummary = selectedOptions.length > 0 ? `${selectedOptions.length}개 옵션 선택` : "부대옵션 없음";
   const guestCount = adultCount + childCount;
   const hasBarbecueOption = selectedOptions.some((optionId) => {
     const option = optionById.get(optionId);
@@ -1355,7 +1368,38 @@ export function StayAppClient({
           <section className="booking-start-panel" aria-label="예약 일정, 객실, 인원, 부대옵션 선택">
             <div className="section-head">
               <h2>예약 시작</h2>
-              <span>일정 · 인원 · 객실 사진/영상 · 부대옵션</span>
+              <span>1주차 1~7일차 · 실제 예약 흐름</span>
+            </div>
+
+            <div className="week-one-booking-status" aria-label="1주차 예약 흐름 완료 기준">
+              <div>
+                <span>WEEK 1</span>
+                <b>날짜 선택부터 서버 견적까지 한 화면에서 확인</b>
+              </div>
+              <ol>
+                {weekOneBookingMilestones.map((milestone) => (
+                  <li key={milestone}>{milestone}</li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="booking-start-summary" aria-label="현재 예약 선택 요약">
+              <div>
+                <span>일정</span>
+                <b>{selectedDate.label}</b>
+              </div>
+              <div>
+                <span>객실</span>
+                <b>{selectedRoom.name}</b>
+              </div>
+              <div>
+                <span>인원</span>
+                <b>성인 {adultCount} · 아동 {childCount}</b>
+              </div>
+              <div>
+                <span>옵션</span>
+                <b>{selectedOptionsSummary}</b>
+              </div>
             </div>
 
             <div className="booking-start-block">
@@ -1515,7 +1559,10 @@ export function StayAppClient({
             </div>
 
             <div className="booking-start-total">
-              <span>예상 결제금액</span>
+              <div>
+                <span>예상 결제금액</span>
+                <small className={quoteAuthorityClass}>{quoteAuthorityLabel}</small>
+              </div>
               <b>{formatWon(totalAmount)}</b>
               {quoteMessage && <small>{quoteMessage}</small>}
             </div>
@@ -1884,6 +1931,7 @@ export function StayAppClient({
             <strong>
               <span>결제 예정</span>
               <b>{formatWon(totalAmount)}</b>
+              <small className={quoteAuthorityClass}>{quoteAuthorityLabel}</small>
             </strong>
           </div>
           <div className="booking-step-tabs" aria-label="예약 진행 단계">

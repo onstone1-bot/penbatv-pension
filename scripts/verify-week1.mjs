@@ -101,6 +101,27 @@ assert(
   "Stay page must load data through getStayPageData"
 );
 
+const stayClient = read("src/app/stays/[id]/StayAppClient.tsx");
+const globalCss = read("src/app/globals.css");
+
+for (const marker of [
+  "weekOneBookingMilestones",
+  "booking-start-summary",
+  "quoteAuthorityLabel",
+  "1일차 홈 단순화",
+  "7일차 모바일 QA"
+]) {
+  assert(stayClient.includes(marker), `Missing week 1 booking UI marker: ${marker}`);
+}
+
+for (const marker of [
+  "week-one-booking-status",
+  "booking-start-summary",
+  "quote-authority"
+]) {
+  assert(globalCss.includes(marker), `Missing week 1 booking style marker: ${marker}`);
+}
+
 console.log(
   JSON.stringify(
     {
