@@ -26,7 +26,7 @@ const bookingFlow = [
 const trustItems = [
   ["영상 확인", "실제 공간을 먼저 보고 선택"],
   ["예약 가능일", "막힌 날짜는 선택 차단"],
-  ["간편 로그인", "네이버·카카오로 빠른 가입"],
+  ["회원 기능", "로그인 후 예약·찜 관리"],
   ["내예약", "결제 후 일정과 옵션 확인"]
 ];
 
@@ -50,8 +50,7 @@ export default function HomePage() {
           </Link>
         </nav>
         <div className="main-home-account" aria-label="회원 메뉴">
-          <Link className="naver-login" href="/auth?provider=naver">네이버로 시작</Link>
-          <Link className="kakao-login" href="/auth?provider=kakao">카카오로 시작</Link>
+          <Link className="main-login-link" href="/auth">로그인/회원가입 안내</Link>
           <Link href="/my">MY</Link>
         </div>
       </header>
@@ -69,7 +68,7 @@ export default function HomePage() {
               지금 예약하기
             </Link>
             <a href="#video-stories">영상 먼저 보기</a>
-            <Link href="/auth?provider=kakao">간편 가입</Link>
+            <Link href="/auth">회원가입 안내</Link>
           </div>
         </div>
         <div className="main-hero-photo">

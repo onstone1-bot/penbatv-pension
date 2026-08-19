@@ -8204,3 +8204,61 @@ button {
     grid-template-columns: 1fr 1fr 54px;
   }
 }
+
+/* Auth setup clarity: social login buttons are setup-aware, not silent failures. */
+.auth-status-note {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(32, 80, 62, 0.14);
+  border-radius: 14px;
+  background: #f7faf6;
+  padding: 14px;
+}
+
+.auth-status-note b {
+  color: #173728;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.auth-status-note span {
+  color: #66746c;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.social-auth-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.social-auth-actions button.secondary {
+  border: 1px solid rgba(32, 80, 62, 0.16);
+  background: #fff;
+  color: #173728;
+}
+
+.main-home-account .main-login-link {
+  background: #173728;
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .main-home-account {
+    grid-template-columns: minmax(0, 1fr) 64px;
+  }
+}
+
+@media (max-width: 520px) {
+  .social-auth-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 390px) {
+  .main-home-account {
+    grid-template-columns: minmax(0, 1fr) 54px;
+  }
+}

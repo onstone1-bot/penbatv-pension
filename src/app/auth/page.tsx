@@ -73,6 +73,10 @@ export default async function AuthPlanningPage({ searchParams }: AuthPlanningPag
   const authMessage = first(query.auth_message) ?? first(query.profile_message);
   const statusMessage = authStatusMessage(authStatus, profileStatus, authMessage);
   const defaultProvider = provider === "naver" || provider === "kakao" ? provider : null;
+  const providerStatus = {
+    naverReady: Boolean(process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET),
+    kakaoReady: process.env.NEXT_PUBLIC_KAKAO_AUTH_READY === "true"
+  };
 
   return (
     <main className="auth-page">
@@ -103,7 +107,7 @@ export default async function AuthPlanningPage({ searchParams }: AuthPlanningPag
           <h2>간편 로그인</h2>
           <span>OAuth · DB 자동가입 · 고객홈 이동</span>
         </div>
-        <AuthClient defaultProvider={defaultProvider} statusMessage={statusMessage} />
+        <AuthClient defaultProvider={defaultProvider} statusMessage={statusMessage} providerStatus={providerStatus} />
       </section>
 
       <section className="auth-section">
