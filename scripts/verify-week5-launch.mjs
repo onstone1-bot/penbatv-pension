@@ -78,9 +78,9 @@ function runStaticVerification(reason = "missing-live-env") {
   const icalLib = read("src/lib/ical-sync.ts");
   const pilotLib = read("src/lib/pilot.ts");
   const environmentRoute = read("src/app/api/admin/environment/route.ts");
-  const week5Doc = read("docs/week5-days29-35-progress.md");
+  const week5Doc = read("docs/week5-days28-35-progress.md");
 
-  for (const required of ["Week 5 Day 29-30", "예약 완료", "입실 안내", "바베큐 리마인드", "Mock 발송"]) {
+  for (const required of ["Week 5 Day 28-30", "28일차 관리자 최종 QA", "예약 완료", "입실 안내", "바베큐 리마인드", "Mock 발송"]) {
     assertStatic(notificationsPage.includes(required), `Missing week5 notification page guard: ${required}`);
   }
 
@@ -112,7 +112,7 @@ function runStaticVerification(reason = "missing-live-env") {
     assertStatic(environmentRoute.includes(required), `Missing week5 environment guard: ${required}`);
   }
 
-  for (const required of ["29일차", "30일차", "31일차", "32일차", "33일차", "34일차", "35일차"]) {
+  for (const required of ["28일차", "29일차", "30일차", "31일차", "32일차", "33일차", "34일차", "35일차"]) {
     assertStatic(week5Doc.includes(required), `Missing week5 progress doc guard: ${required}`);
   }
 

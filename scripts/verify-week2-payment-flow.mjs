@@ -8,6 +8,31 @@ const baseUrl = process.env.STAYLINK_VERIFY_BASE_URL ?? "http://localhost:3000";
 const accommodationId = process.env.STAYLINK_VERIFY_ACCOMMODATION_ID ?? "baebang-alps";
 const qaGuestPhone = "010-0000-0014";
 
+function assertFileIncludes(relativePath, markers) {
+  const content = fs.readFileSync(path.join(root, relativePath), "utf8");
+  const missing = markers.filter((marker) => !content.includes(marker));
+
+  if (missing.length > 0) {
+    throw new Error(relativePath + " is missing week 2 markers: " + missing.join(", "));
+  }
+}
+
+assertFileIncludes("src/app/stays/[id]/StayAppClient.tsx", [
+  "weekTwoPaymentMilestones",
+  "8일차",
+  "14일차",
+  "week-two-payment-status",
+  "payment-readiness-grid",
+  "결제완료 · 예약확정",
+  "입금대기 · 운영자 확인 필요"
+]);
+
+assertFileIncludes("src/app/globals.css", [
+  "week-two-payment-status",
+  "payment-readiness-grid",
+  "payment-readiness-card"
+]);
+
 function loadLocalEnv() {
   if (!fs.existsSync(envPath)) return;
 

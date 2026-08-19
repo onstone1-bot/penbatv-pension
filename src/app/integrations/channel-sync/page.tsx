@@ -32,8 +32,8 @@ const syncApiChecklist = [
 
 export default function ChannelSyncPage() {
   return (
-    <main className="ops-page">
-      <section className="ops-hero system">
+    <main className="ops-page clean-admin-page week-five-page">
+      <section className="ops-hero system clean-ops-hero">
         <div>
           <Link className="home-back-link" href="/">
             펜바TV 메인홈

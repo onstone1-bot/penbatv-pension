@@ -312,6 +312,16 @@ const weekOneBookingMilestones = [
   "7일차 모바일 QA"
 ];
 
+const weekTwoPaymentMilestones = [
+  { day: "8일차", title: "토스 결제 준비 API", body: "/api/payments/prepare에서 서버 견적 기준 결제 주문을 생성합니다." },
+  { day: "9일차", title: "결제 성공 후 예약 확정", body: "/api/payments/confirm 성공 시 bookings와 payments를 저장합니다." },
+  { day: "10일차", title: "실패/취소/만료 처리", body: "결제 실패와 만료 주문은 paid 예약으로 확정하지 않습니다." },
+  { day: "11일차", title: "수동 계좌이체", body: "입금대기 예약을 만들고 운영자 확인 후 확정할 수 있게 둡니다." },
+  { day: "12일차", title: "네이버페이/계좌이체 확장", body: "NAVERPAY, TOSSPAY, TRANSFER, 가상계좌 provider를 같은 구조로 처리합니다." },
+  { day: "13일차", title: "고객 내예약 연결", body: "/api/my/reservations에서 휴대폰 기준 예약 조회를 확인합니다." },
+  { day: "14일차", title: "결제·예약 통합 QA", body: "hold, payment_order, booking, payment가 같은 흐름으로 이어지는지 검증합니다." }
+];
+
 const barbecueSlots: Array<{
   id: BarbecueSlot;
   label: string;
@@ -667,7 +677,30 @@ export function StayAppClient({
   const guestAmount = serverQuote?.guestAmount ?? 0;
   const totalAmount = serverQuote?.totalAmount ?? Math.max(0, roomQuote.roomAmount + optionAmount - coupon);
   const quoteAuthorityLabel = quoteStatus === "ready" ? "서버 기준 견적" : quoteStatus === "loading" ? "서버 계산 중" : "임시 예상가";
-  const quoteAuthorityClass = `quote-authority ${quoteStatus}`;
+  const quoteAuthorityClass = "quote-authority " + quoteStatus;
+  const selectedPaymentProvider = paymentProviderChoices.find((provider) => provider.id === paymentMethod);
+  const paymentReadinessCards = [
+    {
+      label: "결제 주문",
+      value: quoteStatus === "ready" ? "서버 금액 잠금" : "견적 확인 필요",
+      tone: quoteStatus === "ready" ? "ready" : "warn"
+    },
+    {
+      label: "예약 선점",
+      value: activeHold && holdSecondsLeft !== 0 ? "남은 시간 " + formatCountdown(holdSecondsLeft ?? 0) : "결제 시 15분 홀드",
+      tone: activeHold && holdSecondsLeft !== 0 ? "ready" : "neutral"
+    },
+    {
+      label: "결제수단",
+      value: selectedPaymentProvider?.label ?? "신용/체크카드",
+      tone: "ready"
+    },
+    {
+      label: "확정 방식",
+      value: paymentMethod === "manual_bank_transfer" ? "입금대기" : "결제성공 즉시확정",
+      tone: paymentMethod === "manual_bank_transfer" ? "warn" : "ready"
+    }
+  ];
   const selectedOptionsSummary = selectedOptions.length > 0 ? `${selectedOptions.length}개 옵션 선택` : "부대옵션 없음";
   const guestCount = adultCount + childCount;
   const hasBarbecueOption = selectedOptions.some((optionId) => {
@@ -2169,6 +2202,29 @@ export function StayAppClient({
               </div>
               {bookingMode === "instant" ? (
                 <>
+                  <section className="week-two-payment-status" aria-label="2주차 결제와 예약 확정 구현 상태">
+                    <div className="week-two-payment-head">
+                      <span>WEEK 2 · 8~14일차</span>
+                      <b>결제 준비부터 예약 확정, 내예약 조회까지 연결</b>
+                    </div>
+                    <ol>
+                      {weekTwoPaymentMilestones.map((milestone) => (
+                        <li key={milestone.day}>
+                          <span>{milestone.day}</span>
+                          <b>{milestone.title}</b>
+                          <small>{milestone.body}</small>
+                        </li>
+                      ))}
+                    </ol>
+                  </section>
+                  <div className="payment-readiness-grid" aria-label="현재 결제 진행 상태">
+                    {paymentReadinessCards.map((card) => (
+                      <div className={"payment-readiness-card " + card.tone} key={card.label}>
+                        <span>{card.label}</span>
+                        <b>{card.value}</b>
+                      </div>
+                    ))}
+                  </div>
                   <select
                     value={paymentMethod}
                     onChange={(event) => setPaymentMethod(event.target.value as PaymentProvider)}
@@ -2218,7 +2274,7 @@ export function StayAppClient({
               <p className="policy-note">결제 전 취소·환불 규정과 정숙 시간 정책을 확인했습니다.</p>
               {bookingMode === "instant" && holdSecondsLeft !== null && (
                 <div className="hold-timer">
-                  <span>Hold expires in</span>
+                  <span>예약 선점 남은 시간</span>
                   <b>{formatCountdown(holdSecondsLeft)}</b>
                 </div>
               )}
@@ -2244,6 +2300,14 @@ export function StayAppClient({
               <span>
                 {booking?.roomName} · {booking?.checkIn} - {booking?.checkOut}
               </span>
+              <span>
+                {booking?.status === "paid"
+                  ? "결제완료 · 예약확정"
+                  : booking?.status === "waiting_deposit"
+                    ? "입금대기 · 운영자 확인 필요"
+                    : "예약요청 · 결제안내 대기"}
+              </span>
+              {booking?.paymentSessionId && <span>결제 세션 {booking.paymentSessionId}</span>}
               {booking?.barbecueSlot !== "none" && <span>바베큐장 {booking?.barbecueSlot}</span>}
               <strong>{formatWon(booking?.totalAmount ?? totalAmount)}</strong>
               <Link className="primary-action" href={guestPhone ? `/my?phone=${encodeURIComponent(guestPhone)}` : "/my"}>

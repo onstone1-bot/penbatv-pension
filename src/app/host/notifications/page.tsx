@@ -37,16 +37,16 @@ export default async function NotificationsPage() {
   ];
 
   return (
-    <main className="ops-page">
-      <section className="ops-hero proposal">
+    <main className="ops-page clean-admin-page week-five-page">
+      <section className="ops-hero proposal clean-ops-hero">
         <div>
           <Link className="home-back-link" href="/">
             펜바TV 메인홈
           </Link>
-          <p className="muted">Week 5 Day 29-30</p>
+          <p className="muted">Week 5 Day 28-30</p>
           <h1>알림톡·CS 운영</h1>
           <p>
-            고객 예약 완료, 입실 안내, 바베큐장 이용 시간 알림을 자동화하고 실패 건은 CS 대기열로 관리합니다.
+            관리자 최종 QA 후 고객 예약 완료, 입실 안내, 바베큐장 이용 시간 알림을 자동화하고 실패 건은 CS 대기열로 관리합니다.
           </p>
         </div>
       </section>
@@ -111,6 +111,7 @@ export default async function NotificationsPage() {
           <h2>5주차 구현 범위</h2>
           <div className="task-list">
             {[
+              "28일차 관리자 최종 QA와 알림 운영 기준 확정",
               "29일차 예약 완료 알림톡 또는 문자 구조",
               "30일차 입실 안내/바베큐 리마인드 알림",
               "Mock 발송 후 실제 알림톡 공급사 어댑터로 교체",

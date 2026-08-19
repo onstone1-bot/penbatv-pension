@@ -8599,3 +8599,560 @@ button {
     grid-template-columns: 1fr;
   }
 }
+/* Week 2 payment flow: expose prepare, confirm, failure, transfer, and QA status. */
+.week-two-payment-status {
+  display: grid;
+  gap: 14px;
+  margin: 14px 0;
+  border: 1px solid rgba(15, 90, 71, 0.16);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ffffff, #f6fbf8);
+  padding: 16px;
+}
+
+.week-two-payment-head {
+  display: grid;
+  gap: 5px;
+}
+
+.week-two-payment-head span,
+.week-two-payment-status small,
+.payment-readiness-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.week-two-payment-head b {
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.week-two-payment-status ol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.week-two-payment-status li {
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+.week-two-payment-status li span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.week-two-payment-status li b,
+.payment-readiness-card b {
+  color: var(--ink);
+}
+
+.payment-readiness-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.payment-readiness-card {
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+.payment-readiness-card.ready {
+  border-color: rgba(15, 90, 71, 0.28);
+  background: #edf7f2;
+}
+
+.payment-readiness-card.warn {
+  border-color: rgba(183, 115, 0, 0.24);
+  background: #fff8e8;
+}
+
+.payment-readiness-card.neutral {
+  background: #f8faf9;
+}
+
+@media (max-width: 900px) {
+  .week-two-payment-status ol,
+  .payment-readiness-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .week-two-payment-status ol,
+  .payment-readiness-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* Week 3 host management flow: make owner data operations visible. */
+.week-three-host-status {
+  display: grid;
+  gap: 16px;
+  margin: 18px 0;
+  border: 1px solid rgba(15, 90, 71, 0.16);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffffff, #edf7f2);
+  padding: 20px;
+}
+
+.week-three-host-head {
+  display: grid;
+  gap: 7px;
+}
+
+.week-three-host-head span,
+.week-three-host-status small,
+.week-three-host-kpis span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.week-three-host-head h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 26px;
+}
+
+.week-three-host-head p {
+  max-width: 860px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.week-three-host-status ol {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.week-three-host-status li {
+  display: grid;
+  gap: 6px;
+  min-height: 128px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+.week-three-host-status li span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.week-three-host-status li b {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.week-three-host-status li small {
+  line-height: 1.45;
+}
+
+.week-three-host-kpis {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.week-three-host-kpis div {
+  display: grid;
+  gap: 5px;
+  border: 1px solid rgba(15, 90, 71, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+.week-three-host-kpis b {
+  color: var(--ink);
+  font-size: 17px;
+}
+
+@media (max-width: 1100px) {
+  .week-three-host-status ol {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .week-three-host-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .week-three-host-status ol,
+  .week-three-host-kpis {
+    grid-template-columns: 1fr;
+  }
+}
+
+.week-four-admin-status {
+  display: grid;
+  gap: 18px;
+  border: 1px solid rgba(39, 89, 75, 0.16);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(239, 248, 242, 0.92)),
+    url('/penba/reservoir.jpg') center/cover;
+  padding: 22px;
+  box-shadow: 0 18px 50px rgba(31, 49, 44, 0.08);
+}
+
+.week-four-admin-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.week-four-admin-head span {
+  color: #2f7d56;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.week-four-admin-head h2 {
+  margin: 6px 0 6px;
+  font-size: clamp(24px, 3vw, 38px);
+  color: #14352a;
+}
+
+.week-four-admin-head p {
+  max-width: 760px;
+  margin: 0;
+  color: #5d6d66;
+  line-height: 1.65;
+}
+
+.week-four-admin-head a {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #14352a;
+  color: #fff;
+  padding: 12px 16px;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.week-four-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.week-four-admin-grid article {
+  display: grid;
+  gap: 8px;
+  min-height: 138px;
+  border: 1px solid rgba(39, 89, 75, 0.14);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 16px;
+}
+
+.week-four-admin-grid span {
+  width: fit-content;
+  border-radius: 999px;
+  background: #ecf8ef;
+  color: #2f7d56;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.week-four-admin-grid b {
+  color: #18362d;
+  font-size: 18px;
+}
+
+.week-four-admin-grid small {
+  color: #65726d;
+  line-height: 1.55;
+}
+
+@media (max-width: 980px) {
+  .week-four-admin-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .week-four-admin-status {
+    padding: 16px;
+  }
+
+  .week-four-admin-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .week-four-admin-head a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .week-four-admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Clean admin console refresh: quieter, denser, easier to scan. */
+.clean-admin-page {
+  max-width: 1180px;
+  padding-top: 22px;
+  padding-bottom: 88px;
+}
+
+.clean-admin-page .home-back-link {
+  background: #173824;
+  box-shadow: none;
+}
+
+.clean-admin-page .clean-ops-hero {
+  min-height: auto;
+  border: 1px solid rgba(32, 80, 62, 0.12);
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 22px;
+  box-shadow: 0 10px 28px rgba(23, 33, 29, 0.06);
+}
+
+.clean-admin-page .clean-ops-hero h1 {
+  max-width: 720px;
+  margin: 12px 0 8px;
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1.15;
+}
+
+.clean-admin-page .clean-ops-hero p {
+  margin-bottom: 0;
+  color: #607168;
+}
+
+.clean-admin-page .ops-section {
+  gap: 14px;
+  margin-top: 14px;
+  border-color: rgba(32, 80, 62, 0.1);
+  border-radius: 16px;
+  background: #fff;
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(23, 33, 29, 0.045);
+}
+
+.clean-admin-page .week-four-admin-status {
+  gap: 16px;
+  border-color: rgba(32, 80, 62, 0.12);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbf8 100%);
+  box-shadow: 0 10px 26px rgba(23, 33, 29, 0.055);
+}
+
+.clean-admin-page .week-four-admin-head {
+  align-items: center;
+  border-bottom: 1px solid rgba(32, 80, 62, 0.1);
+  padding-bottom: 14px;
+}
+
+.clean-admin-page .week-four-admin-head h2 {
+  margin: 4px 0;
+  font-size: clamp(24px, 2.4vw, 32px);
+}
+
+.clean-admin-page .week-four-admin-head p {
+  color: #607168;
+  line-height: 1.55;
+}
+
+.clean-admin-page .week-four-admin-head a {
+  border: 1px solid rgba(23, 56, 36, 0.12);
+  background: #173824;
+  box-shadow: none;
+}
+
+.clean-admin-page .week-four-admin-grid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.clean-admin-page .week-four-admin-grid article {
+  gap: 7px;
+  min-height: 148px;
+  border-color: rgba(32, 80, 62, 0.1);
+  border-radius: 12px;
+  background: #fff;
+  padding: 13px;
+  box-shadow: none;
+}
+
+.clean-admin-page .week-four-admin-grid span {
+  border: 1px solid rgba(47, 125, 86, 0.14);
+  background: #f1f8f3;
+  padding: 5px 8px;
+  font-size: 11px;
+}
+
+.clean-admin-page .week-four-admin-grid b {
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.clean-admin-page .week-four-admin-grid small {
+  color: #64736b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.clean-admin-page .ops-metric-grid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.clean-admin-page .ops-metric-grid article,
+.clean-admin-page .ops-card,
+.clean-admin-page .campaign-table div,
+.clean-admin-page .operation-queue-list div {
+  border-color: rgba(32, 80, 62, 0.1);
+  border-radius: 12px;
+  background: #fbfdfb;
+  box-shadow: none;
+}
+
+.clean-admin-page .ops-metric-grid article {
+  min-height: 112px;
+  padding: 14px;
+}
+
+.clean-admin-page .ops-metric-grid article b {
+  color: #173824;
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.clean-admin-page .admin-dashboard-grid {
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+}
+
+.clean-admin-page .ops-card h2,
+.clean-admin-page .section-head h2 {
+  color: #173824;
+  font-size: 21px;
+}
+
+.clean-admin-page .section-head {
+  align-items: end;
+  gap: 10px;
+  border-bottom: 1px solid rgba(32, 80, 62, 0.08);
+  padding-bottom: 10px;
+}
+
+.clean-admin-page .campaign-table div {
+  grid-template-columns: minmax(120px, 0.9fr) minmax(0, 1fr) minmax(0, 1.15fr) minmax(140px, auto);
+  padding: 12px 13px;
+}
+
+.clean-admin-page .campaign-table strong {
+  color: #173824;
+  font-size: 13px;
+  text-align: right;
+}
+
+.clean-admin-page .admin-property-list a {
+  border-color: rgba(32, 80, 62, 0.1);
+  border-radius: 12px;
+  background: #fbfdfb;
+}
+
+.clean-admin-page .admin-property-list a > span {
+  border-radius: 9px;
+}
+
+@media (max-width: 1120px) {
+  .clean-admin-page .week-four-admin-grid,
+  .clean-admin-page .ops-metric-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 820px) {
+  .clean-admin-page {
+    padding-inline: 14px;
+  }
+
+  .clean-admin-page .week-four-admin-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .clean-admin-page .week-four-admin-head a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .clean-admin-page .week-four-admin-grid,
+  .clean-admin-page .ops-metric-grid,
+  .clean-admin-page .admin-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .clean-admin-page .campaign-table div {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .clean-admin-page .campaign-table strong {
+    text-align: left;
+  }
+}
+
+/* Week 5 launch readiness polish. */
+.week-five-page .ops-metric-grid article {
+  background: #ffffff;
+}
+
+.week-five-page .ops-card-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.week-five-page .task-list label {
+  border-radius: 12px;
+  background: #fbfdfb;
+}
+
+.week-five-page .pipeline-strip article {
+  border: 1px solid rgba(32, 80, 62, 0.1);
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.week-five-page .pipeline-strip span {
+  color: #2f7d56;
+}
+
+@media (max-width: 900px) {
+  .week-five-page .ops-card-grid {
+    grid-template-columns: 1fr;
+  }
+}

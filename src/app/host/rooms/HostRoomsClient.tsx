@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -165,6 +165,16 @@ const operationChecklist = [
   "주변 가볼만한곳·주변맛집 등록",
   "바베큐·불멍·얼리체크인 옵션 등록",
   "달력 요금과 예약막기까지 최종 확인"
+];
+
+const weekThreeManagementMilestones = [
+  { day: "15일차", title: "숙소 기본정보 등록/수정", body: "숙소명, 지역, 주소, 컨셉, 노출 상태를 운영 DB에 저장합니다." },
+  { day: "16일차", title: "객실 등록/수정/숨김", body: "객실 타입, 요금, 기준/최대 인원, 편의시설을 등록하고 비공개 처리합니다." },
+  { day: "17일차", title: "객실 사진 업로드/대표사진", body: "객실별 이미지 URL과 설명을 등록하고 대표사진을 지정합니다." },
+  { day: "18일차", title: "유튜브 링크 등록/분류", body: "전체, 외부, 내부 영상과 객실 연결, 캠페인 코드를 관리합니다." },
+  { day: "19일차", title: "네이버 블로그/리뷰", body: "네이버 블로그와 리뷰 링크를 객실 또는 숙소 전체에 연결합니다." },
+  { day: "20일차", title: "주변 맛집/가볼만한곳", body: "지도 URL, 거리, 소요시간, 소개 문구를 등록합니다." },
+  { day: "21일차", title: "사장님 관리화면 QA", body: "등록, 수정, 비공개, 고객 화면 미리보기까지 통합 점검합니다." }
 ];
 
 const initialRoomForm: RoomForm = {
@@ -1071,6 +1081,33 @@ export function HostRoomsClient({
         </div>
       </section>
 
+      <section className="week-three-host-status" aria-label="3주차 사장님 관리 실데이터화 진행 상태">
+        <div className="week-three-host-head">
+          <span>WEEK 3 · 15~21일차</span>
+          <h2>사장님이 직접 등록·수정·비공개 처리하는 운영 콘솔</h2>
+          <p>
+            이 화면에서 숙소 기본정보, 객실, 사진, 유튜브 영상, 네이버 블로그·리뷰,
+            주변 맛집·가볼만한곳, 부대옵션을 등록하면 고객 예약 화면의 상세 콘텐츠로 이어집니다.
+          </p>
+        </div>
+        <ol>
+          {weekThreeManagementMilestones.map((milestone) => (
+            <li key={milestone.day}>
+              <span>{milestone.day}</span>
+              <b>{milestone.title}</b>
+              <small>{milestone.body}</small>
+            </li>
+          ))}
+        </ol>
+        <div className="week-three-host-kpis" aria-label="현재 등록 콘텐츠 요약">
+          <div><span>숙소 ID</span><b>{accommodationForm.id}</b></div>
+          <div><span>객실</span><b>{rooms.length}개</b></div>
+          <div><span>사진</span><b>{rooms.reduce((sum, room) => sum + room.images.length, 0)}장</b></div>
+          <div><span>유튜브</span><b>{videos.length}개</b></div>
+          <div><span>네이버</span><b>{naverLinks.length}개</b></div>
+          <div><span>주변정보</span><b>{nearbyPlaces.length}개</b></div>
+        </div>
+      </section>
       <section className="host-travel-mood" aria-label="펜션 여행 분위기">
         <article style={{ backgroundImage: "url(/penba/overlook.jpg)" }}>
           <span>소나무 정원</span>

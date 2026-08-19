@@ -64,7 +64,8 @@ function runStaticVerification(reason = "missing-live-env") {
   const hostRoomsClient = read("src/app/host/rooms/HostRoomsClient.tsx");
   const hostPropertiesClient = read("src/app/host/properties/HostPropertiesClient.tsx");
   const proposalClient = read("src/app/host/proposals/ProposalApprovalClient.tsx");
-  const week4Doc = read("docs/week4-days22-28-progress.md");
+  const week4Doc = read("docs/week4-days22-27-progress.md");
+  const adminCss = read("src/app/globals.css");
 
   for (const required of [
     "return \"customer\"",
@@ -88,6 +89,10 @@ function runStaticVerification(reason = "missing-live-env") {
   }
 
   for (const required of [
+    "weekFourAdminMilestones",
+    "week-four-admin-status",
+    "WEEK 4 · 22~27일차",
+    "회원·권한·운영자 집계 흐름",
     "회원·권한 현황",
     "최근 회원가입",
     "전체 예약 현황",
@@ -110,8 +115,12 @@ function runStaticVerification(reason = "missing-live-env") {
 
   assertStatic(proposalClient.includes("x-penbatv-role") && proposalClient.includes("operator"), "Missing operator proposal role guard.");
 
-  for (const required of ["22일차", "23일차", "24일차", "25일차", "26일차", "27일차", "28일차"]) {
+  for (const required of ["22일차", "23일차", "24일차", "25일차", "26일차", "27일차"]) {
     assertStatic(week4Doc.includes(required), `Missing week4 progress doc guard: ${required}`);
+  }
+
+  for (const required of ["week-four-admin-status", "week-four-admin-head", "week-four-admin-grid"]) {
+    assertStatic(adminCss.includes(required), `Missing week4 admin CSS guard: ${required}`);
   }
 
   console.log(

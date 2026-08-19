@@ -3,23 +3,52 @@ import { formatWon } from "@/lib/local-quote";
 import { getAdminOperationsData } from "@/lib/admin-operations-data";
 import { PartnerInquiryStatusClient } from "./PartnerInquiryStatusClient";
 
+const weekFourAdminMilestones = [
+  { day: "22일차", title: "고객 회원가입/로그인", body: "네이버·카카오 로그인 준비상태와 고객 프로필 자동 저장 흐름을 점검합니다." },
+  { day: "23일차", title: "사장님/운영자 권한 분리", body: "관리 API에서 host와 operator 역할을 분리하고 허용 범위를 확인합니다." },
+  { day: "24일차", title: "운영자 입점 승인", body: "입점문의와 숙소 노출 상태를 운영자가 승인, 보류, 중지 처리합니다." },
+  { day: "25일차", title: "전체 예약 현황 집계", body: "모든 숙소의 예약 상태, 결제 상태, 최근 예약 내역을 한 화면에서 봅니다." },
+  { day: "26일차", title: "결제·정산 예정금액", body: "결제 주문, 결제 완료, 정산 예정액을 운영자 기준으로 합산합니다." },
+  { day: "27일차", title: "유튜브 UTM 전환 집계", body: "유튜브 설명란 링크 유입부터 결제시작, 예약 전환, 매출까지 캠페인별로 봅니다." }
+];
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminOperationsPage() {
   const data = await getAdminOperationsData();
 
   return (
-    <main className="ops-page">
-      <section className="ops-hero admin">
+    <main className="ops-page clean-admin-page">
+      <section className="ops-hero admin clean-ops-hero">
         <div>
           <Link className="home-back-link" href="/">
             펜바TV 메인홈
           </Link>
-          <p className="muted">Week 4 Day 24-28</p>
+          <p className="muted">Week 4 Day 22-27</p>
           <h1>운영자 관리방·운영집계</h1>
           <p>
             펜바TV 운영자가 전체 입점, 예약, 결제, 정산, 유튜브 성과, 장애 대기열을 한 화면에서 보는 내부 운영 대시보드입니다.
           </p>
+        </div>
+      </section>
+
+      <section className="ops-section week-four-admin-status" aria-label="4주차 22일차부터 27일차까지 진행 상태">
+        <div className="week-four-admin-head">
+          <div>
+            <span>WEEK 4 · 22~27일차</span>
+            <h2>회원·권한·운영자 집계 흐름</h2>
+            <p>고객 로그인에서 운영자 승인, 전체 예약/결제/정산/유튜브 전환 집계까지 MVP 운영에 필요한 뼈대를 연결합니다.</p>
+          </div>
+          <Link href="/auth">로그인 화면 점검</Link>
+        </div>
+        <div className="week-four-admin-grid">
+          {weekFourAdminMilestones.map((item) => (
+            <article key={item.day}>
+              <span>{item.day}</span>
+              <b>{item.title}</b>
+              <small>{item.body}</small>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -213,7 +242,7 @@ export default async function AdminOperationsPage() {
       <section className="ops-section">
         <div className="section-head">
           <h2>4주차 관리자 QA</h2>
-          <span>22일차부터 28일차까지</span>
+          <span>22일차부터 27일차까지</span>
         </div>
         <div className="campaign-table">
           {data.week4QaRows.map((row) => (

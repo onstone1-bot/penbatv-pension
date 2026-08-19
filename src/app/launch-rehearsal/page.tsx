@@ -54,8 +54,8 @@ export default async function LaunchRehearsalPage() {
   }
 
   return (
-    <main className="ops-page">
-      <section className="ops-hero proposal">
+    <main className="ops-page clean-admin-page week-five-page">
+      <section className="ops-hero proposal clean-ops-hero">
         <div>
           <Link className="home-back-link" href="/">
             펜바TV 메인홈
@@ -125,7 +125,7 @@ export default async function LaunchRehearsalPage() {
       <section className="ops-section">
         <div className="section-head">
           <h2>5주차 오픈 API</h2>
-          <span>29일차부터 35일차까지</span>
+          <span>28일차부터 35일차까지</span>
         </div>
         <div className="pipeline-strip">
           {launchApiFlow.map((item, index) => (

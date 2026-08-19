@@ -13,6 +13,33 @@ const campaignCode = `qa_week3_video_${suffix.replace(/-/g, "_")}`;
 const naverLinkId = `qa-week3-naver-${suffix}`;
 const placeId = `qa-week3-place-${suffix}`;
 
+function assertFileIncludes(relativePath, markers) {
+  const content = fs.readFileSync(path.join(root, relativePath), "utf8");
+  const missing = markers.filter((marker) => !content.includes(marker));
+
+  if (missing.length > 0) {
+    throw new Error(relativePath + " is missing week 3 markers: " + missing.join(", "));
+  }
+}
+
+assertFileIncludes("src/app/host/rooms/HostRoomsClient.tsx", [
+  "weekThreeManagementMilestones",
+  "15일차",
+  "21일차",
+  "week-three-host-status",
+  "week-three-host-kpis",
+  "숙소 기본정보 등록/수정",
+  "객실 사진 업로드/대표사진",
+  "네이버 블로그/리뷰",
+  "주변 맛집/가볼만한곳"
+]);
+
+assertFileIncludes("src/app/globals.css", [
+  "week-three-host-status",
+  "week-three-host-kpis",
+  "week-three-host-head"
+]);
+
 function loadLocalEnv() {
   if (!fs.existsSync(envPath)) return;
 

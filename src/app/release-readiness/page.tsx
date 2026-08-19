@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const readinessMetrics = [
-  { label: "구현 화면", value: "35일차", detail: "고객/사장님/운영자" },
+  { label: "진행 범위", value: "28~35일차", detail: "알림/연동/배포/오픈" },
   { label: "검증 명령", value: "4개", detail: "week5 + mobile + build" },
   { label: "필수 환경변수", value: "5개", detail: "Supabase/Admin/기본숙소" },
   { label: "배포 상태", value: "대기", detail: "GitHub push 후 Vercel 자동 배포" }
@@ -30,7 +30,7 @@ const handoffItems = [
   "로컬 실행: npm.cmd run dev",
   "브라우저 확인: http://localhost:3000",
   "모바일 QA: npm.cmd run verify:mobile",
-  "5주차 QA: npm.cmd run verify:week5:launch",
+  "5주차 28~35일차 QA: npm.cmd run verify:week5:launch",
   "프로덕션 빌드: npm.cmd run build",
   "GitHub push 후 Vercel 자동 배포 확인"
 ];
@@ -45,8 +45,8 @@ const deploymentSteps = [
 
 export default function ReleaseReadinessPage() {
   return (
-    <main className="ops-page">
-      <section className="ops-hero system">
+    <main className="ops-page clean-admin-page week-five-page">
+      <section className="ops-hero system clean-ops-hero">
         <div>
           <Link className="home-back-link" href="/">
             펜바TV 메인홈
@@ -111,7 +111,7 @@ export default function ReleaseReadinessPage() {
       <section className="ops-section ops-process-panel">
         <div>
           <h2>공개 배포 순서</h2>
-          <p>5주차 기능 검증이 끝난 뒤 GitHub push와 Vercel 자동 배포로 외부 URL을 갱신합니다.</p>
+          <p>5주차 28~35일차 기능 검증이 끝난 뒤 GitHub push와 Vercel 자동 배포로 외부 URL을 갱신합니다.</p>
         </div>
         <ol>
           {deploymentSteps.map((item) => (
