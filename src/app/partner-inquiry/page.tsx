@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PartnerInquiryClient } from "./PartnerInquiryClient";
 
 const inquirySteps = [
   "펜션 기본정보 접수",
@@ -62,36 +63,7 @@ export default function PartnerInquiryPage() {
       </section>
 
       <section className="partner-inquiry-section split">
-        <article className="partner-inquiry-form">
-          <h2>문의 접수 항목</h2>
-          <label>
-            펜션명
-            <input defaultValue="배방알프스" />
-          </label>
-          <label>
-            지역
-            <input defaultValue="충남 아산 배방" />
-          </label>
-          <label>
-            연락처
-            <input placeholder="010-0000-0000" />
-          </label>
-          <label>
-            운영 형태
-            <select defaultValue="pension-bbq">
-              <option value="pension-bbq">펜션 + 바베큐장</option>
-              <option value="pension">펜션</option>
-              <option value="bbq">바베큐장</option>
-              <option value="glamping">글램핑</option>
-            </select>
-          </label>
-          <label>
-            문의 내용
-            <textarea defaultValue="유튜브 촬영과 예약결제 입점을 상담하고 싶습니다." />
-          </label>
-          <button type="button">문의 접수 데모</button>
-          <small>실제 운영 단계에서는 이 버튼을 Supabase 입점문의 테이블 저장 API와 연결합니다.</small>
-        </article>
+        <PartnerInquiryClient />
 
         <article className="partner-inquiry-checklist">
           <h2>미리 준비하면 좋은 자료</h2>

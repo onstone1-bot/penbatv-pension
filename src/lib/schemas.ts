@@ -122,3 +122,27 @@ export const createNearbyPlaceSchema = z.object({
   sortOrder: z.number().int().min(0).default(0),
   status: z.enum(["active", "hidden"]).default("active")
 });
+
+
+export const createPartnerInquirySchema = z.object({
+  stayName: z.string().min(1).max(80),
+  area: z.string().min(1).max(80),
+  ownerName: z.string().max(40).nullable().optional(),
+  ownerPhone: z.string().min(8).max(30),
+  email: z.string().email().or(z.literal("")).nullable().optional(),
+  operationType: z.enum(["pension_bbq", "pension", "bbq", "glamping"]).default("pension_bbq"),
+  roomCount: z.number().int().min(0).max(200).default(0),
+  bbqType: z.string().max(80).nullable().optional(),
+  externalChannels: z.array(z.string().min(1).max(30)).max(8).default([]),
+  message: z.string().max(1000).nullable().optional(),
+  source: z.string().max(60).default("partner_inquiry")
+});
+
+export const updateCustomerProfileSchema = z.object({
+  name: z.string().min(1).max(40),
+  phone: z.string().min(8).max(30),
+  email: z.string().email().or(z.literal("")).nullable().optional(),
+  notificationEnabled: z.boolean().default(true),
+  cashReceiptType: z.enum(["none", "personal", "business"]).default("none"),
+  cashReceiptValue: z.string().max(40).nullable().optional()
+});

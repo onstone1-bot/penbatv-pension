@@ -69,6 +69,43 @@ export default async function AdminOperationsPage() {
 
       <section className="ops-section">
         <div className="section-head">
+          <h2>최근 입점문의</h2>
+          <span>공개 입점문의 페이지 접수건</span>
+        </div>
+        <div className="campaign-table">
+          {data.inquiryRows.map(
+            (row: {
+              id: string;
+              stayName: string;
+              area: string;
+              ownerName: string;
+              operationType: string;
+              roomCount: number;
+              ownerPhone: string;
+              status: string;
+              createdAt: string;
+            }) => (
+              <div key={row.id}>
+                <b>{row.stayName}</b>
+                <span>{row.area} · {row.ownerName}</span>
+                <span>{row.operationType} · 객실 {row.roomCount}개 · {row.ownerPhone}</span>
+                <strong>{row.status} · {row.createdAt.slice(0, 10)}</strong>
+              </div>
+            )
+          )}
+          {data.inquiryRows.length === 0 && (
+            <div>
+              <b>입점문의 없음</b>
+              <span>/partner-inquiry에서 사장님 문의가 접수되면 표시됩니다.</span>
+              <span>무료촬영 후보 관리</span>
+              <strong>0건</strong>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="ops-section">
+        <div className="section-head">
           <h2>회원·권한 현황</h2>
           <span>고객 · 사장님 · 운영자</span>
         </div>

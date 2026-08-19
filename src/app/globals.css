@@ -7894,3 +7894,107 @@ button {
     font-size: 11px;
   }
 }
+
+
+.partner-inquiry-form form {
+  display: grid;
+  gap: 12px;
+}
+
+.partner-inquiry-form fieldset {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  border: 1px solid rgba(32, 80, 62, 0.14);
+  border-radius: 14px;
+  padding: 12px;
+  color: #5d6a61;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.partner-inquiry-form fieldset legend {
+  grid-column: 1 / -1;
+  padding: 0 5px;
+  color: #173824;
+}
+
+.partner-inquiry-form fieldset label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.partner-inquiry-message.success,
+.partner-inquiry-form code {
+  color: #067647;
+  font-weight: 900;
+}
+
+.partner-inquiry-message.error {
+  color: #b42318;
+  font-weight: 900;
+}
+
+.partner-inquiry-form code {
+  width: fit-content;
+  border-radius: 999px;
+  background: #ecfdf3;
+  padding: 8px 10px;
+}
+
+.my-profile-edit-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  border-top: 1px solid rgba(32, 80, 62, 0.1);
+  padding-top: 14px;
+}
+
+.my-profile-edit-form label {
+  display: grid;
+  gap: 6px;
+  color: #5d6a61;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.my-profile-edit-form input,
+.my-profile-edit-form select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(32, 80, 62, 0.14);
+  border-radius: 12px;
+  background: #f9fbf8;
+  color: #17211d;
+  padding: 0 11px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.my-profile-edit-form .my-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.my-profile-edit-form button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: #173824;
+  color: #fff;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.my-profile-edit-form button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.my-profile-edit-form small {
+  color: #66746c;
+  line-height: 1.5;
+}

@@ -26,6 +26,7 @@ export async function getAdminOperationsData() {
     settlementsResult,
     utmEventsResult,
     profilesResult,
+    partnerInquiriesResult,
     notificationsResult,
     calendarSourcesResult,
     pilotRunsResult
@@ -61,6 +62,11 @@ export async function getAdminOperationsData() {
       .select("id, role, provider, status, created_at, last_sign_in_at")
       .order("created_at", { ascending: false })
       .limit(500),
+    (supabase as any)
+      .from("partner_inquiries")
+      .select("id, stay_name, area, owner_name, owner_phone, operation_type, room_count, status, created_at")
+      .order("created_at", { ascending: false })
+      .limit(20),
     supabase
       .from("notification_queue")
       .select("id, status, template_type, scheduled_at")
@@ -87,6 +93,7 @@ export async function getAdminOperationsData() {
     settlementsResult,
     utmEventsResult,
     profilesResult,
+    partnerInquiriesResult,
     notificationsResult,
     calendarSourcesResult,
     pilotRunsResult
@@ -102,6 +109,7 @@ export async function getAdminOperationsData() {
   const settlements = settlementsResult.data ?? [];
   const utmEvents = utmEventsResult.data ?? [];
   const profiles = profilesResult.data ?? [];
+  const partnerInquiries = partnerInquiriesResult.data ?? [];
   const notifications = notificationsResult.data ?? [];
   const calendarSources = calendarSourcesResult.data ?? [];
   const pilotRuns = pilotRunsResult.data ?? [];
@@ -157,10 +165,16 @@ export async function getAdminOperationsData() {
         label: "회원 계정",
         value: `${profiles.length}명`,
         detail: `고객 ${profiles.filter((profile) => profile.role === "customer").length} · 사장님 ${profiles.filter((profile) => profile.role === "host").length} · 운영자 ${profiles.filter((profile) => profile.role === "operator").length}`
+      },
+      {
+        label: "입점문의",
+        value: `${partnerInquiries.length}건`,
+        detail: `신규 ${partnerInquiries.filter((inquiry: any) => inquiry.status === "received").length} · 상담 ${partnerInquiries.filter((inquiry: any) => inquiry.status === "consulting").length}`
       }
     ],
     operationQueues: [
       { label: "입점 승인 대기", count: accommodations.filter((stay) => stay.status !== "active").length, owner: "운영자" },
+      { label: "입점 문의 응대", count: partnerInquiries.filter((inquiry: any) => inquiry.status === "received").length, owner: "운영자/영업" },
       { label: "결제 검증 필요", count: readyOrders.length, owner: "정산 담당" },
       { label: "수동입금 확인", count: waitingDepositOrders.length, owner: "CS/운영" },
       { label: "실패/취소 확인", count: failedOrders.length, owner: "고객 안내" },
@@ -183,6 +197,17 @@ export async function getAdminOperationsData() {
       status: profile.status,
       joinedAt: profile.created_at,
       lastSignInAt: profile.last_sign_in_at
+    })),
+    inquiryRows: partnerInquiries.slice(0, 10).map((inquiry: any) => ({
+      id: inquiry.id,
+      stayName: inquiry.stay_name,
+      area: inquiry.area,
+      ownerName: inquiry.owner_name ?? "미입력",
+      ownerPhone: inquiry.owner_phone,
+      operationType: inquiry.operation_type,
+      roomCount: inquiry.room_count,
+      status: inquiry.status,
+      createdAt: inquiry.created_at
     })),
     roleRows: [
       {

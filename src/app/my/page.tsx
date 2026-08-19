@@ -3,6 +3,7 @@ import { getCurrentCustomer } from "@/lib/auth/current-user";
 import { mockPartnerProperties } from "@/lib/platform-data";
 import { formatWon } from "@/lib/local-quote";
 import { getCustomerReservations } from "@/lib/customer-reservations";
+import { MyProfileClient } from "./MyProfileClient";
 
 export const dynamic = "force-dynamic";
 
@@ -94,6 +95,12 @@ export default async function MyPage({ searchParams }: MyPageProps) {
               </div>
             ))}
           </div>
+          <MyProfileClient
+            initialName={displayName}
+            initialPhone={phone ?? ""}
+            initialEmail={profile?.email ?? user?.email ?? ""}
+            loggedIn={Boolean(user)}
+          />
           <Link className="my-inline-action" href="/auth">로그인/정보 연결</Link>
         </article>
 

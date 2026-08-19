@@ -35,8 +35,8 @@ export function AuthClient({ defaultProvider = null, statusMessage = null }: Aut
           signedInAt: new Date().toISOString()
         })
       );
-      setMessage("네이버 실연동 전 데모 로그인으로 고객홈에 이동합니다. 실제 연동은 네이버 OAuth 콜백 구현 후 연결합니다.");
-      window.location.href = "/customer-home?auth_status=demo&provider=naver";
+      setMessage("네이버 로그인 시작 API로 이동합니다. 키가 없으면 데모 고객홈으로 안전하게 연결됩니다.");
+      window.location.href = "/api/auth/naver/start?next=/customer-home";
       return;
     }
 
