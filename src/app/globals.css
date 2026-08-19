@@ -8110,3 +8110,97 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+/* Main home header usability fix: keep social login buttons from covering content. */
+.main-home-topbar {
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+}
+
+.main-home-nav,
+.main-home-account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.main-home-nav {
+  justify-content: center;
+}
+
+.main-home-account {
+  justify-content: flex-end;
+}
+
+.main-home-account a,
+.main-home-nav a {
+  border: 1px solid rgba(32, 80, 62, 0.14);
+  border-radius: 999px;
+  background: #fff;
+  padding: 10px 13px;
+  color: #18362a;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.main-home-nav .main-reserve-link {
+  background: #173728;
+  color: #fff;
+}
+
+.main-home-account a.naver-login {
+  background: #03c75a;
+  color: #fff;
+}
+
+.main-home-account a.kakao-login {
+  background: #fee500;
+  color: #191600;
+}
+
+@media (max-width: 900px) {
+  .main-home-topbar {
+    position: relative;
+    top: auto;
+    z-index: 1;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .main-home-nav,
+  .main-home-account {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .main-home-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .main-home-account {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  }
+
+  .main-home-nav a,
+  .main-home-account a {
+    min-width: 0;
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 390px) {
+  .main-home-nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .main-home-account {
+    grid-template-columns: 1fr 1fr 54px;
+  }
+}

@@ -42,16 +42,18 @@ export default function HomePage() {
           <span>PenBa TV</span>
           <b>영상으로 보고 바로 예약</b>
         </Link>
-        <nav aria-label="상단 바로가기">
+        <nav className="main-home-nav" aria-label="상단 바로가기">
           <a href="#featured-stays">숙소찾기</a>
           <a href="#video-stories">영상보기</a>
-          <Link href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=top_booking&utm_campaign=${heroProperty.id}`}>
+          <Link className="main-reserve-link" href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=top_booking&utm_campaign=${heroProperty.id}`}>
             예약하기
           </Link>
+        </nav>
+        <div className="main-home-account" aria-label="회원 메뉴">
           <Link className="naver-login" href="/auth?provider=naver">네이버로 시작</Link>
           <Link className="kakao-login" href="/auth?provider=kakao">카카오로 시작</Link>
           <Link href="/my">MY</Link>
-        </nav>
+        </div>
       </header>
 
       <section className="main-home-hero" aria-label="펜바TV 메인">
