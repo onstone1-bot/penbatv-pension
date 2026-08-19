@@ -64,7 +64,7 @@ export async function getAdminOperationsData() {
       .limit(500),
     (supabase as any)
       .from("partner_inquiries")
-      .select("id, stay_name, area, owner_name, owner_phone, operation_type, room_count, status, created_at")
+      .select("id, stay_name, area, owner_name, owner_phone, operation_type, room_count, status, operator_note, contacted_at, created_at")
       .order("created_at", { ascending: false })
       .limit(20),
     supabase
@@ -207,6 +207,8 @@ export async function getAdminOperationsData() {
       operationType: inquiry.operation_type,
       roomCount: inquiry.room_count,
       status: inquiry.status,
+      operatorNote: inquiry.operator_note ?? null,
+      contactedAt: inquiry.contacted_at ?? null,
       createdAt: inquiry.created_at
     })),
     roleRows: [

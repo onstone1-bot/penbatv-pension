@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { formatWon } from "@/lib/local-quote";
 import { getAdminOperationsData } from "@/lib/admin-operations-data";
+import { PartnerInquiryStatusClient } from "./PartnerInquiryStatusClient";
 
 export const dynamic = "force-dynamic";
 
@@ -83,13 +84,17 @@ export default async function AdminOperationsPage() {
               roomCount: number;
               ownerPhone: string;
               status: string;
+              operatorNote: string | null;
+              contactedAt: string | null;
               createdAt: string;
             }) => (
               <div key={row.id}>
                 <b>{row.stayName}</b>
                 <span>{row.area} · {row.ownerName}</span>
                 <span>{row.operationType} · 객실 {row.roomCount}개 · {row.ownerPhone}</span>
-                <strong>{row.status} · {row.createdAt.slice(0, 10)}</strong>
+                <strong>{row.status} · {row.contactedAt ? `연락 ${row.contactedAt.slice(0, 10)}` : row.createdAt.slice(0, 10)}</strong>
+                {row.operatorNote && <small>{row.operatorNote}</small>}
+                <PartnerInquiryStatusClient inquiryId={row.id} initialStatus={row.status} />
               </div>
             )
           )}

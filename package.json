@@ -28,7 +28,8 @@
     "verify:penba-home": "node scripts/verify-penba-home.mjs",
     "verify:ddnayo-calendar": "node scripts/verify-ddnayo-calendar.mjs",
     "verify:make24-benchmark": "node scripts/verify-make24-benchmark.mjs",
-    "verify:hdweb-design": "node scripts/verify-hdweb-design.mjs"
+    "verify:hdweb-design": "node scripts/verify-hdweb-design.mjs",
+    "verify:day6-10": "node scripts/verify-day6-10-customer-ops.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.3",

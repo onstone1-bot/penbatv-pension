@@ -3,6 +3,8 @@ import { getCurrentCustomer } from "@/lib/auth/current-user";
 import { mockPartnerProperties } from "@/lib/platform-data";
 import { formatWon } from "@/lib/local-quote";
 import { getCustomerReservations } from "@/lib/customer-reservations";
+import { getCustomerEngagement } from "@/lib/customer-engagement";
+import type { CustomerStaySummary } from "@/lib/customer-engagement";
 import { MyProfileClient } from "./MyProfileClient";
 
 export const dynamic = "force-dynamic";
@@ -58,7 +60,15 @@ export default async function MyPage({ searchParams }: MyPageProps) {
     limit: 10
   });
   const reservations = reservationResult.reservations;
-  const favorites = mockPartnerProperties.slice(0, 3);
+  const engagement = await getCustomerEngagement(profile?.id ?? null);
+  const favorites = engagement.favorites.length > 0 ? engagement.favorites : mockPartnerProperties.slice(0, 3).map((stay) => ({
+    id: stay.id,
+    name: stay.name,
+    area: stay.area,
+    heroUrl: stay.heroUrl,
+    source: "demo",
+    createdAt: new Date(0).toISOString()
+  }));
 
   return (
     <main className="my-page">
@@ -99,6 +109,11 @@ export default async function MyPage({ searchParams }: MyPageProps) {
             initialName={displayName}
             initialPhone={phone ?? ""}
             initialEmail={profile?.email ?? user?.email ?? ""}
+            initialNotificationEnabled={engagement.preferences.notificationEnabled}
+            initialCashReceiptType={engagement.preferences.cashReceiptType}
+            initialCashReceiptValue={engagement.preferences.cashReceiptValue ?? ""}
+            initialDefaultAdultCount={engagement.preferences.defaultAdultCount}
+            initialDefaultChildCount={engagement.preferences.defaultChildCount}
             loggedIn={Boolean(user)}
           />
           <Link className="my-inline-action" href="/auth">로그인/정보 연결</Link>
@@ -169,6 +184,29 @@ export default async function MyPage({ searchParams }: MyPageProps) {
         </div>
       </section>
 
+      <section className="my-section">
+        <div className="section-head">
+          <h2>최근 본 숙소</h2>
+          <span>유튜브 링크로 들어와 확인한 고객홈</span>
+        </div>
+        <div className="favorite-stay-list recent-stay-list">
+          {engagement.recentStays.length > 0 ? engagement.recentStays.map((stay: CustomerStaySummary) => (
+            <Link href={`/stays/${stay.id}?utm_source=penbatv&utm_medium=my_recent&utm_campaign=${stay.id}`} key={stay.id}>
+              <span style={{ backgroundImage: `url(${stay.heroUrl})` }} />
+              <div>
+                <b>{stay.name}</b>
+                <small>{stay.area} · {stay.viewCount ?? 1}회 확인</small>
+              </div>
+            </Link>
+          )) : (
+            <article className="my-empty-panel">
+              <b>최근 본 숙소가 아직 없습니다</b>
+              <small>숙소 고객홈을 열면 로그인 고객 기준으로 최근 본 숙소가 저장됩니다.</small>
+            </article>
+          )}
+        </div>
+      </section>
+
       <section className="my-section my-layout">
         <article className="my-panel">
           <div className="section-head">
@@ -176,7 +214,7 @@ export default async function MyPage({ searchParams }: MyPageProps) {
             <span>다음 예약 후보</span>
           </div>
           <div className="favorite-stay-list">
-            {favorites.map((stay) => (
+            {favorites.map((stay: CustomerStaySummary) => (
               <Link href={`/stays/${stay.id}?utm_source=penbatv&utm_medium=my_favorite&utm_campaign=${stay.id}`} key={stay.id}>
                 <span style={{ backgroundImage: `url(${stay.heroUrl})` }} />
                 <div>
@@ -196,7 +234,7 @@ export default async function MyPage({ searchParams }: MyPageProps) {
           <div className="notification-rule-list">
             {notificationRules.map((rule) => (
               <label key={rule}>
-                <input type="checkbox" defaultChecked />
+                <input type="checkbox" defaultChecked={engagement.preferences.notificationEnabled} />
                 <span>{rule}</span>
               </label>
             ))}

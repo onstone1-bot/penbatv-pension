@@ -619,6 +619,9 @@ export function StayAppClient({
   const [serverQuote, setServerQuote] = useState<ServerQuote | null>(null);
   const [quoteStatus, setQuoteStatus] = useState<QuoteStatus>("idle");
   const [quoteMessage, setQuoteMessage] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteMessage, setFavoriteMessage] = useState<string | null>(null);
+  const [recentMessage, setRecentMessage] = useState<string | null>(null);
 
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId) ?? rooms[0] ?? emptyRoom;
   const selectedDate = {
@@ -681,6 +684,41 @@ export function StayAppClient({
     [naverLinks, selectedRoom.id]
   );
   const displayTitle = (title: string) => displayWithoutStayName(title, stay.name);
+
+  useEffect(() => {
+    const favorites = JSON.parse(window.localStorage.getItem("penbatv.localFavorites") ?? "[]") as string[];
+    setIsFavorite(favorites.includes(stay.id));
+  }, [stay.id]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function recordRecentStay() {
+      try {
+        const payload = await postJson<{ stored?: boolean; mode?: string }>("/api/my/recent-stays", {
+          accommodationId: stay.id,
+          roomId: selectedRoom.id,
+          source: initialDraft.utmCode ? "youtube_customer_home" : "stay_detail"
+        });
+
+        if (cancelled) return;
+        setRecentMessage(payload.stored ? "최근 본 숙소가 MY에 저장되었습니다." : "비로그인 상태라 최근 본 숙소는 이 브라우저에만 저장됩니다.");
+      } catch {
+        if (cancelled) return;
+        const storageKey = "penbatv.localRecentStays";
+        const previous = JSON.parse(window.localStorage.getItem(storageKey) ?? "[]") as Array<{ id: string; viewedAt: string }>;
+        const next = [{ id: stay.id, viewedAt: new Date().toISOString() }, ...previous.filter((item) => item.id !== stay.id)].slice(0, 10);
+        window.localStorage.setItem(storageKey, JSON.stringify(next));
+        setRecentMessage("최근 본 숙소를 브라우저 데모 정보로 저장했습니다.");
+      }
+    }
+
+    recordRecentStay();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [initialDraft.utmCode, selectedRoom.id, stay.id]);
   const attractionPlaces = useMemo(
     () => nearbyPlaces.filter((place) => place.type === "attraction"),
     [nearbyPlaces]
@@ -897,6 +935,29 @@ export function StayAppClient({
     setSelectedRoomId(video.roomId);
     setSelectedVideoCategory(video.category);
     setScreen("detail");
+  }
+
+  async function toggleFavorite() {
+    const nextFavorite = !isFavorite;
+    setIsFavorite(nextFavorite);
+    setFavoriteMessage(nextFavorite ? "찜한 숙소에 저장하는 중입니다." : "찜 해제 중입니다.");
+
+    try {
+      await postJson("/api/my/favorites", {
+        accommodationId: stay.id,
+        action: nextFavorite ? "add" : "remove",
+        source: initialDraft.utmCode ? "youtube_customer_home" : "stay_detail"
+      });
+      setFavoriteMessage(nextFavorite ? "MY 찜한 숙소에 저장되었습니다." : "찜한 숙소에서 해제되었습니다.");
+    } catch {
+      const storageKey = "penbatv.localFavorites";
+      const previous = JSON.parse(window.localStorage.getItem(storageKey) ?? "[]") as string[];
+      const next = nextFavorite
+        ? Array.from(new Set([...previous, stay.id]))
+        : previous.filter((item) => item !== stay.id);
+      window.localStorage.setItem(storageKey, JSON.stringify(next));
+      setFavoriteMessage(nextFavorite ? "비로그인 데모 찜으로 저장했습니다." : "비로그인 데모 찜에서 해제했습니다.");
+    }
   }
 
   function goBooking(roomId = selectedRoomId, step: BookingStep = 1) {
@@ -1263,6 +1324,13 @@ export function StayAppClient({
               <span>펜바TV 단독 촬영 · 영상 검증 예약</span>
               <h1>{stay.name}</h1>
               <p>{stay.concept}</p>
+              <div className="customer-quick-actions">
+                <button type="button" className={isFavorite ? "favorite-button active" : "favorite-button"} onClick={toggleFavorite}>
+                  {isFavorite ? "찜 해제" : "찜하기"}
+                </button>
+                <Link href="/my">MY에서 예약·찜 확인</Link>
+              </div>
+              {(favoriteMessage || recentMessage) && <small className="customer-save-message">{favoriteMessage ?? recentMessage}</small>}
             </div>
           </section>
 

@@ -2,16 +2,33 @@
 
 import { useState } from "react";
 
+type CashReceiptType = "none" | "personal" | "business";
+
 type MyProfileClientProps = {
   initialName: string;
   initialPhone: string;
   initialEmail: string;
+  initialNotificationEnabled: boolean;
+  initialCashReceiptType: CashReceiptType;
+  initialCashReceiptValue: string;
+  initialDefaultAdultCount: number;
+  initialDefaultChildCount: number;
   loggedIn: boolean;
 };
 
-export function MyProfileClient({ initialName, initialPhone, initialEmail, loggedIn }: MyProfileClientProps) {
+export function MyProfileClient({
+  initialName,
+  initialPhone,
+  initialEmail,
+  initialNotificationEnabled,
+  initialCashReceiptType,
+  initialCashReceiptValue,
+  initialDefaultAdultCount,
+  initialDefaultChildCount,
+  loggedIn
+}: MyProfileClientProps) {
   const [message, setMessage] = useState(
-    loggedIn ? "수정하면 고객 프로필 DB에 저장됩니다." : "로그인 전에는 이 브라우저에 데모 정보로 저장됩니다."
+    loggedIn ? "수정하면 고객 프로필과 예약 기본 설정이 DB에 저장됩니다." : "로그인 전에는 이 브라우저에 데모 정보로 저장됩니다."
   );
   const [saving, setSaving] = useState(false);
 
@@ -24,7 +41,9 @@ export function MyProfileClient({ initialName, initialPhone, initialEmail, logge
       email: String(formData.get("email") || ""),
       notificationEnabled: formData.get("notificationEnabled") === "on",
       cashReceiptType: String(formData.get("cashReceiptType") || "none"),
-      cashReceiptValue: String(formData.get("cashReceiptValue") || "")
+      cashReceiptValue: String(formData.get("cashReceiptValue") || ""),
+      defaultAdultCount: Number(formData.get("defaultAdultCount") || 2),
+      defaultChildCount: Number(formData.get("defaultChildCount") || 0)
     };
 
     setSaving(true);
@@ -32,7 +51,7 @@ export function MyProfileClient({ initialName, initialPhone, initialEmail, logge
     if (!loggedIn) {
       localStorage.setItem("penbatv.demoCustomerProfile", JSON.stringify(payload));
       setSaving(false);
-      setMessage("데모 고객정보를 저장했습니다. 실제 저장은 네이버·카카오 로그인 후 DB에 반영됩니다.");
+      setMessage("데모 고객정보와 예약 기본 설정을 저장했습니다. 실제 저장은 네이버·카카오 로그인 후 DB에 반영됩니다.");
       return;
     }
 
@@ -51,7 +70,7 @@ export function MyProfileClient({ initialName, initialPhone, initialEmail, logge
       return;
     }
 
-    setMessage("고객정보가 DB에 저장되었습니다.");
+    setMessage("고객정보와 예약 기본 설정이 DB에 저장되었습니다.");
   }
 
   return (
@@ -69,8 +88,16 @@ export function MyProfileClient({ initialName, initialPhone, initialEmail, logge
         <input name="email" type="email" defaultValue={initialEmail} placeholder="customer@example.com" />
       </label>
       <label>
+        기본 성인 인원
+        <input name="defaultAdultCount" type="number" min={1} max={30} defaultValue={initialDefaultAdultCount} />
+      </label>
+      <label>
+        기본 아동 인원
+        <input name="defaultChildCount" type="number" min={0} max={30} defaultValue={initialDefaultChildCount} />
+      </label>
+      <label>
         현금영수증
-        <select name="cashReceiptType" defaultValue="none">
+        <select name="cashReceiptType" defaultValue={initialCashReceiptType}>
           <option value="none">신청 안함</option>
           <option value="personal">개인 소득공제</option>
           <option value="business">사업자 지출증빙</option>
@@ -78,10 +105,10 @@ export function MyProfileClient({ initialName, initialPhone, initialEmail, logge
       </label>
       <label>
         현금영수증 번호
-        <input name="cashReceiptValue" placeholder="휴대폰 또는 사업자번호" />
+        <input name="cashReceiptValue" placeholder="휴대폰 또는 사업자번호" defaultValue={initialCashReceiptValue} />
       </label>
       <label className="my-toggle-row">
-        <input name="notificationEnabled" type="checkbox" defaultChecked />
+        <input name="notificationEnabled" type="checkbox" defaultChecked={initialNotificationEnabled} />
         <span>예약/입실/바베큐 알림 받기</span>
       </label>
       <button type="submit" disabled={saving}>

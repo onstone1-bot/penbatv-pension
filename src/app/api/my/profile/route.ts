@@ -22,7 +22,7 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const supabase = createAdminClient() as any;
   const now = new Date().toISOString();
   const { data, error } = await supabase
     .from("profiles")
@@ -40,12 +40,29 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  const { data: preferences, error: preferencesError } = await supabase
+    .from("customer_preferences")
+    .upsert(
+      {
+        customer_id: currentCustomer.user.id,
+        notification_enabled: parsed.data.notificationEnabled,
+        cash_receipt_type: parsed.data.cashReceiptType,
+        cash_receipt_value: parsed.data.cashReceiptValue || null,
+        default_adult_count: parsed.data.defaultAdultCount,
+        default_child_count: parsed.data.defaultChildCount,
+        updated_at: now
+      },
+      { onConflict: "customer_id" }
+    )
+    .select()
+    .single();
+
+  if (preferencesError) {
+    return NextResponse.json({ error: preferencesError.message }, { status: 500 });
+  }
+
   return NextResponse.json({
     profile: data,
-    preferences: {
-      notificationEnabled: parsed.data.notificationEnabled,
-      cashReceiptType: parsed.data.cashReceiptType,
-      cashReceiptValue: parsed.data.cashReceiptValue ?? null
-    }
+    preferences
   });
 }

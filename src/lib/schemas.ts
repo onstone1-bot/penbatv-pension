@@ -144,5 +144,25 @@ export const updateCustomerProfileSchema = z.object({
   email: z.string().email().or(z.literal("")).nullable().optional(),
   notificationEnabled: z.boolean().default(true),
   cashReceiptType: z.enum(["none", "personal", "business"]).default("none"),
-  cashReceiptValue: z.string().max(40).nullable().optional()
+  cashReceiptValue: z.string().max(40).nullable().optional(),
+  defaultAdultCount: z.number().int().min(1).max(30).default(2),
+  defaultChildCount: z.number().int().min(0).max(30).default(0)
+});
+
+export const toggleCustomerFavoriteSchema = z.object({
+  accommodationId: z.string().min(1).max(80),
+  action: z.enum(["add", "remove"]).default("add"),
+  source: z.string().max(60).default("customer_home")
+});
+
+export const recordRecentStaySchema = z.object({
+  accommodationId: z.string().min(1).max(80),
+  roomId: z.string().max(80).nullable().optional(),
+  source: z.string().max(60).default("stay_detail")
+});
+
+export const updatePartnerInquiryStatusSchema = z.object({
+  status: z.enum(["received", "consulting", "filming", "onboarding", "open", "rejected"]),
+  operatorNote: z.string().max(500).nullable().optional(),
+  contacted: z.boolean().default(false)
 });
