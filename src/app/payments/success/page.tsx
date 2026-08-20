@@ -40,14 +40,15 @@ export default async function PaymentSuccessPage({ searchParams }: PaymentSucces
       ).result
     : null;
   const isPaid = result?.status === "paid";
+  const isWaitingDeposit = result?.status === "waiting_deposit";
 
   return (
     <main className="payment-result">
       <section className="result-card">
         <span className={isPaid ? "result-badge ok" : "result-badge warn"}>
-          {isPaid ? "Payment confirmed" : "Payment needs review"}
+          {isPaid ? "Payment confirmed" : isWaitingDeposit ? "Waiting deposit" : "Payment needs review"}
         </span>
-        <h1>{isPaid ? "예약 결제가 완료되었습니다" : "결제 승인 확인이 필요합니다"}</h1>
+        <h1>{isPaid ? "예약 결제가 완료되었습니다" : isWaitingDeposit ? "입금대기 예약이 접수되었습니다" : "결제 승인 확인이 필요합니다"}</h1>
         <p>
           결제 성공 redirect 값을 확인했습니다. 실제 운영에서는 결제 요청 시 서버에 저장한 금액과
           redirect 금액을 비교한 뒤 승인해야 합니다.

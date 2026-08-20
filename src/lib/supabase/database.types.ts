@@ -333,6 +333,10 @@ export type Database = {
           guest_phone: string | null;
           expires_at: string;
           confirmed_at: string | null;
+          deposit_due_at: string | null;
+          cancelled_at: string | null;
+          expired_at: string | null;
+          last_error: string | null;
           created_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["payment_orders"]["Row"]> & {
@@ -344,6 +348,26 @@ export type Database = {
           expires_at: string;
         };
         Update: Partial<Database["public"]["Tables"]["payment_orders"]["Row"]>;
+        Relationships: [];
+      };
+      payment_order_events: {
+        Row: {
+          id: string;
+          order_id: string;
+          event_type: "prepared" | "paid" | "waiting_deposit" | "failed" | "cancelled" | "expired";
+          from_status: "ready" | "paid" | "waiting_deposit" | "failed" | "cancelled" | "expired" | null;
+          to_status: "ready" | "paid" | "waiting_deposit" | "failed" | "cancelled" | "expired" | null;
+          payment_key: string | null;
+          booking_id: string | null;
+          message: string | null;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["payment_order_events"]["Row"]> & {
+          order_id: string;
+          event_type: "prepared" | "paid" | "waiting_deposit" | "failed" | "cancelled" | "expired";
+        };
+        Update: Partial<Database["public"]["Tables"]["payment_order_events"]["Row"]>;
         Relationships: [];
       };
       payments: {

@@ -17,6 +17,25 @@ function assertFileIncludes(relativePath, markers) {
   }
 }
 
+assertFileIncludes("src/lib/payments/orders.ts", [
+  "logPaymentOrderEvent",
+  "markPaymentOrderExpired",
+  "deposit_due_at",
+  "Payment order expired before confirmation"
+]);
+
+assertFileIncludes("src/lib/payments/provider.ts", [
+  "expiresAtForPayment",
+  "manual_bank_transfer",
+  "PENBATV_BANK_DEPOSIT_DUE_HOURS"
+]);
+
+assertFileIncludes("supabase/migrations/20260821100000_week2_payment_reservation_hardening.sql", [
+  "payment_order_events",
+  "deposit_due_at",
+  "authenticated users can read own payment order events"
+]);
+
 assertFileIncludes("src/app/stays/[id]/StayAppClient.tsx", [
   "weekTwoPaymentMilestones",
   "8일차",
@@ -313,6 +332,7 @@ try {
         waitingDepositBookingId: created.bookingId,
         naverPayMode: naverPay.payment.mode,
         naverPayEasyPay: naverPay.payment.checkout?.easyPay ?? null,
+        eventAuditTable: "payment_order_events",
         expiredOrderId,
         myReservationCount: myReservations.reservations?.length ?? 0,
         checkedAt: new Date().toISOString()

@@ -1,6 +1,7 @@
 import { confirmTossPayment, type PaymentProviderId } from "@/lib/payments/provider";
 import {
   getPaymentOrder,
+  markPaymentOrderExpired,
   markPaymentOrderFailed,
   markPaymentOrderPaid,
   markPaymentOrderWaitingDeposit
@@ -175,7 +176,8 @@ async function recordManualTransferPaymentOrder(input: {
     await markPaymentOrderWaitingDeposit({
       orderId: input.order.order_id,
       paymentKey: input.paymentKey,
-      bookingId: input.order.booking_id
+      bookingId: input.order.booking_id,
+      depositDueAt: input.order.deposit_due_at ?? input.order.expires_at
     });
 
     return { bookingId: input.order.booking_id, bookingNo: null, idempotent: true };
@@ -259,7 +261,8 @@ async function recordManualTransferPaymentOrder(input: {
   await markPaymentOrderWaitingDeposit({
     orderId: input.order.order_id,
     paymentKey: input.paymentKey,
-    bookingId: booking.id
+    bookingId: booking.id,
+    depositDueAt: input.order.deposit_due_at ?? input.order.expires_at
   });
   await enqueueBookingNotifications(booking.id);
 
@@ -282,7 +285,12 @@ export async function confirmPreparedPayment(input: ConfirmPreparedPaymentInput)
   if (storedOrder.order.amount !== input.amount) {
     await markPaymentOrderFailed({
       orderId: input.orderId,
-      paymentKey: input.paymentKey
+      paymentKey: input.paymentKey,
+      reason: "Payment amount does not match the server-side order amount.",
+      metadata: {
+        requestedAmount: input.amount,
+        storedAmount: storedOrder.order.amount
+      }
     });
 
     return {
@@ -306,6 +314,21 @@ export async function confirmPreparedPayment(input: ConfirmPreparedPaymentInput)
         orderId: input.orderId,
         bookingId: storedOrder.order.booking_id,
         bookingNo: null
+      }
+    };
+  }
+
+  if (new Date(storedOrder.order.expires_at).getTime() < Date.now()) {
+    await markPaymentOrderExpired({
+      orderId: input.orderId,
+      reason: "Payment confirmation was requested after the order expiration time."
+    });
+
+    return {
+      statusCode: 409,
+      result: {
+        status: "failed" as const,
+        error: "Payment order has expired. Please create a new reservation hold."
       }
     };
   }
@@ -366,7 +389,9 @@ export async function confirmPreparedPayment(input: ConfirmPreparedPaymentInput)
   } else {
     await markPaymentOrderFailed({
       orderId: input.orderId,
-      paymentKey: input.paymentKey
+      paymentKey: input.paymentKey,
+      reason: "Toss payment confirmation failed.",
+      metadata: "error" in result ? (result.error as never) : {}
     });
   }
 

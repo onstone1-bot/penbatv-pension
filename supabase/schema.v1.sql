@@ -255,6 +255,23 @@ create table if not exists public.payment_orders (
   guest_phone text,
   expires_at timestamptz not null,
   confirmed_at timestamptz,
+  deposit_due_at timestamptz,
+  cancelled_at timestamptz,
+  expired_at timestamptz,
+  last_error text,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.payment_order_events (
+  id uuid primary key default gen_random_uuid(),
+  order_id text not null references public.payment_orders(order_id) on delete cascade,
+  event_type text not null check (event_type in ('prepared', 'paid', 'waiting_deposit', 'failed', 'cancelled', 'expired')),
+  from_status text check (from_status is null or from_status in ('ready', 'paid', 'waiting_deposit', 'failed', 'cancelled', 'expired')),
+  to_status text check (to_status is null or to_status in ('ready', 'paid', 'waiting_deposit', 'failed', 'cancelled', 'expired')),
+  payment_key text,
+  booking_id uuid references public.bookings(id) on delete set null,
+  message text,
+  metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
 
@@ -359,6 +376,8 @@ create index if not exists payment_orders_customer_created_idx on public.payment
 create index if not exists payment_orders_hold_idx on public.payment_orders(hold_id);
 create index if not exists payment_orders_booking_idx on public.payment_orders(booking_id);
 create index if not exists payment_orders_status_idx on public.payment_orders(status, expires_at);
+create index if not exists payment_orders_deposit_due_idx on public.payment_orders(status, deposit_due_at);
+create index if not exists payment_order_events_order_created_idx on public.payment_order_events(order_id, created_at desc);
 create index if not exists payments_booking_idx on public.payments(booking_id);
 create index if not exists settlements_payment_idx on public.settlements(payment_id);
 create unique index if not exists notification_queue_booking_template_unique_idx
@@ -414,6 +433,7 @@ alter table public.naver_links enable row level security;
 alter table public.nearby_places enable row level security;
 alter table public.utm_events enable row level security;
 alter table public.payment_orders enable row level security;
+alter table public.payment_order_events enable row level security;
 alter table public.payments enable row level security;
 alter table public.settlements enable row level security;
 alter table public.notification_queue enable row level security;
@@ -441,6 +461,16 @@ using ((select auth.uid()) = customer_id);
 create policy "authenticated users can read own payment orders"
 on public.payment_orders for select to authenticated
 using ((select auth.uid()) = customer_id);
+
+create policy "authenticated users can read own payment order events"
+on public.payment_order_events for select to authenticated
+using (
+  exists (
+    select 1 from public.payment_orders po
+    where po.order_id = payment_order_events.order_id
+    and po.customer_id = (select auth.uid())
+  )
+);
 
 create policy "anon can read active rooms"
 on public.rooms for select to anon
@@ -519,8 +549,10 @@ grant insert on public.utm_events to anon;
 grant select, update on public.profiles to authenticated;
 grant select on public.bookings to authenticated;
 grant select on public.payment_orders to authenticated;
+grant select on public.payment_order_events to authenticated;
 
 grant select, insert, update, delete on all tables in schema public to service_role;
+grant select, insert, update, delete on public.payment_order_events to service_role;
 grant select, insert, update, delete on public.profiles to service_role;
 grant select, insert, update, delete on public.notification_queue to service_role;
 grant select, insert, update, delete on public.calendar_sync_sources to service_role;

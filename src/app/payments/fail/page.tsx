@@ -20,8 +20,8 @@ export default async function PaymentFailPage({ searchParams }: PaymentFailPageP
     (message ?? "").includes("취소");
   const savedResult = orderId
     ? isCancelled
-      ? await markPaymentOrderCancelled({ orderId })
-      : await markPaymentOrderFailed({ orderId })
+      ? await markPaymentOrderCancelled({ orderId, reason: message ?? code ?? null })
+      : await markPaymentOrderFailed({ orderId, reason: message ?? code ?? null })
     : null;
 
   return (

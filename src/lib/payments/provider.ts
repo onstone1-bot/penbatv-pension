@@ -1,4 +1,4 @@
-export type PaymentProviderId =
+﻿export type PaymentProviderId =
   | "card"
   | "naverpay"
   | "tosspay"
@@ -113,12 +113,18 @@ function manualBankTransfer() {
   };
 }
 
+function expiresAtForPayment(mode: PaymentMode, bankTransfer: ReturnType<typeof manualBankTransfer> | null) {
+  const minutes = mode === "manual" ? Math.max(1, bankTransfer?.depositDueHours ?? 24) * 60 : 15;
+  return new Date(Date.now() + minutes * 60_000).toISOString();
+}
+
 export function preparePayment(input: PreparePaymentInput): PreparedPayment {
   const mode = paymentMode(input.provider);
   const orderId = makeOrderId(input.roomId);
   const orderName = `${input.roomId} ${input.checkIn}~${input.checkOut}`;
   const successUrl = new URL("/payments/success", input.requestOrigin);
   const failUrl = new URL("/payments/fail", input.requestOrigin);
+  const bankTransfer = mode === "manual" ? manualBankTransfer() : null;
 
   successUrl.searchParams.set("orderId", orderId);
   failUrl.searchParams.set("orderId", orderId);
@@ -134,7 +140,7 @@ export function preparePayment(input: PreparePaymentInput): PreparedPayment {
     orderName,
     holdId: input.holdId,
     utmCode: input.utmCode,
-    expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(),
+    expiresAt: expiresAtForPayment(mode, bankTransfer),
     checkout: {
       type: mode === "toss" ? "toss-window" : mode === "manual" ? "manual-bank-transfer" : "mock",
       url: null,
@@ -143,7 +149,7 @@ export function preparePayment(input: PreparePaymentInput): PreparedPayment {
       easyPay: mode === "toss" ? easyPayProvider(input.provider) : null,
       successUrl: successUrl.toString(),
       failUrl: failUrl.toString(),
-      bankTransfer: mode === "manual" ? manualBankTransfer() : null
+      bankTransfer
     }
   };
 }
