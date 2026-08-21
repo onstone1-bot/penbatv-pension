@@ -8,13 +8,24 @@ import {
 import { formatWon } from "@/lib/local-quote";
 
 const quickLinks = [
-  ["예약", "#quick-booking"],
-  ["숙소", "#featured-stays"],
-  ["영상", "#video-stories"],
-  ["입점", "/partner-inquiry"]
-];
+  { label: "예약", href: "#quick-booking", icon: "D", tone: "reserve" },
+  { label: "숙소", href: "#featured-stays", icon: "S", tone: "stay" },
+  { label: "영상", href: "#video-stories", icon: "V", tone: "video" },
+  { label: "입점", href: "/partner-inquiry", icon: "+", tone: "partner" }
+] as const;
+
+const actionGuide = [
+  { label: "예약", helper: "날짜/결제", icon: "D", tone: "reserve" },
+  { label: "영상", helper: "유튜브", icon: "V", tone: "video" },
+  { label: "회원", helper: "로그인/MY", icon: "M", tone: "member" },
+  { label: "관리", helper: "사장님/운영자", icon: "A", tone: "admin" }
+] as const;
 
 const simpleSteps = ["날짜 선택", "객실 확인", "결제 진행"];
+
+function ActionIcon({ icon }: { icon: string }) {
+  return <span className="button-icon" aria-hidden="true">{icon}</span>;
+}
 
 export default function HomePage() {
   const properties = mockPartnerProperties.slice(0, 3);
@@ -29,15 +40,41 @@ export default function HomePage() {
           <b>펜션·바베큐 예약</b>
         </Link>
         <nav className="main-home-nav" aria-label="상단 바로가기">
-          {quickLinks.map(([label, href]) =>
-            href.startsWith("#") ? <a href={href} key={label}>{label}</a> : <Link href={href} key={label}>{label}</Link>
+          {quickLinks.map((item) =>
+            item.href.startsWith("#") ? (
+              <a className={`action-link tone-${item.tone}`} href={item.href} key={item.label}>
+                <ActionIcon icon={item.icon} />
+                <span>{item.label}</span>
+              </a>
+            ) : (
+              <Link className={`action-link tone-${item.tone}`} href={item.href} key={item.label}>
+                <ActionIcon icon={item.icon} />
+                <span>{item.label}</span>
+              </Link>
+            )
           )}
         </nav>
         <div className="main-home-account" aria-label="회원 메뉴">
-          <Link className="main-login-link" href="/auth">로그인</Link>
-          <Link href="/my">MY</Link>
+          <Link className="main-login-link action-link tone-member" href="/auth">
+            <ActionIcon icon="M" />
+            <span>로그인</span>
+          </Link>
+          <Link className="action-link tone-my" href="/my">
+            <ActionIcon icon="MY" />
+            <span>MY</span>
+          </Link>
         </div>
       </header>
+
+      <section className="main-action-guide" aria-label="버튼 색상 안내">
+        {actionGuide.map((item) => (
+          <span className={`action-guide-chip tone-${item.tone}`} key={item.label}>
+            <ActionIcon icon={item.icon} />
+            <b>{item.label}</b>
+            <small>{item.helper}</small>
+          </span>
+        ))}
+      </section>
 
       <section className="main-home-hero simple-hero" aria-label="펜바TV 메인">
         <div className="main-hero-copy">
@@ -45,10 +82,14 @@ export default function HomePage() {
           <h1>영상 보고 바로 예약</h1>
           <p>유튜브에서 본 펜션을 펜바TV에서 날짜 확인 후 바로 예약합니다.</p>
           <div className="main-hero-actions">
-            <Link href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=hero_booking&utm_campaign=${heroProperty.id}`}>
-              예약 시작
+            <Link className="action-button tone-reserve" href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=hero_booking&utm_campaign=${heroProperty.id}`}>
+              <ActionIcon icon="D" />
+              <span>예약 시작</span>
             </Link>
-            <a href="#featured-stays">숙소 보기</a>
+            <a className="action-button tone-stay" href="#featured-stays">
+              <ActionIcon icon="S" />
+              <span>숙소 보기</span>
+            </a>
           </div>
           <div className="simple-step-row" aria-label="예약 흐름">
             {simpleSteps.map((step, index) => (
@@ -101,7 +142,10 @@ export default function HomePage() {
               <option value="8">8명 이상</option>
             </select>
           </label>
-          <button type="submit">예약 가능일 보기</button>
+          <button className="action-button tone-reserve" type="submit">
+            <ActionIcon icon="D" />
+            <span>예약 가능일 보기</span>
+          </button>
         </form>
       </section>
 
@@ -111,8 +155,9 @@ export default function HomePage() {
             <span>STAYS</span>
             <h2>추천 숙소</h2>
           </div>
-          <Link href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=featured_more&utm_campaign=${heroProperty.id}`}>
-            전체 예약화면
+          <Link className="action-button tone-reserve" href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=featured_more&utm_campaign=${heroProperty.id}`}>
+            <ActionIcon icon="D" />
+            <span>전체 예약화면</span>
           </Link>
         </div>
         <div className="main-property-grid simple-property-grid">
@@ -139,10 +184,14 @@ export default function HomePage() {
                   <small>영상 {property.videoLinks.length}개</small>
                 </div>
                 <div className="main-card-actions">
-                  <Link href={`/stays/${property.id}?start=booking&utm_source=penbatv&utm_medium=main_card_reserve&utm_campaign=${property.id}`}>
-                    예약하기
+                  <Link className="action-button tone-reserve" href={`/stays/${property.id}?start=booking&utm_source=penbatv&utm_medium=main_card_reserve&utm_campaign=${property.id}`}>
+                    <ActionIcon icon="D" />
+                    <span>예약하기</span>
                   </Link>
-                  <a href={property.featuredVideoUrl} target="_blank" rel="noreferrer">영상</a>
+                  <a className="action-button tone-video" href={property.featuredVideoUrl} target="_blank" rel="noreferrer">
+                    <ActionIcon icon="V" />
+                    <span>영상</span>
+                  </a>
                 </div>
               </div>
             </article>
@@ -156,8 +205,9 @@ export default function HomePage() {
             <span>VIDEOS</span>
             <h2>영상으로 먼저 보기</h2>
           </div>
-          <Link href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=video_reserve&utm_campaign=${heroProperty.id}`}>
-            보고 예약
+          <Link className="action-button tone-video" href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=video_reserve&utm_campaign=${heroProperty.id}`}>
+            <ActionIcon icon="V" />
+            <span>보고 예약</span>
           </Link>
         </div>
         <div className="main-video-grid simple-video-grid">
@@ -184,19 +234,38 @@ export default function HomePage() {
           <p>영상 홍보와 예약결제 운영을 함께 시작합니다.</p>
         </div>
         <div>
-          <Link href="/partner-inquiry">입점 문의</Link>
-          <Link href="/host/rooms">사장님 관리</Link>
+          <Link className="action-button tone-partner" href="/partner-inquiry">
+            <ActionIcon icon="+" />
+            <span>입점 문의</span>
+          </Link>
+          <Link className="action-button tone-admin" href="/host/rooms">
+            <ActionIcon icon="A" />
+            <span>사장님 관리</span>
+          </Link>
         </div>
       </section>
 
       <nav className="home-bottom-tabs" aria-label="모바일 하단 메뉴">
-        <Link className="on" href="/">홈</Link>
-        <a href="#featured-stays">숙소</a>
-        <Link href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=bottom_booking&utm_campaign=${heroProperty.id}`}>
-          예약
+        <Link className="on tone-home" href="/">
+          <ActionIcon icon="H" />
+          <span>홈</span>
         </Link>
-        <Link href="/my">내예약</Link>
-        <Link href="/my">MY</Link>
+        <a className="tone-stay" href="#featured-stays">
+          <ActionIcon icon="S" />
+          <span>숙소</span>
+        </a>
+        <Link className="tone-reserve" href={`/stays/${heroProperty.id}?start=booking&utm_source=penbatv&utm_medium=bottom_booking&utm_campaign=${heroProperty.id}`}>
+          <ActionIcon icon="D" />
+          <span>예약</span>
+        </Link>
+        <Link className="tone-my" href="/my">
+          <ActionIcon icon="R" />
+          <span>내예약</span>
+        </Link>
+        <Link className="tone-member" href="/my">
+          <ActionIcon icon="MY" />
+          <span>MY</span>
+        </Link>
       </nav>
     </main>
   );
