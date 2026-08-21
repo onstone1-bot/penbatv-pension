@@ -65,6 +65,8 @@ function runStaticVerification(reason = "missing-live-env") {
   const hostPropertiesClient = read("src/app/host/properties/HostPropertiesClient.tsx");
   const proposalClient = read("src/app/host/proposals/ProposalApprovalClient.tsx");
   const week4Doc = read("docs/week4-days22-27-progress.md");
+  const adminOperationEvents = read("src/lib/admin-operation-events.ts");
+  const week4Migration = read("supabase/migrations/20260821120000_week4_admin_operations_audit.sql");
   const adminCss = read("src/app/globals.css");
 
   for (const required of [
@@ -83,7 +85,9 @@ function runStaticVerification(reason = "missing-live-env") {
     "week4QaRows",
     "payment_orders",
     "settlements",
-    "utm_events"
+    "utm_events",
+    "admin_operation_events",
+    "adminAuditRows"
   ]) {
     assertStatic(adminData.includes(required), `Missing week4 admin data guard: ${required}`);
   }
@@ -91,13 +95,14 @@ function runStaticVerification(reason = "missing-live-env") {
   for (const required of [
     "weekFourAdminMilestones",
     "week-four-admin-status",
-    "WEEK 4 · 22~27일차",
+    "WEEK 4 · 22~28일차",
     "회원·권한·운영자 집계 흐름",
     "회원·권한 현황",
     "최근 회원가입",
     "전체 예약 현황",
     "결제·정산 예정금액",
     "유튜브 UTM 유입/예약 전환",
+    "운영자 처리 이력",
     "4주차 관리자 QA"
   ]) {
     assertStatic(adminPage.includes(required), `Missing week4 admin page guard: ${required}`);
@@ -115,8 +120,16 @@ function runStaticVerification(reason = "missing-live-env") {
 
   assertStatic(proposalClient.includes("x-penbatv-role") && proposalClient.includes("operator"), "Missing operator proposal role guard.");
 
-  for (const required of ["22일차", "23일차", "24일차", "25일차", "26일차", "27일차"]) {
+  for (const required of ["22일차", "23일차", "24일차", "25일차", "26일차", "27일차", "28일차"]) {
     assertStatic(week4Doc.includes(required), `Missing week4 progress doc guard: ${required}`);
+  }
+
+  for (const required of ["logAdminOperationEvent", "admin_operation_events", "dashboard_view", "accommodation_approval"]) {
+    assertStatic(adminOperationEvents.includes(required), `Missing week4 admin operation guard: ${required}`);
+  }
+
+  for (const required of ["create table if not exists public.admin_operation_events", "operators can read admin operation events"]) {
+    assertStatic(week4Migration.includes(required), `Missing week4 migration guard: ${required}`);
   }
 
   for (const required of ["week-four-admin-status", "week-four-admin-head", "week-four-admin-grid"]) {
@@ -134,6 +147,7 @@ function runStaticVerification(reason = "missing-live-env") {
           "host-operator-role-separation",
           "operator-approval-screen",
           "reservation-payment-settlement-utm-dashboard",
+          "admin-operation-audit",
           "week4-qa-document"
         ],
         checkedAt: new Date().toISOString()
@@ -181,6 +195,10 @@ if (!Array.isArray(operations.payload.properties)) {
   throw new Error("Admin properties were not returned.");
 }
 
+if (operations.payload.operationLog?.persisted !== true) {
+  throw new Error("Admin operations dashboard audit log was not persisted.");
+}
+
 if (!operations.payload.statusCounts?.bookings || !operations.payload.statusCounts?.paymentOrders) {
   throw new Error("Admin status counts were not returned.");
 }
@@ -216,6 +234,10 @@ if (!approval.response.ok) {
   throw new Error(`Approval API failed: ${approval.response.status} ${JSON.stringify(approval.payload)}`);
 }
 
+if (approval.payload.operationLog?.persisted !== true) {
+  throw new Error("Approval audit log was not persisted.");
+}
+
 if (approval.payload.accommodation?.status !== accommodation.status) {
   throw new Error("Approval API returned an unexpected status.");
 }
@@ -231,7 +253,8 @@ console.log(
         "operator-approval-api",
         "admin-reservation-summary",
         "admin-payment-settlement-summary",
-        "youtube-utm-conversion-summary"
+        "youtube-utm-conversion-summary",
+        "admin-operation-audit"
       ],
       metricCount: operations.payload.metrics.length,
       propertyCount: operations.payload.properties.length,

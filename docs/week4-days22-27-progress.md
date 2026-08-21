@@ -1,4 +1,4 @@
-# 펜바TV 4주차 22-27일차 진행 정리
+# 펜바TV 4주차 22-28일차 진행 정리
 
 ## 4주차 목표
 
@@ -22,7 +22,7 @@
 
 - /host/proposals에서 입점문의와 숙소 상태를 확인합니다.
 - /api/admin/accommodations/[id]/approval로 운영자가 승인, 보류, 중지 상태를 변경합니다.
-- 사장님 등록자료 검수 후 고객 홈 노출 여부를 결정하는 흐름입니다.
+- 승인/보류/중지 처리 결과는 admin_operation_events에 저장합니다.
 
 ## 25일차: 전체 예약 현황 집계
 
@@ -42,18 +42,39 @@
 - bookings.utm_code와 연결해 캠페인별 예약 건수와 매출을 계산합니다.
 - 유튜브 설명란 링크가 실제 예약으로 이어지는지 운영자가 확인하는 지표입니다.
 
+## 28일차: 관리자 QA와 운영자 감사 로그
+
+- /api/admin/operations는 operator 권한에서만 조회됩니다.
+- host 권한으로 운영자 API를 호출하면 차단되는지 검증합니다.
+- 운영자 대시보드 조회, 입점 승인, 입점문의 상태 변경은 admin_operation_events에 기록합니다.
+- 운영자 화면에는 최근 운영자 처리 이력 섹션을 추가해 실제 로그가 보이도록 했습니다.
+
+## 추가된 DB 테이블
+
+### admin_operation_events
+
+운영자 관리방에서 발생한 주요 운영 액션을 기록합니다.
+
+- action: dashboard_view, accommodation_approval, partner_inquiry_status, role_scope_check, qa_run
+- target_type: admin_dashboard, accommodation, partner_inquiry, profile, booking, payment_order, utm_campaign
+- target_id: 대상 ID
+- status: completed, blocked, failed
+- metadata: 처리 내용 요약 JSON
+- created_at: 기록 시각
+
 ## 이번 반영 결과
 
-- /admin/operations 상단에 WEEK 4 · 22~27일차 진행 상태판을 추가했습니다.
-- 회원/권한, 입점 승인, 예약 현황, 결제/정산, UTM 전환 흐름을 카드형으로 요약했습니다.
-- verify:week4:admin 정적 검증에 22~27일차 화면 마커와 문서 마커를 추가했습니다.
+- /admin/operations 상단에 WEEK 4 · 22~28일차 진행 상태판을 정리했습니다.
+- 회원/권한, 입점 승인, 예약 현황, 결제/정산, UTM 전환, 운영자 처리 이력을 카드형으로 요약했습니다.
+- verify:week4:admin 검증에 운영자 감사 로그와 28일차 문서 마커를 추가했습니다.
 
 ## 검증 기준
 
 - npm run typecheck 통과
 - npm run build 통과
 - npm run verify:week4:admin 통과
+- npm audit 취약점 0건 확인
 
 ## 배포 메모
 
-자동 배포는 마지막 차수 때 진행하기로 했으므로 이번 4주차 22~27일차 반영분은 로컬 소스 기준으로만 유지합니다.
+자동 배포는 마지막 차수 때 진행하기로 했으므로 이번 4주차 22~28일차 반영분은 로컬 소스 기준으로만 유지합니다.

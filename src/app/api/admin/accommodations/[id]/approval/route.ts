@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { logAdminOperationEvent } from "@/lib/admin-operation-events";
 import { requireOperatorToken } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -28,8 +29,16 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
 
     if (error) throw error;
 
+    const operationLog = await logAdminOperationEvent(request, {
+      action: "accommodation_approval",
+      targetType: "accommodation",
+      targetId: data.id,
+      metadata: { status: parsed.data.status, note: parsed.data.note ?? null, name: data.name }
+    });
+
     return NextResponse.json({
       accommodation: data,
+      operationLog,
       approval: {
         status: parsed.data.status,
         note: parsed.data.note ?? null,

@@ -29,7 +29,8 @@ export async function getAdminOperationsData() {
     partnerInquiriesResult,
     notificationsResult,
     calendarSourcesResult,
-    pilotRunsResult
+    pilotRunsResult,
+    adminEventsResult
   ] = await Promise.all([
     supabase
       .from("accommodations")
@@ -81,7 +82,12 @@ export async function getAdminOperationsData() {
       .from("pilot_runs")
       .select("id, accommodation_id, status, opened_at, created_at")
       .order("created_at", { ascending: false })
-      .limit(20)
+      .limit(20),
+    supabase
+      .from("admin_operation_events")
+      .select("id, action, target_type, target_id, status, metadata, created_at")
+      .order("created_at", { ascending: false })
+      .limit(30)
   ]);
 
   for (const result of [
@@ -96,7 +102,8 @@ export async function getAdminOperationsData() {
     partnerInquiriesResult,
     notificationsResult,
     calendarSourcesResult,
-    pilotRunsResult
+    pilotRunsResult,
+    adminEventsResult
   ]) {
     if (result.error) throw result.error;
   }
@@ -113,6 +120,7 @@ export async function getAdminOperationsData() {
   const notifications = notificationsResult.data ?? [];
   const calendarSources = calendarSourcesResult.data ?? [];
   const pilotRuns = pilotRunsResult.data ?? [];
+  const adminEvents = adminEventsResult.data ?? [];
   const roomById = new Map(rooms.map((room) => [room.id, room]));
   const accommodationById = new Map(accommodations.map((stay) => [stay.id, stay]));
   const paidPayments = payments.filter((payment) => payment.status === "paid");
@@ -180,7 +188,8 @@ export async function getAdminOperationsData() {
       { label: "실패/취소 확인", count: failedOrders.length, owner: "고객 안내" },
       { label: "알림 발송 대기", count: notifications.filter((row) => row.status === "queued").length, owner: "알림/CS" },
       { label: "외부달력 점검", count: calendarSources.filter((row) => row.status !== "active").length, owner: "사장님/운영" },
-      { label: "파일럿 오픈 점검", count: pilotRuns.filter((row) => row.status !== "open").length, owner: "운영자" }
+      { label: "파일럿 오픈 점검", count: pilotRuns.filter((row) => row.status !== "open").length, owner: "운영자" },
+      { label: "운영자 처리 이력", count: adminEvents.length, owner: "운영자 QA" }
     ],
     properties: accommodations.map((stay) => ({
       id: stay.id,
@@ -255,6 +264,14 @@ export async function getAdminOperationsData() {
       payoutEstimate: Math.max(0, Math.round(order.amount * 0.9)),
       createdAt: order.created_at
     })),
+    adminAuditRows: adminEvents.slice(0, 12).map((event) => ({
+      id: event.id,
+      action: event.action,
+      targetType: event.target_type,
+      targetId: event.target_id,
+      status: event.status,
+      createdAt: event.created_at
+    })),
     campaignRows: utmCodes.slice(0, 10).map((utmCode) => {
       const visits = utmEvents.filter((event) => event.utm_code === utmCode && event.event_name === "landing_view").length;
       const starts = utmEvents.filter((event) => event.utm_code === utmCode && event.event_name === "payment_started").length;
@@ -278,7 +295,8 @@ export async function getAdminOperationsData() {
       payments: countBy(payments, (payment) => payment.status),
       notifications: countBy(notifications, (notification) => notification.status),
       calendarSync: countBy(calendarSources, (source) => source.status),
-      pilotRuns: countBy(pilotRuns, (run) => run.status)
+      pilotRuns: countBy(pilotRuns, (run) => run.status),
+      adminOperations: countBy(adminEvents, (event) => event.action)
     },
     week4QaRows: [
       { day: "22일차", title: "고객 회원가입/로그인", status: "연결됨", evidence: "네이버/카카오 OAuth 후 profiles 자동 저장" },
@@ -287,7 +305,7 @@ export async function getAdminOperationsData() {
       { day: "25일차", title: "전체 예약 현황", status: "집계됨", evidence: "bookings 최근 예약 테이블" },
       { day: "26일차", title: "결제/정산 예정금액", status: "집계됨", evidence: "payment_orders, payments, settlements" },
       { day: "27일차", title: "유튜브 UTM 전환", status: "집계됨", evidence: "utm_events + bookings.utm_code" },
-      { day: "28일차", title: "관리자 QA", status: "점검중", evidence: "권한, 승인, 집계, 상태 카운트 검증" }
+      { day: "28일차", title: "관리자 QA", status: "검증됨", evidence: "권한 차단, 승인 API, 운영 로그, 상태 카운트 검증" }
     ]
   };
 }

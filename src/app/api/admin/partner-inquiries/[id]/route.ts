@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logAdminOperationEvent } from "@/lib/admin-operation-events";
 import { requireOperatorToken } from "@/lib/admin-auth";
 import { updatePartnerInquiryStatusSchema } from "@/lib/schemas";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -39,7 +40,19 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-    return NextResponse.json({ inquiry: data });
+    const operationLog = await logAdminOperationEvent(request, {
+      action: "partner_inquiry_status",
+      targetType: "partner_inquiry",
+      targetId: data.id,
+      metadata: {
+        status: parsed.data.status,
+        contacted: parsed.data.contacted,
+        operatorNote: parsed.data.operatorNote ?? null,
+        stayName: data.stay_name
+      }
+    });
+
+    return NextResponse.json({ inquiry: data, operationLog });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown partner inquiry update error";
     return NextResponse.json({ error: message }, { status: 401 });
