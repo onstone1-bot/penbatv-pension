@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { getLatestLaunchReadinessEvents } from "@/lib/launch-readiness-events";
 import { getLatestPilotRuns } from "@/lib/pilot";
 import type { Database } from "@/lib/supabase/database.types";
 
 type PilotRunRow = Database["public"]["Tables"]["pilot_runs"]["Row"];
+type LaunchReadinessEventRow = Database["public"]["Tables"]["launch_readiness_events"]["Row"];
 
 const rehearsalMetrics = [
   { label: "리허설 역할", value: "3명", detail: "고객/사장님/운영자" },
@@ -46,11 +48,13 @@ export const dynamic = "force-dynamic";
 
 export default async function LaunchRehearsalPage() {
   let pilotRuns: PilotRunRow[] = [];
+  let readinessEvents: LaunchReadinessEventRow[] = [];
 
   try {
-    pilotRuns = await getLatestPilotRuns(5);
+    [pilotRuns, readinessEvents] = await Promise.all([getLatestPilotRuns(5), getLatestLaunchReadinessEvents(8)]);
   } catch {
     pilotRuns = [];
+    readinessEvents = [];
   }
 
   return (
@@ -134,6 +138,31 @@ export default async function LaunchRehearsalPage() {
               <b>{item}</b>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="ops-section">
+        <div className="section-head">
+          <h2>런칭 리허설 이력</h2>
+          <span>29~35일차 실행 로그</span>
+        </div>
+        <div className="campaign-table launch-readiness-events">
+          {readinessEvents.map((event) => (
+            <div key={event.id}>
+              <b>{event.stage}</b>
+              <span>{event.target_type} · {event.target_id}</span>
+              <span>{new Date(event.created_at).toLocaleString("ko-KR")}</span>
+              <strong>{event.status}</strong>
+            </div>
+          ))}
+          {readinessEvents.length === 0 && (
+            <div>
+              <b>런칭 이력 없음</b>
+              <span>알림, iCal, 환경변수, 파일럿 오픈 API 실행 후 표시됩니다.</span>
+              <span>launch_readiness_events 기준</span>
+              <strong>대기</strong>
+            </div>
+          )}
         </div>
       </section>
 

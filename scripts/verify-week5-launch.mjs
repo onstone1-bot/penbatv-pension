@@ -7,6 +7,7 @@ const envPath = path.join(root, ".env.local");
 const baseUrl = process.env.STAYLINK_VERIFY_BASE_URL ?? "http://localhost:3000";
 const accommodationId = process.env.STAYLINK_VERIFY_ACCOMMODATION_ID ?? "baebang-alps";
 const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+const launchEventIds = [];
 
 function read(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -77,10 +78,12 @@ function runStaticVerification(reason = "missing-live-env") {
   const notificationLib = read("src/lib/notifications.ts");
   const icalLib = read("src/lib/ical-sync.ts");
   const pilotLib = read("src/lib/pilot.ts");
+  const launchEventLib = read("src/lib/launch-readiness-events.ts");
   const environmentRoute = read("src/app/api/admin/environment/route.ts");
-  const week5Doc = read("docs/week5-days28-35-progress.md");
+  const week5Doc = read("docs/week5-days29-35-progress.md");
+  const launchMigration = read("supabase/migrations/20260821130000_week5_launch_readiness_events.sql");
 
-  for (const required of ["Week 5 Day 28-30", "28일차 관리자 최종 QA", "예약 완료", "입실 안내", "바베큐 리마인드", "Mock 발송"]) {
+  for (const required of ["Week 5 Day 28-30", "예약 완료", "입실 안내", "바베큐 리마인드", "Mock 발송"]) {
     assertStatic(notificationsPage.includes(required), `Missing week5 notification page guard: ${required}`);
   }
 
@@ -92,7 +95,7 @@ function runStaticVerification(reason = "missing-live-env") {
     assertStatic(readinessPage.includes(required), `Missing week5 readiness guard: ${required}`);
   }
 
-  for (const required of ["Week 5 Day 34-35", "POST /api/pilot/open", "Go/No-Go", "파일럿 오픈 기록"]) {
+  for (const required of ["Week 5 Day 34-35", "POST /api/pilot/open", "Go/No-Go", "파일럿 오픈 기록", "런칭 리허설 이력"]) {
     assertStatic(rehearsalPage.includes(required), `Missing week5 rehearsal guard: ${required}`);
   }
 
@@ -108,11 +111,19 @@ function runStaticVerification(reason = "missing-live-env") {
     assertStatic(pilotLib.includes(required), `Missing week5 pilot guard: ${required}`);
   }
 
+  for (const required of ["logLaunchReadinessEvent", "launch_readiness_events", "notification_queue", "pilot_open"]) {
+    assertStatic(launchEventLib.includes(required), `Missing week5 launch event guard: ${required}`);
+  }
+
+  for (const required of ["create table if not exists public.launch_readiness_events", "operators can read launch readiness events"]) {
+    assertStatic(launchMigration.includes(required), `Missing week5 migration guard: ${required}`);
+  }
+
   for (const required of ["NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "STAYLINK_ADMIN_API_TOKEN", "TOSS_PAYMENTS_CLIENT_KEY", "requiredFor"]) {
     assertStatic(environmentRoute.includes(required), `Missing week5 environment guard: ${required}`);
   }
 
-  for (const required of ["28일차", "29일차", "30일차", "31일차", "32일차", "33일차", "34일차", "35일차"]) {
+  for (const required of ["29일차", "30일차", "31일차", "32일차", "33일차", "34일차", "35일차", "launch_readiness_events"]) {
     assertStatic(week5Doc.includes(required), `Missing week5 progress doc guard: ${required}`);
   }
 
@@ -127,7 +138,8 @@ function runStaticVerification(reason = "missing-live-env") {
           "ical-sync-room-blocks",
           "mobile-qa-release-readiness",
           "environment-variable-check",
-          "pilot-open-checklist"
+          "pilot-open-checklist",
+          "launch-readiness-events"
         ],
         checkedAt: new Date().toISOString()
       },
@@ -138,6 +150,10 @@ function runStaticVerification(reason = "missing-live-env") {
 }
 
 async function cleanup(supabase, created) {
+  if (launchEventIds.length > 0) {
+    await supabase.from("launch_readiness_events").delete().in("id", launchEventIds);
+  }
+
   if (created.bookingId) {
     await supabase.from("notification_queue").delete().eq("booking_id", created.bookingId);
   }
@@ -232,6 +248,11 @@ try {
     body: JSON.stringify({ bookingId: booking.id })
   });
 
+  if (queued.launchReadinessLog?.persisted !== true) {
+    throw new Error("Notification queue launch readiness event was not persisted.");
+  }
+  launchEventIds.push(queued.launchReadinessLog.event.id);
+
   if (queued.queuedCount !== 3) {
     throw new Error(`Expected 3 queued notifications, got ${queued.queuedCount}.`);
   }
@@ -249,6 +270,11 @@ try {
     headers: { "x-penbatv-role": "operator" },
     body: JSON.stringify({ limit: 10 })
   });
+
+  if (dispatched.launchReadinessLog?.persisted !== true) {
+    throw new Error("Notification dispatch launch readiness event was not persisted.");
+  }
+  launchEventIds.push(dispatched.launchReadinessLog.event.id);
 
   if (dispatched.dispatchedCount < 1) {
     throw new Error("Due notification dispatch did not send any rows.");
@@ -279,6 +305,11 @@ try {
   });
 
   created.sourceId = synced.source?.id ?? null;
+
+  if (synced.launchReadinessLog?.persisted !== true) {
+    throw new Error("iCal sync launch readiness event was not persisted.");
+  }
+  launchEventIds.push(synced.launchReadinessLog.event.id);
 
   if (synced.eventCount !== 1 || synced.blockCount !== 1) {
     throw new Error("iCal sync did not create the expected external block.");
@@ -315,6 +346,11 @@ try {
 
   created.pilotRunId = pilot.pilotRun?.id ?? null;
 
+  if (pilot.launchReadinessLog?.persisted !== true) {
+    throw new Error("Pilot open launch readiness event was not persisted.");
+  }
+  launchEventIds.push(pilot.launchReadinessLog.event.id);
+
   if (!pilot.readiness?.ready || pilot.pilotRun?.status !== "open") {
     throw new Error("Pilot open readiness did not pass.");
   }
@@ -322,6 +358,11 @@ try {
   const environment = await requestJson("/api/admin/environment", {
     headers: { "x-penbatv-role": "operator" }
   });
+
+  if (environment.launchReadinessLog?.persisted !== true) {
+    throw new Error("Environment launch readiness event was not persisted.");
+  }
+  launchEventIds.push(environment.launchReadinessLog.event.id);
 
   if (!environment.environment?.filter((item) => item.required).every((item) => item.present)) {
     throw new Error("One or more required deployment environment variables are missing locally.");
@@ -341,12 +382,14 @@ try {
           "ical-external-room-block",
           "availability-calendar-blocked-by-ical",
           "deployment-env-presence-api",
-          "pilot-open-checklist"
+          "pilot-open-checklist",
+          "launch-readiness-event-audit"
         ],
         notificationQueuedCount: queued.queuedCount,
         dispatchedCount: dispatched.dispatchedCount,
         icalEventCount: synced.eventCount,
         icalBlockCount: synced.blockCount,
+        launchEventCount: launchEventIds.length,
         pilotStatus: pilot.pilotRun.status,
         checkedAt: new Date().toISOString()
       },

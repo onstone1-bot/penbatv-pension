@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireOperatorToken } from "@/lib/admin-auth";
 import { getServerEnv } from "@/lib/env";
+import { logLaunchReadinessEvent } from "@/lib/launch-readiness-events";
 
 const runtimeKeys: Array<{
   key: string;
@@ -24,12 +25,23 @@ export async function GET(request: Request) {
     requireOperatorToken(request);
     getServerEnv();
 
+    const environment = runtimeKeys.map((item) => ({
+      ...item,
+      present: Boolean(process.env[item.key]),
+      secret: !item.key.startsWith("NEXT_PUBLIC_")
+    }));
+    const requiredMissing = environment.filter((item) => item.required && !item.present).map((item) => item.key);
+    const launchReadinessLog = await logLaunchReadinessEvent(request, {
+      stage: "environment_check",
+      targetType: "environment",
+      targetId: "runtime-env",
+      status: requiredMissing.length === 0 ? "completed" : "blocked",
+      metadata: { requiredMissing, presentCount: environment.filter((item) => item.present).length, totalCount: environment.length }
+    });
+
     return NextResponse.json({
-      environment: runtimeKeys.map((item) => ({
-        ...item,
-        present: Boolean(process.env[item.key]),
-        secret: !item.key.startsWith("NEXT_PUBLIC_")
-      })),
+      environment,
+      launchReadinessLog,
       checkedAt: new Date().toISOString()
     });
   } catch (error) {

@@ -12,54 +12,63 @@
 
 ## 29일차: 예약 완료 알림톡 또는 문자 구조
 
-- 예약 확정 시 notification_queue에 booking_confirmed 알림을 적재합니다.
-- 현재는 Mock 발송 구조이며, 실제 운영 시 카카오 알림톡 또는 문자 공급사 어댑터로 교체합니다.
+- 예약 확정 시 `notification_queue`에 `booking_confirmed` 알림을 적재합니다.
+- 현재는 `mock-alimtalk` 발송 구조이며, 실제 운영 시 카카오 알림톡 또는 문자 공급사 어댑터로 교체합니다.
+- 알림 큐 적재 이력은 `launch_readiness_events`에 `notification_queue` 단계로 기록합니다.
 
 ## 30일차: 입실 안내/바베큐 리마인드 알림
 
-- 입실 전날 안내 알림과 바베큐 이용 30분 전 리마인드 알림을 큐에 쌓습니다.
+- 입실 전날 안내 알림과 바베큐 이용 리마인드 알림을 큐에 쌓습니다.
 - 실패 건은 CS 대기열에서 재발송 또는 수동 연락 대상으로 관리합니다.
+- 발송 실행 결과는 `launch_readiness_events`에 `notification_dispatch` 단계로 기록합니다.
 
 ## 31일차: iCal 기반 외부 예약 차단일 연동
 
-- /api/integrations/ical/sync가 iCal VEVENT를 파싱합니다.
-- calendar_sync_sources, calendar_sync_events에 동기화 이력을 남깁니다.
-- room_blocks에 외부 예약 차단일을 생성해 펜바TV 예약 달력에서 선택할 수 없게 합니다.
+- `/api/integrations/ical/sync`가 iCal `VEVENT`를 파싱합니다.
+- `calendar_sync_sources`, `calendar_sync_events`에 동기화 이력을 남깁니다.
+- `room_blocks`에 외부 예약 차단일을 생성해 펜바TV 예약 달력에서 선택할 수 없게 합니다.
+- 동기화 실행 이력은 `launch_readiness_events`에 `ical_sync` 단계로 기록합니다.
 
 ## 32일차: 모바일 사용성 QA
 
 - 고객 예약 화면, MY 화면, 사장님 관리방, 운영자 화면이 모바일에서 읽히는지 확인합니다.
-- verify:mobile과 주요 예약 흐름 검증을 함께 실행합니다.
+- `verify:mobile`과 주요 예약 흐름 검증을 함께 실행합니다.
+- 모바일 검증은 파일럿 오픈 체크리스트의 `mobileChecked` 항목으로 반영합니다.
 
 ## 33일차: 공개 배포 환경변수 점검
 
 - Supabase, Admin Token, Toss, 기본 숙소 ID, 계좌 정보 환경변수를 확인합니다.
-- /api/admin/environment로 운영 환경 준비 상태를 점검합니다.
+- `/api/admin/environment`로 운영 환경 준비 상태를 점검합니다.
+- 점검 결과는 `launch_readiness_events`에 `environment_check` 단계로 기록합니다.
 
 ## 34일차: 첫 파일럿 숙소 운영 리허설
 
-- /launch-rehearsal 화면에서 고객, 사장님, 운영자 역할별 리허설을 진행합니다.
+- `/launch-rehearsal` 화면에서 고객, 사장님, 운영자 역할별 리허설을 진행합니다.
 - 유튜브 유입부터 예약, 결제, 알림, 사장님 확인, 운영자 확인까지 한 번에 점검합니다.
+- `launch_readiness_events` 기준으로 런칭 리허설 이력을 확인합니다.
 
 ## 35일차: 파일럿 오픈
 
-- /api/pilot/open에 체크리스트를 제출합니다.
-- 모든 체크가 true이면 pilot_runs.status=open으로 저장됩니다.
+- `/api/pilot/open`에 체크리스트를 제출합니다.
+- 모든 체크가 true이면 `pilot_runs.status=open`으로 저장됩니다.
 - 공개 URL에서 첫 숙소 예약 시나리오를 최종 확인합니다.
+- 파일럿 오픈 판단 이력은 `launch_readiness_events`에 `pilot_open` 단계로 기록합니다.
 
 ## 이번 반영 결과
 
 - 5주차 범위를 28~35일차 기준으로 재정렬했습니다.
 - 알림 화면에 28일차 관리자 최종 QA 항목을 추가했습니다.
 - 알림, 외부채널, 배포 준비, 런칭 리허설 화면에 깔끔한 운영 콘솔 스타일을 적용했습니다.
-- verify:week5:launch 검증 기준을 28~35일차 문서와 화면 마커로 맞췄습니다.
+- `verify:week5:launch` 검증 기준을 28~35일차 문서와 화면 마커로 맞췄습니다.
+- `launch_readiness_events` 테이블을 추가해 알림, iCal, 환경 점검, 파일럿 오픈 실행 이력을 남기도록 했습니다.
 
 ## 검증 기준
 
-- npm.cmd run build 통과
-- npm.cmd run typecheck 통과
-- npm.cmd run verify:week5:launch 통과
-- 필요 시 npm.cmd run verify:mobile 추가 실행
+- `npm.cmd run typecheck` 통과
+- `npm.cmd run build` 통과
+- `npm.cmd audit --json` 확인
+- `npm.cmd run verify:mobile` 통과
+- `STAYLINK_VERIFY_LIVE=1 npm.cmd run verify:week5:launch` 통과
 
 ## 배포 메모
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireOperatorToken } from "@/lib/admin-auth";
+import { logLaunchReadinessEvent } from "@/lib/launch-readiness-events";
 import { dispatchDueNotifications } from "@/lib/notifications";
 
 const dispatchSchema = z.object({
@@ -17,8 +18,15 @@ export async function POST(request: Request) {
     }
 
     const result = await dispatchDueNotifications(parsed.data.limit ?? 20);
+    const launchReadinessLog = await logLaunchReadinessEvent(request, {
+      stage: "notification_dispatch",
+      targetType: "notification",
+      targetId: result.notifications[0]?.id ?? "dispatch-empty",
+      status: result.dispatchedCount > 0 ? "completed" : "blocked",
+      metadata: { dispatchedCount: result.dispatchedCount, limit: parsed.data.limit ?? 20, provider: "mock-alimtalk" }
+    });
 
-    return NextResponse.json(result);
+    return NextResponse.json({ ...result, launchReadinessLog });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown notification dispatch error";
     return NextResponse.json({ error: message }, { status: 500 });

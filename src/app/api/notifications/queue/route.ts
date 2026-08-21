@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireHostToken } from "@/lib/admin-auth";
+import { logLaunchReadinessEvent } from "@/lib/launch-readiness-events";
 import { enqueueBookingNotifications, getNotificationQueue } from "@/lib/notifications";
 
 const enqueueSchema = z.object({
@@ -31,8 +32,14 @@ export async function POST(request: Request) {
     }
 
     const result = await enqueueBookingNotifications(parsed.data.bookingId);
+    const launchReadinessLog = await logLaunchReadinessEvent(request, {
+      stage: "notification_queue",
+      targetType: "booking",
+      targetId: parsed.data.bookingId,
+      metadata: { queuedCount: result.queuedCount, templateTypes: result.notifications.map((row) => row.template_type) }
+    });
 
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json({ ...result, launchReadinessLog }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown enqueue notification error";
     return NextResponse.json({ error: message }, { status: 500 });
