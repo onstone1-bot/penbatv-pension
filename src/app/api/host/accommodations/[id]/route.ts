@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminToken } from "@/lib/admin-auth";
+import { logHostOperationEvent } from "@/lib/host-operation-events";
 import { updateAccommodationSchema } from "@/lib/schemas";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/supabase/database.types";
@@ -42,7 +43,15 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
 
     if (error) throw error;
 
-    return NextResponse.json({ accommodation: data });
+    const operationLog = await logHostOperationEvent(request, {
+      accommodationId: data.id,
+      targetType: "accommodation",
+      targetId: data.id,
+      action: "update",
+      metadata: { changedFields: Object.keys(updatePayload) }
+    });
+
+    return NextResponse.json({ accommodation: data, operationLog });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown update accommodation error";
     return NextResponse.json({ error: message }, { status: 500 });
@@ -63,7 +72,15 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
 
     if (error) throw error;
 
-    return NextResponse.json({ accommodation: data });
+    const operationLog = await logHostOperationEvent(request, {
+      accommodationId: data.id,
+      targetType: "accommodation",
+      targetId: data.id,
+      action: "hide",
+      metadata: { status: "hidden" }
+    });
+
+    return NextResponse.json({ accommodation: data, operationLog });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown hide accommodation error";
     return NextResponse.json({ error: message }, { status: 500 });

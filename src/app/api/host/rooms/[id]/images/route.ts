@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminToken } from "@/lib/admin-auth";
+import { logHostOperationEvent } from "@/lib/host-operation-events";
 import { createRoomImageSchema } from "@/lib/schemas";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -37,7 +38,22 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
     if (error) throw error;
 
-    return NextResponse.json({ image: data }, { status: 201 });
+    const { data: room } = await supabase
+      .from("rooms")
+      .select("accommodation_id")
+      .eq("id", id)
+      .maybeSingle();
+
+    const operationLog = await logHostOperationEvent(request, {
+      accommodationId: room?.accommodation_id ?? null,
+      roomId: id,
+      targetType: "room_image",
+      targetId: data.id,
+      action: data.is_cover ? "set_cover" : "create",
+      metadata: { caption: data.caption, sortOrder: data.sort_order, isCover: data.is_cover }
+    });
+
+    return NextResponse.json({ image: data, operationLog }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown create room image error";
     return NextResponse.json({ error: message }, { status: 500 });

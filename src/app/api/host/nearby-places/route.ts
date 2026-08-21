@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminToken } from "@/lib/admin-auth";
+import { logHostOperationEvent } from "@/lib/host-operation-events";
 import { createNearbyPlaceSchema } from "@/lib/schemas";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -57,7 +58,15 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
-    return NextResponse.json({ place: data }, { status: 201 });
+    const operationLog = await logHostOperationEvent(request, {
+      accommodationId: data.accommodation_id,
+      targetType: "nearby_place",
+      targetId: data.id,
+      action: "upsert",
+      metadata: { type: data.place_type, name: data.name, category: data.category, status: data.status }
+    });
+
+    return NextResponse.json({ place: data, operationLog }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown create nearby place error";
     return NextResponse.json({ error: message }, { status: 500 });

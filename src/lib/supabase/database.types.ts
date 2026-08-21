@@ -476,6 +476,44 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["calendar_sync_events"]["Row"]>;
         Relationships: [];
       };
+      host_operation_events: {
+        Row: {
+          id: string;
+          actor_role: "host" | "operator";
+          actor_user_id: string | null;
+          accommodation_id: string | null;
+          room_id: string | null;
+          target_type:
+            | "accommodation"
+            | "room"
+            | "room_image"
+            | "room_rate"
+            | "booking_option"
+            | "youtube_campaign"
+            | "naver_link"
+            | "nearby_place";
+          target_id: string;
+          action: "create" | "update" | "hide" | "upsert" | "set_cover";
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["host_operation_events"]["Row"]> & {
+          actor_role?: "host" | "operator";
+          target_type:
+            | "accommodation"
+            | "room"
+            | "room_image"
+            | "room_rate"
+            | "booking_option"
+            | "youtube_campaign"
+            | "naver_link"
+            | "nearby_place";
+          target_id: string;
+          action: "create" | "update" | "hide" | "upsert" | "set_cover";
+        };
+        Update: Partial<Database["public"]["Tables"]["host_operation_events"]["Row"]>;
+        Relationships: [];
+      };
       pilot_runs: {
         Row: {
           id: string;

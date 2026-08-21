@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminToken } from "@/lib/admin-auth";
+import { logHostOperationEvent } from "@/lib/host-operation-events";
 import { createNaverLinkSchema } from "@/lib/schemas";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -55,7 +56,16 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
-    return NextResponse.json({ link: data }, { status: 201 });
+    const operationLog = await logHostOperationEvent(request, {
+      accommodationId: data.accommodation_id,
+      roomId: data.room_id,
+      targetType: "naver_link",
+      targetId: data.id,
+      action: "upsert",
+      metadata: { type: data.link_type, title: data.title, status: data.status }
+    });
+
+    return NextResponse.json({ link: data, operationLog }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown create naver link error";
     return NextResponse.json({ error: message }, { status: 500 });

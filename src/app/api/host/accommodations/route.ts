@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminToken } from "@/lib/admin-auth";
+import { logHostOperationEvent } from "@/lib/host-operation-events";
 import { createAccommodationSchema } from "@/lib/schemas";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -48,9 +49,23 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
+    const operationLog = await logHostOperationEvent(request, {
+      accommodationId: data.id,
+      targetType: "accommodation",
+      targetId: data.id,
+      action: "create",
+      metadata: {
+        ownerName: parsed.data.ownerName,
+        adPlan: parsed.data.adPlan,
+        reservationMode: parsed.data.reservationMode,
+        roomCount: parsed.data.roomCount
+      }
+    });
+
     return NextResponse.json(
       {
         accommodation: data,
+        operationLog,
         onboarding: {
           ownerName: parsed.data.ownerName,
           ownerPhone: parsed.data.ownerPhone,

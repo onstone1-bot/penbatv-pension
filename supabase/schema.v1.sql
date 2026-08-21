@@ -346,6 +346,19 @@ alter table public.room_blocks
   add column if not exists external_uid text,
   add column if not exists source_channel text;
 
+create table if not exists public.host_operation_events (
+  id uuid primary key default gen_random_uuid(),
+  actor_role text not null default 'host' check (actor_role in ('host', 'operator')),
+  actor_user_id uuid references public.profiles(id) on delete set null,
+  accommodation_id text references public.accommodations(id) on delete set null,
+  room_id text references public.rooms(id) on delete set null,
+  target_type text not null check (target_type in ('accommodation', 'room', 'room_image', 'room_rate', 'booking_option', 'youtube_campaign', 'naver_link', 'nearby_place')),
+  target_id text not null,
+  action text not null check (action in ('create', 'update', 'hide', 'upsert', 'set_cover')),
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.pilot_runs (
   id uuid primary key default gen_random_uuid(),
   accommodation_id text not null references public.accommodations(id) on delete cascade,
@@ -387,6 +400,9 @@ create index if not exists notification_queue_status_schedule_idx on public.noti
 create unique index if not exists room_blocks_external_source_uid_unique_idx
 on public.room_blocks(external_source_id, external_uid)
 where external_source_id is not null and external_uid is not null;
+create index if not exists host_operation_events_accommodation_created_idx on public.host_operation_events(accommodation_id, created_at desc);
+create index if not exists host_operation_events_target_idx on public.host_operation_events(target_type, target_id, created_at desc);
+create index if not exists host_operation_events_room_created_idx on public.host_operation_events(room_id, created_at desc);
 create index if not exists pilot_runs_accommodation_status_idx on public.pilot_runs(accommodation_id, status, created_at desc);
 
 do $$
@@ -439,7 +455,18 @@ alter table public.settlements enable row level security;
 alter table public.notification_queue enable row level security;
 alter table public.calendar_sync_sources enable row level security;
 alter table public.calendar_sync_events enable row level security;
+alter table public.host_operation_events enable row level security;
 alter table public.pilot_runs enable row level security;
+
+create policy "hosts can read operation events for managed accommodations"
+on public.host_operation_events for select to authenticated
+using (
+  private.current_profile_role() = 'operator'
+  or (
+    accommodation_id is not null
+    and private.can_manage_accommodation(accommodation_id)
+  )
+);
 
 create policy "anon can read active accommodations"
 on public.accommodations for select to anon
@@ -546,6 +573,7 @@ grant select on public.youtube_campaigns to anon;
 grant select on public.naver_links to anon;
 grant select on public.nearby_places to anon;
 grant insert on public.utm_events to anon;
+grant select on public.host_operation_events to authenticated;
 grant select, update on public.profiles to authenticated;
 grant select on public.bookings to authenticated;
 grant select on public.payment_orders to authenticated;
@@ -557,4 +585,5 @@ grant select, insert, update, delete on public.profiles to service_role;
 grant select, insert, update, delete on public.notification_queue to service_role;
 grant select, insert, update, delete on public.calendar_sync_sources to service_role;
 grant select, insert, update, delete on public.calendar_sync_events to service_role;
+grant select, insert, update, delete on public.host_operation_events to service_role;
 grant select, insert, update, delete on public.pilot_runs to service_role;

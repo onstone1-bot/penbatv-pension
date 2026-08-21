@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminToken } from "@/lib/admin-auth";
+import { logHostOperationEvent } from "@/lib/host-operation-events";
 import { createYoutubeCampaignSchema } from "@/lib/schemas";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -53,7 +54,20 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
-    return NextResponse.json({ campaign: data }, { status: 201 });
+    const { data: room } = data.room_id
+      ? await supabase.from("rooms").select("accommodation_id").eq("id", data.room_id).maybeSingle()
+      : { data: null };
+
+    const operationLog = await logHostOperationEvent(request, {
+      accommodationId: room?.accommodation_id ?? null,
+      roomId: data.room_id,
+      targetType: "youtube_campaign",
+      targetId: data.code,
+      action: "upsert",
+      metadata: { title: data.title, category: data.category, tag: data.tag, status: data.status }
+    });
+
+    return NextResponse.json({ campaign: data, operationLog }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown create youtube campaign error";
     return NextResponse.json({ error: message }, { status: 500 });

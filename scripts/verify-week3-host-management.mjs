@@ -12,6 +12,7 @@ const optionId = `qa-week3-option-${suffix}`;
 const campaignCode = `qa_week3_video_${suffix.replace(/-/g, "_")}`;
 const naverLinkId = `qa-week3-naver-${suffix}`;
 const placeId = `qa-week3-place-${suffix}`;
+const createdTargetIds = [roomId, optionId, campaignCode, naverLinkId, placeId];
 
 function assertFileIncludes(relativePath, markers) {
   const content = fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -38,6 +39,18 @@ assertFileIncludes("src/app/globals.css", [
   "week-three-host-status",
   "week-three-host-kpis",
   "week-three-host-head"
+]);
+
+assertFileIncludes("src/lib/host-operation-events.ts", [
+  "logHostOperationEvent",
+  "host_operation_events",
+  "x-penbatv-user-id"
+]);
+
+assertFileIncludes("supabase/migrations/20260821110000_week3_host_management_audit.sql", [
+  "create table if not exists public.host_operation_events",
+  "hosts can read operation events for managed accommodations",
+  "target_type in"
 ]);
 
 function loadLocalEnv() {
@@ -83,6 +96,7 @@ async function requestJson(pathname, init = {}) {
 }
 
 async function cleanup(supabase) {
+  await supabase.from("host_operation_events").delete().in("target_id", createdTargetIds);
   await supabase.from("nearby_places").delete().eq("id", placeId);
   await supabase.from("naver_links").delete().eq("id", naverLinkId);
   await supabase.from("youtube_campaigns").delete().eq("code", campaignCode);
@@ -123,9 +137,8 @@ try {
     })
   });
 
-  if (accommodation.accommodation?.id !== accommodationId) {
-    throw new Error("Accommodation update failed.");
-  }
+  if (accommodation.accommodation?.id !== accommodationId) throw new Error("Accommodation update failed.");
+  if (accommodation.operationLog?.persisted !== true) throw new Error("Accommodation operation log failed.");
 
   const room = await requestJson("/api/host/rooms", {
     method: "POST",
@@ -145,6 +158,7 @@ try {
   });
 
   if (room.room?.id !== roomId) throw new Error("Room create failed.");
+  if (room.operationLog?.persisted !== true) throw new Error("Room create operation log failed.");
 
   const updatedRoom = await requestJson(`/api/host/rooms/${roomId}`, {
     method: "PATCH",
@@ -157,6 +171,7 @@ try {
   });
 
   if (updatedRoom.room?.base_price !== 220000) throw new Error("Room update failed.");
+  if (updatedRoom.operationLog?.persisted !== true) throw new Error("Room update operation log failed.");
 
   const image = await requestJson(`/api/host/rooms/${roomId}/images`, {
     method: "POST",
@@ -169,6 +184,8 @@ try {
   });
 
   if (!image.image?.id || image.image.is_cover !== true) throw new Error("Room image create failed.");
+  if (image.operationLog?.persisted !== true) throw new Error("Room image operation log failed.");
+  createdTargetIds.push(image.image.id);
 
   const option = await requestJson(`/api/host/accommodations/${accommodationId}/options`, {
     method: "POST",
@@ -183,6 +200,7 @@ try {
   });
 
   if (option.option?.id !== optionId) throw new Error("Option upsert failed.");
+  if (option.operationLog?.persisted !== true) throw new Error("Option operation log failed.");
 
   const video = await requestJson("/api/host/youtube-campaigns", {
     method: "POST",
@@ -201,6 +219,7 @@ try {
   });
 
   if (video.campaign?.code !== campaignCode) throw new Error("Youtube campaign upsert failed.");
+  if (video.operationLog?.persisted !== true) throw new Error("Youtube operation log failed.");
 
   const naver = await requestJson("/api/host/naver-links", {
     method: "POST",
@@ -221,6 +240,7 @@ try {
   });
 
   if (naver.link?.id !== naverLinkId) throw new Error("Naver link upsert failed.");
+  if (naver.operationLog?.persisted !== true) throw new Error("Naver operation log failed.");
 
   const nearby = await requestJson("/api/host/nearby-places", {
     method: "POST",
@@ -243,12 +263,28 @@ try {
   });
 
   if (nearby.place?.id !== placeId) throw new Error("Nearby place upsert failed.");
+  if (nearby.operationLog?.persisted !== true) throw new Error("Nearby operation log failed.");
 
   const hiddenRoom = await requestJson(`/api/host/rooms/${roomId}`, {
     method: "DELETE"
   });
 
   if (hiddenRoom.room?.status !== "hidden") throw new Error("Room hide failed.");
+  if (hiddenRoom.operationLog?.persisted !== true) throw new Error("Room hide operation log failed.");
+
+  const { data: operationEvents, error: operationError } = await supabase
+    .from("host_operation_events")
+    .select("target_type, target_id, action")
+    .in("target_id", createdTargetIds);
+
+  if (operationError) throw operationError;
+
+  const expectedTargets = new Set(createdTargetIds);
+  for (const event of operationEvents ?? []) expectedTargets.delete(event.target_id);
+
+  if (expectedTargets.size > 0) {
+    throw new Error("Host operation audit events missing for: " + [...expectedTargets].join(", "));
+  }
 
   console.log(
     JSON.stringify(
@@ -263,7 +299,8 @@ try {
           "youtube-link-upsert",
           "naver-link-upsert",
           "nearby-place-upsert",
-          "option-upsert"
+          "option-upsert",
+          "host-operation-audit"
         ],
         roomId,
         imageId: image.image.id,

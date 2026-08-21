@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminToken } from "@/lib/admin-auth";
+import { logHostOperationEvent } from "@/lib/host-operation-events";
 import { createRoomSchema } from "@/lib/schemas";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
@@ -52,7 +53,21 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
-    return NextResponse.json({ room: data }, { status: 201 });
+    const operationLog = await logHostOperationEvent(request, {
+      accommodationId: data.accommodation_id,
+      roomId: data.id,
+      targetType: "room",
+      targetId: data.id,
+      action: "create",
+      metadata: {
+        type: data.type,
+        basePrice: data.base_price,
+        standardCapacity: data.standard_capacity,
+        maxCapacity: data.max_capacity
+      }
+    });
+
+    return NextResponse.json({ room: data, operationLog }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown create room error";
     return NextResponse.json({ error: message }, { status: 500 });
